@@ -1,16 +1,41 @@
-# React + Vite
+# 🏘️ Expat Village
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A digital village for expats in Poland, starting with Warsaw.
 
-Currently, two official plugins are available:
+## What is this?
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Expat Village replaces scattered blogs, Facebook groups, and outdated expat guides with one trusted, living platform.
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Get Things Done** - Bank accounts, PESEL, residency permits, contracts reviewed
+- **Insurance & Health** - NFZ explained, private insurance options
+- **Live Your Life** - Salons, gyms, restaurants, events
+- **Housing** - Trusted rentals, English-speaking agents, scam warnings
+- **Town Hall** - Community space for real expat connections
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- React + Vite
+- Tailwind CSS
+- React Router
+
+## Getting Started
+
+```bash
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+
+# Open http://localhost:5173
+```
+
+## Status
+
+🚧 Currently in development
+
+---
+
+Made with ❤️ in Warsaw
