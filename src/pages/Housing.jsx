@@ -80,15 +80,15 @@ function Housing() {
           {
             step: 4,
             title: 'Watch for these RED FLAGS',
-            details: 'Price too good to be true (30% below market = scam). Urgency and pressure ("many people interested, pay now"). Request for Western Union, crypto, or cash only. Landlord abroad and cannot meet. Poor Polish or English in listing. Stock photos or photos from multiple different apartments.'
+            details: 'Price too good to be true (30% below market = scam). Urgency and pressure ("many people interested, pay now"). Request for Western Union, crypto, or cash only. Landlord abroad and cannot meet. Poor Polish or English in listing (often foreign scammers). Stock photos or photos from multiple different apartments.'
           }
         ],
         whatNext: 'If you suspect a scam, do not engage further. Report fake listings to the platform. If you have been scammed, report to police (Policja) and your bank immediately.',
         proTips: [
-          'NestQuest Trust Score checks 8 verification points automatically',
           'Reverse image search listing photos - scammers steal photos from other listings',
-          'If the landlord only communicates via WhatsApp/Telegram and avoids calls, be suspicious',
+          'If the landlord only communicates via WhatsApp/Telegram and avoids phone calls, be suspicious',
           'Meet at the actual apartment, not a cafe or other location',
+          'Trust your gut - if something feels off, it probably is',
           'Legitimate landlords will happily show proof of ownership'
         ],
         sources: [
@@ -105,84 +105,84 @@ function Housing() {
       lastUpdated: 'January 2025',
       content: {
         whatIsIt: 'Rental agents (posrednik or agent nieruchomosci) help you find apartments and handle negotiations with landlords. For expats, English-speaking agents can be invaluable - they translate, explain local norms, and filter out scams.',
-        whyItMatters: 'Agents have access to listings before they go public. They handle the Polish communication. They know fair prices and can negotiate. For expats unfamiliar with the market, a good agent saves time and prevents costly mistakes.',
+        whyItMatters: 'While you pay a fee (typically one month rent), a good agent saves time and reduces risk. They have access to listings before they go public, can negotiate on your behalf, and help with paperwork.',
         howToDoIt: [
           {
             step: 1,
             title: 'Understand the fee structure',
-            details: 'Agent fees are typically: One month rent (most common), or 50% of one month rent, or a fixed fee (less common). Fee is usually paid by tenant, sometimes split with landlord. Confirm the fee upfront before working with any agent.'
+            details: 'Standard agent fee: One month rent (paid by you). Some agents charge landlord instead - ask upfront. Fee is usually due at contract signing. No legitimate agent asks for payment before you sign.'
           },
           {
             step: 2,
-            title: 'Find English-speaking agents',
-            details: 'Hamilton May - Premium, English-speaking, expat-focused. Savills Poland - International agency, corporate relocations. Emmerson Realty - Wide range, some English speakers. Atlas Real Estate - Good expat reviews. Ask in expat Facebook groups for personal recommendations.'
+            title: 'Find expat-friendly agents',
+            details: 'Look for agents advertising "English spoken" or listed on expat forums. Hamilton May, Spotless, and Lion\'s Bank are known for expat services. Check Google reviews and expat group recommendations.'
           },
           {
             step: 3,
-            title: 'Brief your agent clearly',
-            details: 'Tell them: Budget (with all costs), Preferred areas, Must-haves (parking, balcony, pets allowed), Move-in date, Contract length preference. The clearer you are, the better matches they will find.'
+            title: 'Set clear requirements',
+            details: 'Tell them: Budget (total including czynsz), Move-in date, Must-haves (pet-friendly, parking, balcony), Preferred districts, Deal-breakers. The clearer you are, the less time wasted.'
           },
           {
             step: 4,
-            title: 'What a good agent does',
-            details: 'Filters listings to match your needs. Schedules and accompanies viewings. Translates and explains contract terms. Negotiates price and conditions. Handles communication with landlord. Helps with handover protocol (protokol zdawczo-odbiorczy).'
+            title: 'Understand what they should do for you',
+            details: 'A good agent: Filters listings to match your criteria, Arranges viewings, Translates during viewings, Explains contract terms, Helps negotiate, Is present at contract signing. If they just send you links, find a better agent.'
           }
         ],
-        whatNext: 'Interview 2-3 agents before committing. Ask about their experience with expats, their fee, and typical timeline. A good agent should find you suitable options within 1-2 weeks.',
+        whatNext: 'Once you find an apartment through an agent, they should help with the contract review and signing process.',
         proTips: [
-          'Agent fee is negotiable, especially in slower months (winter)',
-          'Some companies offer relocation packages that include housing search',
-          'Ask your employer - many have preferred agents for relocating employees',
-          'Get the agent agreement in writing before they start searching',
-          'A good agent is worth the fee - they can save you from bad contracts and scams'
+          'Ask agents about their experience with expat clients',
+          'Get the fee agreement in writing before starting',
+          'You can work with multiple agents - no exclusivity unless agreed',
+          'Agent fee is negotiable, especially in slower market',
+          'Good agents will warn you about problematic landlords'
         ],
         sources: [
           { name: 'Hamilton May', url: 'https://www.hamiltonmay.com' },
-          { name: 'Savills Poland', url: 'https://www.savills.pl' }
+          { name: 'Spotless', url: 'https://www.spotless.pl' }
         ]
       }
     },
     {
-      id: 'contracts',
+      id: 'rental-contracts',
       icon: '📝',
       title: 'Rental Contracts',
       shortDesc: 'What to check before signing',
       lastUpdated: 'January 2025',
       content: {
-        whatIsIt: 'A rental contract (umowa najmu) is a legally binding agreement between you and your landlord. In Poland, contracts are in Polish by law for legal validity. Understanding what you are signing is crucial - bad clauses can cost you thousands.',
-        whyItMatters: 'Contracts protect both parties, but landlord-friendly contracts can trap you with unfair deposit terms, impossible notice periods, or liability for things that are not your fault. 30 minutes of careful review prevents months of problems.',
+        whatIsIt: 'Polish rental contracts (umowa najmu) are legally binding documents. Most are in Polish only, which puts expats at a disadvantage. Understanding key clauses protects you from unfair terms.',
+        whyItMatters: 'Signing a bad contract can trap you in unfair conditions: excessive penalties for leaving early, no protection if landlord sells, unclear utility costs that balloon, or inability to get your deposit back.',
         howToDoIt: [
           {
             step: 1,
-            title: 'Get the contract translated',
-            details: 'At minimum, use Google Translate on key sections. Better: Ask a Polish friend or colleague to review it. Best: Pay for professional translation of important clauses (deposit, termination, repairs). Our Contract Analyzer tool can help identify red flags (coming soon).'
+            title: 'Use our Contract Analyzer',
+            details: 'Upload your contract to our AI-powered analyzer. It scans for red flags, unusual clauses, and potential issues in seconds. For important decisions, connect with our partner lawyers for a professional review.'
           },
           {
             step: 2,
-            title: 'Check these critical clauses',
-            details: 'Deposit amount (kaucja) - should be 1-2 months max. Deposit return conditions - within 30 days of leaving. Notice period (okres wypowiedzenia) - typically 1-3 months. Termination conditions - can you leave early? At what cost? Rent increase terms - when and how much can it increase?'
+            title: 'Check these CRITICAL clauses',
+            details: 'Deposit amount (typical: 1-2 months), Notice period (typical: 1-3 months), Early termination conditions, Who pays for repairs, Utility payment structure (included? separate? capped?), Landlord entry rights (should require notice).'
           },
           {
             step: 3,
-            title: 'Watch for these RED FLAGS',
-            details: 'Deposit over 2 months rent. No clear deposit return conditions. Landlord can terminate with less than 1 month notice. You cannot terminate early at all. You pay for ALL repairs (normal wear should be landlord responsibility). Vague "other fees" without specification. "Najem okazjonalny" without understanding what it means.'
+            title: 'Understand the two contract types',
+            details: 'Umowa najmu okazjonalnego: Stronger landlord protections, requires notarized documents. Umowa najmu: Standard contract, more tenant-friendly. Ask which type you are signing.'
           },
           {
             step: 4,
             title: 'Negotiate before signing',
-            details: 'Everything is negotiable until you sign. Common negotiation points: Reduce notice period, Add specific deposit return timeline, Clarify who pays for what repairs, Add inventory list as appendix, Specify included furniture/appliances.'
+            details: 'Everything is negotiable until you sign. Common negotiations: Lower deposit, Longer notice period, Cap on utility increases, Permission for minor modifications, Pet allowance in writing.'
           }
         ],
-        whatNext: 'Before signing, create a detailed inventory (protokol zdawczo-odbiorczy) with photos. This protects your deposit when you leave. Both parties should sign the inventory.',
+        whatNext: 'After signing, get a copy of the signed contract, take photos/video of apartment condition, and document any existing damage.',
         proTips: [
-          'Umowa najmu okazjonalnego gives landlord more power to evict - understand it before signing',
-          'Take timestamped photos of EVERYTHING on move-in day',
-          'Keep a copy of the signed contract and all receipts',
-          'Pay rent by bank transfer only - creates proof of payment',
-          'If landlord refuses to put something in writing, that is a red flag'
+          'If contract is Polish-only, ask for English translation or use our analyzer',
+          'Take photos of EVERYTHING before moving in',
+          'Protokol zdawczo-odbiorczy (handover protocol) documents apartment condition - insist on it',
+          'Keep all receipts for rent and deposit payments',
+          'Contracts can be modified by written annexes (aneks)'
         ],
         sources: [
-          { name: 'Contract Analyzer (Coming Soon)', url: '#' }
+          { name: 'Polish Civil Code', url: 'https://isap.sejm.gov.pl' }
         ]
       }
     },
@@ -193,85 +193,85 @@ function Housing() {
       shortDesc: 'Sharing apartments and modern co-living options',
       lastUpdated: 'January 2025',
       content: {
-        whatIsIt: 'Flatshares (wspolnajem) mean renting a room in a shared apartment with other tenants. Co-living spaces are modern, professionally managed buildings designed for young professionals with shared amenities, events, and flexible terms.',
-        whyItMatters: 'Flatshares are significantly cheaper than solo apartments. Co-living is great for newcomers - you instantly have a community, everything is included, and terms are flexible. Both are excellent options when you first arrive.',
+        whatIsIt: 'Flatshares (wspolnajem) and co-living spaces offer cheaper rent and ready-made social connections. Popular with younger expats and those new to the city who want to meet people quickly.',
+        whyItMatters: 'Renting alone in Warsaw center can be expensive (3000-5000 PLN). A room in a flatshare might be 1500-2500 PLN with bills included. Plus, you get instant connections in a new city.',
         howToDoIt: [
           {
             step: 1,
-            title: 'Flatshare options',
-            details: 'Facebook groups: "Pokoj do wynajecia Warszawa", "Warsaw Flatshare/Roommate". OLX.pl - Search for "pokoj" (room). Gumtree.pl - Room listings. Erasmus/student groups - Even if you are not a student, these have good options.'
+            title: 'Know where to search',
+            details: 'Facebook groups: "Warsaw Flatshare", "Expats in Warsaw Housing". OLX.pl pokoje (rooms). Gumtree. Dedicated sites: Flatmates.pl, Roomster. Co-living: Vonder, Quarters, The Social Hub.'
           },
           {
             step: 2,
-            title: 'Co-living spaces in Warsaw',
-            details: 'Vonder - Premium co-living, great locations, all-inclusive. Coliving.com listings for Warsaw. Quarters Co-living - International chain with Warsaw presence. LifeX - Design-focused co-living. Prices: 2000-4000 PLN/month all-inclusive.'
+            title: 'Understand co-living options',
+            details: 'Vonder (premium co-living, fully furnished, community events). Quarters (professional co-living). The Social Hub (co-working + co-living). These cost more but include everything: wifi, cleaning, bills, community.'
           },
           {
             step: 3,
-            title: 'What to check for flatshares',
-            details: 'Meet ALL current flatmates before committing. Check whose name is on the main contract. Understand how bills are split. Clarify cleaning responsibilities and house rules. Ask about guest policies. Visit at different times of day if possible.'
+            title: 'Vet your potential flatmates',
+            details: 'Video call before committing. Ask: How are bills split? Cleaning schedule? Guest policy? Noise expectations? How long have others lived there? Trust your gut about compatibility.'
           },
           {
             step: 4,
-            title: 'Co-living advantages',
-            details: 'All-inclusive: Rent, bills, wifi, cleaning, often gym. Flexible terms: Monthly contracts common. Community: Events, shared spaces, instant social network. Furnished: Move in with just a suitcase. No Polish bureaucracy: They handle everything.'
+            title: 'Understand your legal position',
+            details: 'If your name is not on the main lease, you have fewer protections. Ask to see the main lease. Get your room arrangement in writing (even informal). Clarify notice period and deposit return process.'
           }
         ],
-        whatNext: 'Flatshares are great for your first 3-6 months while you learn the city and market. Then you can find your own place with more confidence.',
+        whatNext: 'Once you find a suitable flatshare, arrange to meet all flatmates in person before committing.',
         proTips: [
-          'Co-living is worth the premium when you first arrive - the community helps you settle',
-          'In flatshares, insist on being added to the official contract or having a sublet agreement',
-          'Check the main tenant is actually allowed to sublet (some contracts forbid it)',
-          'Ask why the room is available - is someone leaving or are they trying to fill a problem room?',
-          'Trust your instincts about flatmates - you will be living with these people'
+          'Ask about the internet speed - important for remote workers',
+          'Check washing machine/kitchen access arrangements',
+          'Understand if landlord knows about the sublet (important legally)',
+          'Co-living is great for first 3-6 months while you learn the city',
+          'Join expat Facebook groups - flatshare postings are common'
         ],
         sources: [
-          { name: 'Vonder Co-living', url: 'https://www.vonder.com' },
-          { name: 'Coliving.com Warsaw', url: 'https://coliving.com/warsaw' }
+          { name: 'Vonder', url: 'https://vondereurope.com' },
+          { name: 'The Social Hub', url: 'https://www.thesocialhub.co' }
         ]
       }
     },
     {
-      id: 'costs',
+      id: 'rental-costs',
       icon: '💰',
       title: 'Rental Costs Explained',
       shortDesc: 'Understanding all the fees and typical prices',
       lastUpdated: 'January 2025',
       content: {
-        whatIsIt: 'Rental costs in Poland include more than just rent. You need to understand czynsz (rent vs admin fees), media (utilities), kaucja (deposit), and agent fees. Without knowing these, you cannot accurately budget.',
-        whyItMatters: 'A listing showing "2500 PLN" might actually cost 3500 PLN/month when you add all fees. Understanding the full cost prevents budget surprises and helps you compare listings accurately.',
+        whatIsIt: 'Polish rental costs are confusing because "czynsz" can mean different things. Understanding the TRUE monthly cost prevents nasty surprises. NestQuest calculates this automatically for Otodom listings.',
+        whyItMatters: 'An apartment listed at 2500 PLN might actually cost 3500 PLN monthly when you add administration fees, utilities, and internet. Knowing true costs helps you budget accurately.',
         howToDoIt: [
           {
             step: 1,
             title: 'Use NestQuest for true cost calculation',
-            details: 'NestQuest automatically calculates your REAL monthly cost from any Otodom listing - rent + admin + utilities + hidden fees. It shows costs in both PLN and EUR. No more manual calculations or surprises.'
+            details: 'Our tool automatically calculates total monthly costs from any Otodom listing: rent + czynsz administracyjny + estimated utilities. See it in PLN and EUR.'
           },
           {
             step: 2,
-            title: 'Understand czynsz (the confusing term)',
-            details: 'Czynsz can mean two things: 1) Total rent to landlord, OR 2) Just the admin fee (czynsz administracyjny) to the building. Always ask: "Is czynsz included or additional?" If separate, expect 300-800 PLN/month extra for admin fees.'
+            title: 'Understand czynsz (the confusing part)',
+            details: 'Czynsz can mean: Just rent (czynsz najmu), OR rent + admin fee (czynsz całkowity). ALWAYS ask: "Is czynsz administracyjny included?" Admin fee covers: building maintenance, trash, water, heating (sometimes).'
           },
           {
             step: 3,
-            title: 'Media (utilities) breakdown',
-            details: 'Electricity (prad): 100-300 PLN/month. Gas (gaz): 50-200 PLN/month (if gas heating/cooking). Water (woda): Usually in admin fee or 50-100 PLN. Internet: 50-80 PLN/month. Heating: Often in admin fee, or 100-400 PLN in winter. Always ask what is included and what is extra.'
+            title: 'Budget for these additional costs',
+            details: 'Electricity (prąd): 100-300 PLN/month. Gas (gaz): 50-200 PLN/month if gas heating/cooking. Internet: 50-80 PLN/month. These are usually EXTRA unless explicitly included.'
           },
           {
             step: 4,
-            title: 'One-time costs to budget for',
-            details: 'Deposit (kaucja): 1-2 months rent, refundable. Agent fee: 0.5-1 month rent, non-refundable. First month rent: Due on signing. So to move in, expect to pay: 2.5-4 months rent upfront.'
+            title: 'Know typical Warsaw prices (2025)',
+            details: 'Studio (kawalerka): 2000-3500 PLN. 1-bedroom (2 pokoje): 2800-4500 PLN. 2-bedroom (3 pokoje): 3500-6000 PLN. Center is 20-40% more than outer districts. These are BASE rent - add 500-1000 for total costs.'
           }
         ],
-        whatNext: 'When comparing apartments, calculate the TOTAL monthly cost including all fees. Ask landlords for average utility bills from previous tenants.',
+        whatNext: 'Use the 30% rule: total housing cost should not exceed 30% of your net salary. NestQuest has a salary stress test feature for this.',
         proTips: [
-          'NestQuest salary stress test shows if rent fits your budget using the 30% rule',
-          'Winter heating costs can be 3x summer costs - ask for winter bills',
-          'New buildings often have lower admin fees than old kamienice',
-          'Ground floor (parter) and top floor are usually cheaper',
-          'Furnished (umeblowane) costs more than unfurnished (nieumeblowane)'
+          'Ask for bills from previous 12 months to estimate utilities',
+          'Winter heating can double utility costs in old buildings',
+          'New buildings often have lower admin fees',
+          'Ground floor (parter) is usually cheaper but less desirable',
+          'Negotiate - listed prices are starting points'
         ],
         sources: [
-          { name: 'Otodom Price Trends', url: 'https://www.otodom.pl' }
+          { name: 'Otodom Market Report', url: 'https://www.otodom.pl' }
         ]
       }
     }
@@ -279,64 +279,78 @@ function Housing() {
 
   const activeContent = categories.find(c => c.id === activeCategory)
 
+  const nestQuestFeatures = [
+    { icon: '💰', title: 'True Cost Breakdown', desc: 'Real monthly cost in PLN and EUR - no hidden fees' },
+    { icon: '🚨', title: 'Scam & Risk Detection', desc: '8-point trust score, automatic red flag alerts' },
+    { icon: '📊', title: 'Salary Stress Test', desc: 'Does this fit your budget? 30% rule check' },
+    { icon: '🚇', title: 'Commute Calculator', desc: 'Travel time to your workplace' },
+    { icon: '🏘️', title: 'Neighborhood Vibe', desc: 'District insights, expat density, price tier' },
+    { icon: '⚖️', title: 'Compare Apartments', desc: 'Side-by-side comparison with weighted scoring' }
+  ]
+
   return (
-    <div>
-      <nav className="mb-6">
-        {activeCategory ? (
-          <button 
-            onClick={() => setActiveCategory(null)}
-            className="text-slate-400 hover:text-white transition-colors"
-          >
-            ← Back to Housing
-          </button>
-        ) : (
-          <Link to="/" className="text-slate-400 hover:text-white transition-colors">
-            ← Back to Home
-          </Link>
-        )}
-      </nav>
+    <div className="min-h-screen">
+      {/* Back Navigation */}
+      <Link 
+        to="/" 
+        className="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-6 transition-colors"
+      >
+        ← Back to Home
+      </Link>
+
+      {/* Breadcrumb when viewing article */}
+      {activeCategory && (
+        <button 
+          onClick={() => setActiveCategory(null)}
+          className="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-6 transition-colors"
+        >
+          ← Back to Housing
+        </button>
+      )}
 
       {!activeCategory ? (
         <>
+          {/* Header */}
           <header className="mb-8">
             <div className="flex items-center gap-3 mb-4">
               <span className="text-4xl">🏠</span>
               <h1 className="text-3xl font-bold text-white">Housing</h1>
             </div>
             <p className="text-slate-400 text-lg">
-              Find a safe, fair rental without getting scammed. Everything you need to know about renting in Poland.
+              Finding an apartment, avoiding scams, understanding contracts.
             </p>
           </header>
 
-          {/* NestQuest Feature Card */}
-          <div className="mb-6 p-5 bg-gradient-to-r from-blue-900/40 to-indigo-900/40 border border-blue-500/50 rounded-xl">
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">🏠</span>
-                <h3 className="text-xl font-bold text-white">NestQuest</h3>
-                <span className="text-xs bg-blue-500 text-white px-2 py-0.5 rounded-full">Free Tool</span>
+          {/* NestQuest Hero Card */}
+          <div className="mb-6 p-5 bg-gradient-to-r from-blue-900/40 to-indigo-900/40 border border-blue-700/50 rounded-xl">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+              <span className="text-4xl">🏠</span>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="font-semibold text-white text-lg">NestQuest</h3>
+                  <span className="text-xs bg-blue-600 text-white px-2 py-0.5 rounded-full">Free Tool</span>
+                </div>
+                <p className="text-slate-300 text-sm mb-3">
+                  One click on any Otodom listing and get instant English analysis with true cost breakdown, scam detection, and commute times.
+                </p>
+                <div className="flex flex-wrap gap-2 mb-4">
+                  <span className="text-xs bg-blue-800/50 text-blue-200 px-2 py-1 rounded">💰 True Cost Calculator</span>
+                  <span className="text-xs bg-blue-800/50 text-blue-200 px-2 py-1 rounded">🚨 Scam Detection</span>
+                  <span className="text-xs bg-blue-800/50 text-blue-200 px-2 py-1 rounded">🚇 Commute Times</span>
+                  <span className="text-xs bg-blue-800/50 text-blue-200 px-2 py-1 rounded">📊 Salary Stress Test</span>
+                </div>
+                <a
+                  href="https://chromewebstore.google.com/detail/polish-apartment-summariz/lmbkkgedjmcoackmbdkmdgmgenhlaako"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium"
+                >
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0C8.21 0 4.831 1.757 2.632 4.501l3.953 6.848A5.454 5.454 0 0 1 12 6.545h10.691A12 12 0 0 0 12 0zM1.931 5.47A11.943 11.943 0 0 0 0 12c0 6.012 4.42 10.991 10.189 11.864l3.953-6.847a5.45 5.45 0 0 1-6.865-2.29zm13.342 2.166a5.446 5.446 0 0 1 1.45 7.09l.002.001h-.002l-3.952 6.848A12.014 12.014 0 0 0 24 12c0-1.525-.284-2.986-.802-4.329z"/>
+                  </svg>
+                  Add to Chrome — It's Free
+                </a>
               </div>
-              <p className="text-blue-100/90 text-sm">
-                Your secret weapon for apartment hunting. One click on any Otodom listing and get instant English analysis with true cost breakdown, scam detection, and commute times.
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <span className="text-xs bg-blue-800/50 text-blue-200 px-2 py-1 rounded">💰 True Cost Calculator</span>
-                <span className="text-xs bg-blue-800/50 text-blue-200 px-2 py-1 rounded">🚨 Scam Detection</span>
-                <span className="text-xs bg-blue-800/50 text-blue-200 px-2 py-1 rounded">🚇 Commute Times</span>
-                <span className="text-xs bg-blue-800/50 text-blue-200 px-2 py-1 rounded">📊 Salary Stress Test</span>
-                <span className="text-xs bg-blue-800/50 text-blue-200 px-2 py-1 rounded">⚖️ Compare Apartments</span>
-              </div>
-              <a
-                href="https://chromewebstore.google.com/detail/polish-apartment-summariz/lmbkkgedjmcoackmbdkmdgmgenhlaako"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-lg transition-colors text-sm font-medium w-full sm:w-auto"
-              >
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 0C8.21 0 4.831 1.757 2.632 4.501l3.953 6.848A5.454 5.454 0 0 1 12 6.545h10.691A12 12 0 0 0 12 0zM1.931 5.47A11.943 11.943 0 0 0 0 12c0 6.012 4.42 10.991 10.189 11.864l3.953-6.847a5.45 5.45 0 0 1-6.865-2.29zm13.342 2.166a5.446 5.446 0 0 1 1.45 7.09l.002.001h-.002l-3.952 6.848A12.014 12.014 0 0 0 24 12c0-1.525-.284-2.986-.802-4.329h-7.912a5.45 5.45 0 0 1-.013 0z"/>
-                </svg>
-                Add to Chrome — It's Free
-              </a>
             </div>
           </div>
 
@@ -353,6 +367,7 @@ function Housing() {
             </div>
           </div>
 
+          {/* Category List */}
           <div className="space-y-3">
             {categories.map((category) => (
               <button
@@ -396,15 +411,18 @@ function Housing() {
             ))}
           </div>
 
-          {/* Coming Soon: Contract Analyzer */}
-          <div className="mt-8 p-5 bg-gradient-to-r from-emerald-900/30 to-slate-800 border border-emerald-700/50 rounded-xl">
+          {/* Contract Analyzer - NOW LIVE */}
+          <Link 
+            to="/contract-analyzer"
+            className="block mt-8 p-5 bg-gradient-to-r from-emerald-900/30 to-slate-800 border border-emerald-700/50 hover:border-emerald-500 rounded-xl transition-all group"
+          >
             <div className="flex items-start gap-4">
               <span className="text-3xl">🤖</span>
               <div className="flex-1">
-                <h3 className="font-semibold text-white mb-1">
+                <h3 className="font-semibold text-white mb-1 group-hover:text-emerald-400 transition-colors">
                   Contract Analyzer
                   <span className="ml-2 text-xs bg-emerald-600 text-white px-2 py-0.5 rounded-full">
-                    Coming Soon
+                    New!
                   </span>
                 </h3>
                 <p className="text-slate-400 text-sm mb-3">
@@ -415,106 +433,64 @@ function Housing() {
                   <span className="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded">Free Scan</span>
                   <span className="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded">Lawyer Review Option</span>
                 </div>
+                <span className="text-emerald-400 text-sm mt-3 block group-hover:text-emerald-300">
+                  Analyze your contract →
+                </span>
               </div>
             </div>
-          </div>
+          </Link>
 
-          {/* NestQuest Full Features */}
-          <div className="mt-6 p-5 bg-slate-800/50 border border-slate-700 rounded-xl">
-            <h3 className="font-semibold text-white mb-4">What NestQuest Analyzes</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div className="flex gap-3">
-                <span className="text-lg">💰</span>
-                <div>
-                  <p className="font-medium text-slate-200">True Cost Breakdown</p>
-                  <p className="text-slate-400">Real monthly cost in PLN and EUR - no hidden fees</p>
+          {/* NestQuest Features Grid */}
+          <div className="mt-8">
+            <h3 className="text-lg font-semibold text-white mb-4">What NestQuest Analyzes</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {nestQuestFeatures.map((feature, index) => (
+                <div key={index} className="flex items-start gap-3 p-4 bg-slate-800/50 rounded-lg">
+                  <span className="text-xl">{feature.icon}</span>
+                  <div>
+                    <h4 className="font-medium text-white">{feature.title}</h4>
+                    <p className="text-slate-400 text-sm">{feature.desc}</p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex gap-3">
-                <span className="text-lg">🚨</span>
-                <div>
-                  <p className="font-medium text-slate-200">Scam & Risk Detection</p>
-                  <p className="text-slate-400">8-point trust score, automatic red flag alerts</p>
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <span className="text-lg">📊</span>
-                <div>
-                  <p className="font-medium text-slate-200">Salary Stress Test</p>
-                  <p className="text-slate-400">Does this fit your budget? 30% rule check</p>
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <span className="text-lg">🚇</span>
-                <div>
-                  <p className="font-medium text-slate-200">Commute Calculator</p>
-                  <p className="text-slate-400">Travel time to your workplace</p>
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <span className="text-lg">🏘️</span>
-                <div>
-                  <p className="font-medium text-slate-200">Neighborhood Vibe</p>
-                  <p className="text-slate-400">District insights, expat density, price tier</p>
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <span className="text-lg">⚖️</span>
-                <div>
-                  <p className="font-medium text-slate-200">Compare Apartments</p>
-                  <p className="text-slate-400">Side-by-side comparison with weighted scoring</p>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </>
       ) : (
+        /* Article Detail View */
         <article>
           <header className="mb-8">
             <div className="flex items-center gap-3 mb-2">
-              <span className="text-4xl">{activeContent.icon}</span>
-              <h1 className="text-3xl font-bold text-white">{activeContent.title}</h1>
-              {activeContent.isAlert && (
-                <span className="text-xs bg-red-600 text-white px-2 py-1 rounded-full">
-                  Important
-                </span>
-              )}
+              <span className="text-3xl">{activeContent.icon}</span>
+              <h1 className="text-2xl font-bold text-white">{activeContent.title}</h1>
             </div>
             <p className="text-slate-500 text-sm">Last updated: {activeContent.lastUpdated}</p>
           </header>
 
-          {activeContent.isAlert && (
-            <div className="mb-6 p-4 bg-red-900/30 border border-red-600/50 rounded-lg">
-              <p className="text-red-200 text-sm">
-                ⚠️ This information is critical for protecting yourself. NestQuest can help detect scams automatically, but please read this guide carefully.
-              </p>
-            </div>
-          )}
-
           <section className="mb-8">
-            <h2 className="text-xl font-semibold text-emerald-400 mb-3">What is it?</h2>
+            <h2 className="text-lg font-semibold text-emerald-400 mb-3">What is it?</h2>
             <p className="text-slate-300 leading-relaxed">{activeContent.content.whatIsIt}</p>
           </section>
 
           <section className="mb-8">
-            <h2 className="text-xl font-semibold text-emerald-400 mb-3">Why it matters</h2>
+            <h2 className="text-lg font-semibold text-emerald-400 mb-3">Why it matters</h2>
             <p className="text-slate-300 leading-relaxed">{activeContent.content.whyItMatters}</p>
           </section>
 
           <section className="mb-8">
-            <h2 className="text-xl font-semibold text-emerald-400 mb-4">How to do it</h2>
+            <h2 className="text-lg font-semibold text-emerald-400 mb-3">How to do it</h2>
             <div className="space-y-4">
               {activeContent.content.howToDoIt.map((step) => (
                 <div key={step.step} className="bg-slate-800 border border-slate-700 rounded-lg p-4">
                   <div className="flex gap-3">
-                    <span className={`flex-shrink-0 w-8 h-8 ${
-                      activeContent.isAlert ? 'bg-red-600' : 'bg-emerald-600'
-                    } text-white rounded-full flex items-center justify-center font-bold text-sm`}>
+                    <span className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                      activeContent.isAlert ? 'bg-red-600 text-white' : 'bg-emerald-600 text-white'
+                    }`}>
                       {step.step}
                     </span>
                     <div>
-                      <h3 className="font-semibold text-white mb-1">{step.title}</h3>
-                      <p className="text-slate-400 text-sm leading-relaxed">{step.details}</p>
+                      <h3 className="font-medium text-white mb-1">{step.title}</h3>
+                      <p className="text-slate-400 text-sm">{step.details}</p>
                     </div>
                   </div>
                 </div>
@@ -522,19 +498,13 @@ function Housing() {
             </div>
           </section>
 
-          <section className="mb-8">
-            <h2 className="text-xl font-semibold text-emerald-400 mb-3">What to do next</h2>
-            <div className={`rounded-lg p-4 ${
-              activeContent.isAlert 
-                ? 'bg-red-900/20 border border-red-700/50'
-                : 'bg-slate-800 border border-emerald-700/50'
-            }`}>
-              <p className="text-slate-300 leading-relaxed">{activeContent.content.whatNext}</p>
-            </div>
+          <section className="mb-8 p-4 bg-slate-800 border border-slate-700 rounded-lg">
+            <h2 className="text-lg font-semibold text-white mb-2">What to do next</h2>
+            <p className="text-slate-300">{activeContent.content.whatNext}</p>
           </section>
 
           <section className="mb-8">
-            <h2 className="text-xl font-semibold text-emerald-400 mb-3">Pro Tips</h2>
+            <h2 className="text-lg font-semibold text-emerald-400 mb-3">Pro Tips</h2>
             <ul className="space-y-2">
               {activeContent.content.proTips.map((tip, index) => (
                 <li key={index} className="flex gap-2 text-slate-300">
