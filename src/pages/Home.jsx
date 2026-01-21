@@ -306,25 +306,26 @@ function Home() {
         </div>
       </section>
 
-      {/* My Checklist Teaser */}
-      <section className="mb-10 bg-gradient-to-r from-purple-900/30 to-indigo-900/30 border border-purple-700/50 rounded-xl p-6">
+      {/* My Checklist */}
+      <Link 
+        to="/my-checklist"
+        className="block mb-10 bg-gradient-to-r from-purple-900/30 to-indigo-900/30 border border-purple-700/50 hover:border-purple-500 rounded-xl p-6 transition-all group"
+      >
         <div className="flex items-start gap-4">
           <span className="text-4xl">✅</span>
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
-              <h3 className="text-xl font-bold text-white">My Checklist</h3>
-              <span className="bg-purple-600 text-white text-xs px-2 py-0.5 rounded-full">Coming Soon</span>
+              <h3 className="text-xl font-bold text-white group-hover:text-purple-300 transition-colors">My Checklist</h3>
+              <span className="bg-emerald-600 text-white text-xs px-2 py-0.5 rounded-full">New!</span>
             </div>
-            <p className="text-slate-300 mb-4">
-              Your personal "New to Poland" tracker. 30+ tasks organized by priority, 
-              tick them off as you go, get reminders. Never miss an important step.
+            <p className="text-slate-300 mb-2">
+              Your personal "New to Poland" tracker. 22 tasks organized by priority, 
+              tick them off as you go. Never miss an important step.
             </p>
-            <button className="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg transition-colors">
-              Get Notified When It Launches
-            </button>
+            <span className="text-purple-400 group-hover:text-purple-300 text-sm">Start tracking your progress →</span>
           </div>
         </div>
-      </section>
+      </Link>
 
       {/* Community Stats */}
       <section className="grid grid-cols-3 gap-4 mb-10">

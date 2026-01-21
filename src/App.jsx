@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import MainLayout from './layouts/MainLayout'
 import Home from './pages/Home'
+import MyChecklist from './pages/MyChecklist'
 import GetThingsDone from './pages/GetThingsDone'
 import InsuranceHealth from './pages/InsuranceHealth'
 import JobsCareers from './pages/JobsCareers'
@@ -16,6 +17,7 @@ function App() {
       <Routes>
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Home />} />
+          <Route path="/my-checklist" element={<MyChecklist />} />
           <Route path="get-things-done" element={<GetThingsDone />} />
           <Route path="insurance-health" element={<InsuranceHealth />} />
           <Route path="/jobs-careers" element={<JobsCareers />} />
