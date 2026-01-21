@@ -39,6 +39,24 @@ function Home() {
       featured: false
     },
     {
+  id: 'jobs-careers',
+  icon: '💼',
+  title: 'Jobs & Careers',
+  description: 'Work permits, job hunting, IT scene, freelancing, and workplace culture.',
+  tags: ['Work Permits', 'IT Jobs', 'B2B'],
+  path: '/jobs-careers',
+  featured: false
+},
+{
+  id: 'getting-around',
+  icon: '🚇',
+  title: 'Getting Around',
+  description: 'Public transport, tickets, trains, driving, and all the apps you need.',
+  tags: ['Transport', 'Tickets', 'Trains'],
+  path: '/getting-around',
+  featured: false
+},
+    {
       id: 'town-hall',
       icon: '🏛️',
       title: 'Town Hall',

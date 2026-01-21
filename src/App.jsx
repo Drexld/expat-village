@@ -6,6 +6,7 @@ import InsuranceHealth from './pages/InsuranceHealth'
 import JobsCareers from './pages/JobsCareers'
 import LiveYourLife from './pages/LiveYourLife'
 import Housing from './pages/Housing'
+import GettingAround from './pages/GettingAround'
 import TownHall from './pages/TownHall'
 import './App.css'
 
@@ -20,6 +21,7 @@ function App() {
           <Route path="/jobs-careers" element={<JobsCareers />} />
           <Route path="live-your-life" element={<LiveYourLife />} />
           <Route path="housing" element={<Housing />} />
+          <Route path="/getting-around" element={<GettingAround />} />
           <Route path="town-hall" element={<TownHall />} />
         </Route>
       </Routes>
