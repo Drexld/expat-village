@@ -306,6 +306,48 @@ function Home() {
         </div>
       </section>
 
+      {/* AI Tools Section */}
+      <section className="mb-10">
+        <h2 className="text-xl font-bold text-white mb-4">🤖 AI Tools</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Link 
+            to="/contract-analyzer"
+            className="bg-gradient-to-r from-emerald-900/30 to-slate-800 border border-emerald-700/50 hover:border-emerald-500 rounded-xl p-5 transition-all group"
+          >
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">📝</span>
+              <div>
+                <h3 className="font-semibold text-white group-hover:text-emerald-400 transition-colors">
+                  Contract Analyzer
+                  <span className="ml-2 text-xs bg-emerald-600 text-white px-2 py-0.5 rounded-full">New!</span>
+                </h3>
+                <p className="text-slate-400 text-sm mt-1">
+                  Upload rental contracts, AI scans for red flags. Lawyer review available.
+                </p>
+              </div>
+            </div>
+          </Link>
+          
+          <Link 
+            to="/document-analyzer"
+            className="bg-gradient-to-r from-blue-900/30 to-slate-800 border border-blue-700/50 hover:border-blue-500 rounded-xl p-5 transition-all group"
+          >
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">📄</span>
+              <div>
+                <h3 className="font-semibold text-white group-hover:text-blue-400 transition-colors">
+                  Document Analyzer
+                  <span className="ml-2 text-xs bg-blue-600 text-white px-2 py-0.5 rounded-full">New!</span>
+                </h3>
+                <p className="text-slate-400 text-sm mt-1">
+                  Confused by Polish letters? Upload and get plain English explanations.
+                </p>
+              </div>
+            </div>
+          </Link>
+        </div>
+      </section>
+
       {/* My Checklist */}
       <Link 
         to="/my-checklist"
