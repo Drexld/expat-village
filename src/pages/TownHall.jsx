@@ -2,7 +2,75 @@ import { Link } from 'react-router-dom'
 import { useState } from 'react'
 
 function TownHall() {
+  const [activeView, setActiveView] = useState('main') // main, room, live-session
   const [activeRoom, setActiveRoom] = useState(null)
+  const [activeLiveSession, setActiveLiveSession] = useState(null)
+
+  // Live sessions - the WOW factor
+  const liveSessions = [
+    {
+      id: 'live-1',
+      status: 'live',
+      title: 'Ask Me Anything: Polish Taxes for Freelancers',
+      host: {
+        name: 'Marta K.',
+        badge: '💎 Village Elder',
+        avatar: '👩‍💼',
+        verified: true
+      },
+      listeners: 47,
+      speakers: 3,
+      startedAt: '18 min ago',
+      tags: ['Taxes', 'B2B', 'Freelancing'],
+      description: 'Tax advisor answering your questions about B2B, PIT, VAT, and everything in between.'
+    },
+    {
+      id: 'live-2',
+      status: 'live',
+      title: 'Newcomers Welcome Circle - January Edition',
+      host: {
+        name: 'James T.',
+        badge: '🥇 Trusted Local',
+        avatar: '👨',
+        verified: true
+      },
+      listeners: 23,
+      speakers: 5,
+      startedAt: '42 min ago',
+      tags: ['Newcomers', 'Community', 'Q&A'],
+      description: 'Weekly hangout for people who just arrived. Ask anything, meet others, get tips.'
+    }
+  ]
+
+  const scheduledSessions = [
+    {
+      id: 'scheduled-1',
+      title: 'Housing Scams: How I Almost Lost 5000 PLN',
+      host: { name: 'Daniel R.', badge: '🥈 Contributor', avatar: '👨‍🦱' },
+      date: 'Tomorrow',
+      time: '19:00 CET',
+      interested: 89,
+      tags: ['Housing', 'Scams', 'Story Time']
+    },
+    {
+      id: 'scheduled-2',
+      title: 'Immigration Lawyer Q&A: Work Permits 2025',
+      host: { name: 'Kancelaria Nowak', badge: '✅ Verified Partner', avatar: '⚖️' },
+      date: 'Thursday',
+      time: '18:00 CET',
+      interested: 156,
+      tags: ['Immigration', 'Legal', 'Work Permits']
+    },
+    {
+      id: 'scheduled-3',
+      title: 'Polish Language Exchange - Beginners Welcome',
+      host: { name: 'Anna M.', badge: '🥇 Trusted Local', avatar: '👩‍🏫' },
+      date: 'Saturday',
+      time: '15:00 CET',
+      interested: 67,
+      tags: ['Polish', 'Language', 'Learning']
+    }
+  ]
 
   const rooms = [
     {
@@ -13,27 +81,11 @@ function TownHall() {
       members: '2.4k',
       activity: 'Very Active',
       activityColor: 'text-green-400',
-      content: {
-        description: 'The first stop for anyone new to Poland. No question is too basic here. Ask about first steps, share your arrival experience, or just say hello. Our community of experienced expats loves helping newcomers settle in.',
-        topics: [
-          'First week survival tips',
-          'What I wish I knew before moving',
-          'Making friends as a newcomer',
-          'Culture shock moments',
-          'Best neighborhoods for expats'
-        ],
-        rules: [
-          'All questions welcome - no judgment',
-          'Share your experiences to help others',
-          'Be patient with language barriers',
-          'Point newcomers to relevant guides'
-        ],
-        featuredDiscussions: [
-          { title: 'First month checklist - what to prioritize?', replies: 47, hot: true },
-          { title: 'Moving from UK post-Brexit - my experience', replies: 32, hot: false },
-          { title: 'Solo expat looking for social tips', replies: 28, hot: true },
-          { title: 'Best way to learn basic Polish fast?', replies: 51, hot: false }
-        ]
+      unread: 12,
+      lastMessage: {
+        user: 'Sophie L.',
+        text: 'Just got my PESEL! The guide here saved me hours...',
+        time: '2 min ago'
       }
     },
     {
@@ -44,27 +96,11 @@ function TownHall() {
       members: '3.1k',
       activity: 'Very Active',
       activityColor: 'text-green-400',
-      content: {
-        description: 'Everything about finding and keeping a home in Poland. Share listings, warn about scams, ask for neighborhood advice, or vent about your landlord. Real experiences from real renters.',
-        topics: [
-          'Apartment recommendations',
-          'Scam alerts and warnings',
-          'Roommate finder',
-          'Landlord/tenant issues',
-          'Neighborhood reviews'
-        ],
-        rules: [
-          'Always verify before sharing listings',
-          'Report suspected scams immediately',
-          'No agents promoting their services',
-          'Be specific about locations and prices'
-        ],
-        featuredDiscussions: [
-          { title: '⚠️ SCAM ALERT: Fake listings on OLX using stolen photos', replies: 89, hot: true },
-          { title: 'Mokotów vs Praga - which for young professionals?', replies: 63, hot: false },
-          { title: 'Landlord refusing to return deposit - advice?', replies: 41, hot: true },
-          { title: 'Looking for roommate - Śródmieście, March', replies: 22, hot: false }
-        ]
+      unread: 8,
+      lastMessage: {
+        user: 'Mike D.',
+        text: '⚠️ SCAM ALERT: Fake listing on OLX, same photos as...',
+        time: '5 min ago'
       }
     },
     {
@@ -75,27 +111,11 @@ function TownHall() {
       members: '2.8k',
       activity: 'Active',
       activityColor: 'text-blue-400',
-      content: {
-        description: 'Connect with other professionals, share job opportunities, discuss workplace culture, and build your network. From IT to teaching to finance - all industries welcome.',
-        topics: [
-          'Job opportunities',
-          'Salary discussions',
-          'B2B vs employment advice',
-          'Industry meetups',
-          'Career transitions'
-        ],
-        rules: [
-          'Job posts must include salary range',
-          'No MLM or commission-only schemes',
-          'Respect confidentiality',
-          'Help others - karma comes back'
-        ],
-        featuredDiscussions: [
-          { title: 'IT salaries 2025 - share yours anonymously', replies: 127, hot: true },
-          { title: 'My company is hiring - Senior React devs (B2B 25-30k)', replies: 34, hot: false },
-          { title: 'Switching from UoP to B2B - worth it?', replies: 56, hot: true },
-          { title: 'Networking events in Warsaw this month', replies: 29, hot: false }
-        ]
+      unread: 3,
+      lastMessage: {
+        user: 'Tomek W.',
+        text: 'My company is hiring React devs, B2B 25-30k, DM me',
+        time: '12 min ago'
       }
     },
     {
@@ -106,27 +126,11 @@ function TownHall() {
       members: '4.2k',
       activity: 'Very Active',
       activityColor: 'text-green-400',
-      content: {
-        description: 'The heart of Expat Village. Organize meetups, find activity partners, discover events, and build your social circle. From hiking groups to language exchanges to Friday drinks.',
-        topics: [
-          'Weekly meetups',
-          'Sports & fitness groups',
-          'Language exchange',
-          'Cultural events',
-          'Weekend trips'
-        ],
-        rules: [
-          'All events must be inclusive',
-          'No selling or promoting businesses',
-          'Post event recaps to encourage others',
-          'Be welcoming to newcomers'
-        ],
-        featuredDiscussions: [
-          { title: '🍻 Friday drinks @ Pawilony - this week!', replies: 67, hot: true },
-          { title: 'Hiking group - Kampinos Forest Saturday', replies: 43, hot: true },
-          { title: 'Polish-English language exchange meetup', replies: 38, hot: false },
-          { title: 'Board game night - looking for players', replies: 31, hot: false }
-        ]
+      unread: 21,
+      lastMessage: {
+        user: 'Events Bot',
+        text: '🍻 Friday drinks at Pawilony - 34 people going!',
+        time: '1 min ago'
       }
     },
     {
@@ -137,27 +141,11 @@ function TownHall() {
       members: '3.5k',
       activity: 'Active',
       activityColor: 'text-blue-400',
-      content: {
-        description: 'For everything that doesn\'t fit elsewhere. Where to find specific products, service recommendations, random Poland questions, funny observations, and daily wins and struggles.',
-        topics: [
-          'Where to find...',
-          'Service recommendations',
-          'Polish quirks and observations',
-          'Wins and struggles',
-          'Random questions'
-        ],
-        rules: [
-          'Search before asking common questions',
-          'Be specific about location',
-          'Share your discoveries',
-          'Keep it friendly and helpful'
-        ],
-        featuredDiscussions: [
-          { title: 'Where to find good Mexican ingredients in Warsaw?', replies: 44, hot: false },
-          { title: 'Best English-speaking dentist? Reasonable prices?', replies: 52, hot: true },
-          { title: 'Polish bureaucracy wins - share your victories', replies: 37, hot: false },
-          { title: 'Things that still confuse me after 2 years here', replies: 91, hot: true }
-        ]
+      unread: 5,
+      lastMessage: {
+        user: 'Rachel K.',
+        text: 'Best Mexican ingredients in Warsaw? Need real tortillas!',
+        time: '8 min ago'
       }
     },
     {
@@ -168,27 +156,11 @@ function TownHall() {
       members: '1.8k',
       activity: 'Active',
       activityColor: 'text-blue-400',
-      content: {
-        description: 'For expat parents navigating family life in Poland. Schools, childcare, kid-friendly activities, parenting in a new culture, and connecting with other families.',
-        topics: [
-          'International schools',
-          'Childcare and nannies',
-          'Kid-friendly activities',
-          'Healthcare for children',
-          'Family meetups'
-        ],
-        rules: [
-          'Respect different parenting styles',
-          'Verify school/childcare recommendations',
-          'Keep discussions supportive',
-          'Protect children\'s privacy'
-        ],
-        featuredDiscussions: [
-          { title: 'International schools comparison - our experience', replies: 58, hot: true },
-          { title: 'Polish public school as an expat kid - AMA', replies: 42, hot: false },
-          { title: 'Nanny rates in Warsaw 2025?', replies: 33, hot: false },
-          { title: 'Weekend activities for kids - your favorites?', replies: 47, hot: true }
-        ]
+      unread: 0,
+      lastMessage: {
+        user: 'Emma T.',
+        text: 'International school applications open next week!',
+        time: '23 min ago'
       }
     },
     {
@@ -199,27 +171,11 @@ function TownHall() {
       members: '2.1k',
       activity: 'Active',
       activityColor: 'text-blue-400',
-      content: {
-        description: 'Learning Polish together. Share resources, ask for translations, celebrate your progress, and commiserate over the seven cases. From complete beginners to advanced learners.',
-        topics: [
-          'Learning resources',
-          'Translation help',
-          'Language schools',
-          'Progress sharing',
-          'Common mistakes'
-        ],
-        rules: [
-          'No judgment on skill level',
-          'Help with translations kindly',
-          'Share free resources when possible',
-          'Celebrate others\' progress'
-        ],
-        featuredDiscussions: [
-          { title: 'Best apps/resources for learning Polish?', replies: 73, hot: true },
-          { title: 'Finally had a full conversation in Polish! 🎉', replies: 29, hot: false },
-          { title: 'Translation help: letter from ZUS', replies: 18, hot: false },
-          { title: 'Language schools in Warsaw - worth it?', replies: 45, hot: true }
-        ]
+      unread: 2,
+      lastMessage: {
+        user: 'Chris P.',
+        text: 'Finally understood a full conversation! 6 months in 🎉',
+        time: '15 min ago'
       }
     },
     {
@@ -230,226 +186,440 @@ function TownHall() {
       members: '2.9k',
       activity: 'Moderate',
       activityColor: 'text-yellow-400',
-      content: {
-        description: 'Expat marketplace. Sell furniture before you move, find second-hand items, or give away things you don\'t need. Trusted community, fair prices, English communication.',
-        topics: [
-          'Furniture',
-          'Electronics',
-          'Household items',
-          'Free stuff',
-          'ISO (In Search Of)'
-        ],
-        rules: [
-          'Post clear photos and prices',
-          'Mark items as sold when gone',
-          'Meet in safe public places',
-          'No commercial sellers'
-        ],
-        featuredDiscussions: [
-          { title: 'GIVING AWAY: IKEA furniture, moving out', replies: 34, hot: true },
-          { title: 'FS: MacBook Pro M2 - 4500 PLN', replies: 12, hot: false },
-          { title: 'ISO: Desk chair, budget 200-300 PLN', replies: 8, hot: false },
-          { title: 'Moving sale - everything must go by March', replies: 27, hot: true }
-        ]
+      unread: 0,
+      lastMessage: {
+        user: 'Moving Out Mike',
+        text: 'FREE: IKEA KALLAX shelf, Mokotow pickup',
+        time: '34 min ago'
       }
     }
   ]
 
-  const activeContent = rooms.find(r => r.id === activeRoom)
+  const liveSessionDetail = {
+    id: 'live-1',
+    title: 'Ask Me Anything: Polish Taxes for Freelancers',
+    host: {
+      name: 'Marta Kowalczyk',
+      badge: '💎 Village Elder',
+      avatar: '👩‍💼',
+      bio: 'Tax advisor with 8 years helping expats. Fluent in English, Polish, German.',
+      verified: true
+    },
+    coHosts: [
+      { name: 'Tax Expert PL', avatar: '📊', badge: '✅ Partner' },
+      { name: 'Accountant Anna', avatar: '👩‍💻', badge: '🥇 Trusted' }
+    ],
+    listeners: 47,
+    speakers: [
+      { name: 'Marta K.', avatar: '👩‍💼', speaking: true },
+      { name: 'John D.', avatar: '👨', speaking: false },
+      { name: 'Lisa M.', avatar: '👩', speaking: false }
+    ],
+    queue: [
+      { name: 'Peter R.', avatar: '👨‍🦰', question: 'IP Box eligibility?' },
+      { name: 'Sarah K.', avatar: '👩‍🦱', question: 'VAT registration timing' }
+    ],
+    chat: [
+      { user: 'Tom B.', message: 'This is so helpful! 🙏', time: '2m' },
+      { user: 'Anna W.', message: 'Can you explain ZUS ulga na start again?', time: '1m' },
+      { user: 'Mod', message: '📌 Resources mentioned: kalkulator-b2b.pl', time: 'now', pinned: true }
+    ]
+  }
 
-  return (
-    <div className="min-h-screen">
-      {/* Back Navigation */}
-      <Link 
-        to="/" 
-        className="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-6 transition-colors"
-      >
-        ← Back to Home
-      </Link>
+  // Main Town Hall View
+  const renderMainView = () => (
+    <>
+      {/* Header */}
+      <header className="mb-8">
+        <div className="flex items-center gap-3 mb-4">
+          <span className="text-4xl">🏛️</span>
+          <h1 className="text-3xl font-bold text-white">Town Hall</h1>
+        </div>
+        <p className="text-slate-400 text-lg">
+          Real expats, real conversations, real-time. Your community hub.
+        </p>
+      </header>
 
-      {!activeRoom ? (
-        <>
-          {/* Section Header */}
-          <header className="mb-8">
-            <div className="flex items-center gap-3 mb-4">
-              <span className="text-4xl">🏛️</span>
-              <h1 className="text-3xl font-bold text-white">Town Hall</h1>
-            </div>
-            <p className="text-slate-400 text-lg">
-              Real expats, real conversations. Ask questions, share experiences, make connections.
-            </p>
-          </header>
-
-          {/* Community Stats */}
-          <div className="bg-gradient-to-r from-indigo-900/40 to-purple-900/40 border border-indigo-700/50 rounded-xl p-6 mb-6">
-            <div className="flex items-center justify-between flex-wrap gap-4">
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-1">Welcome to the Community</h3>
-                <p className="text-slate-300 text-sm">Connect with thousands of expats living in Poland</p>
-              </div>
-              <div className="flex gap-6">
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-white">8.2k+</p>
-                  <p className="text-xs text-slate-400">Members</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-white">24/7</p>
-                  <p className="text-xs text-slate-400">Active</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-white">8</p>
-                  <p className="text-xs text-slate-400">Rooms</p>
-                </div>
-              </div>
-            </div>
+      {/* LIVE NOW - The WOW factor */}
+      {liveSessions.length > 0 && (
+        <section className="mb-8">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="relative flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+            </span>
+            <h2 className="text-xl font-bold text-white">Live Now</h2>
           </div>
-
-          {/* Coming Soon Notice */}
-          <div className="bg-amber-900/30 border border-amber-700/50 rounded-xl p-5 mb-6">
-            <div className="flex items-start gap-4">
-              <span className="text-2xl">🚧</span>
-              <div>
-                <h3 className="text-lg font-semibold text-amber-400 mb-1">Community Features Coming Soon</h3>
-                <p className="text-slate-300 text-sm">
-                  We're building the full community experience. Soon you'll be able to post, reply, and connect with other expats. For now, explore the rooms and see what's planned!
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Room List */}
-          <div className="space-y-3">
-            {rooms.map((room) => (
+          
+          <div className="space-y-4">
+            {liveSessions.map((session) => (
               <button
-                key={room.id}
-                onClick={() => setActiveRoom(room.id)}
-                className="w-full text-left bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-slate-600 rounded-xl p-5 transition-all group"
+                key={session.id}
+                onClick={() => {
+                  setActiveLiveSession(session)
+                  setActiveView('live-session')
+                }}
+                className="w-full text-left bg-gradient-to-r from-red-900/40 to-orange-900/40 border border-red-700/50 hover:border-red-500 rounded-xl p-5 transition-all group"
               >
-                <div className="flex items-center gap-4">
-                  <span className="text-2xl">{room.icon}</span>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-lg font-semibold text-white group-hover:text-emerald-400 transition-colors">
-                        {room.title}
-                      </h3>
-                      <span className={`text-xs ${room.activityColor}`}>● {room.activity}</span>
-                    </div>
-                    <p className="text-slate-400 text-sm">{room.shortDesc}</p>
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="bg-red-600 text-white text-xs px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
+                      <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+                      LIVE
+                    </span>
+                    <span className="text-slate-400 text-sm">{session.startedAt}</span>
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm text-slate-300">{room.members}</p>
-                    <p className="text-xs text-slate-500">members</p>
+                  <div className="flex items-center gap-3 text-sm">
+                    <span className="text-slate-300">👥 {session.listeners} listening</span>
+                    <span className="text-slate-400">🎤 {session.speakers} speaking</span>
+                  </div>
+                </div>
+                
+                <h3 className="text-lg font-semibold text-white group-hover:text-red-300 transition-colors mb-2">
+                  {session.title}
+                </h3>
+                
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-xl">{session.host.avatar}</span>
+                  <span className="text-slate-300">{session.host.name}</span>
+                  <span className="text-xs bg-slate-700 text-slate-300 px-2 py-0.5 rounded">{session.host.badge}</span>
+                </div>
+                
+                <p className="text-slate-400 text-sm mb-3">{session.description}</p>
+                
+                <div className="flex flex-wrap gap-2">
+                  {session.tags.map((tag, i) => (
+                    <span key={i} className="text-xs bg-red-900/50 text-red-300 px-2 py-1 rounded">{tag}</span>
+                  ))}
+                </div>
+                
+                <div className="mt-4 flex items-center justify-between">
+                  <span className="text-red-400 text-sm group-hover:text-red-300">Tap to join →</span>
+                  <div className="flex -space-x-2">
+                    <span className="w-6 h-6 bg-slate-600 rounded-full flex items-center justify-center text-xs">👤</span>
+                    <span className="w-6 h-6 bg-slate-600 rounded-full flex items-center justify-center text-xs">👤</span>
+                    <span className="w-6 h-6 bg-slate-600 rounded-full flex items-center justify-center text-xs">👤</span>
+                    <span className="w-6 h-6 bg-slate-700 rounded-full flex items-center justify-center text-xs text-slate-300">+{session.listeners - 3}</span>
                   </div>
                 </div>
               </button>
             ))}
           </div>
+        </section>
+      )}
 
-          {/* Join CTA */}
-          <div className="mt-8 bg-slate-800/50 border border-slate-700 rounded-xl p-6 text-center">
-            <h3 className="text-lg font-semibold text-white mb-2">Ready to Join the Conversation?</h3>
-            <p className="text-slate-400 text-sm mb-4">
-              Create a free account to post, reply, and connect with other expats.
-            </p>
-            <button className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-lg transition-colors">
-              Sign Up Free
-            </button>
-          </div>
-        </>
-      ) : (
-        /* Room Detail View */
-        <article>
-          {/* Room Header */}
-          <header className="mb-8">
-            <button 
-              onClick={() => setActiveRoom(null)}
-              className="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-4 transition-colors"
+      {/* Upcoming Sessions */}
+      <section className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold text-white">📅 Upcoming Sessions</h2>
+          <button className="text-emerald-400 text-sm hover:text-emerald-300 transition-colors">
+            + Host a Session
+          </button>
+        </div>
+        
+        <div className="space-y-3">
+          {scheduledSessions.map((session) => (
+            <div
+              key={session.id}
+              className="bg-slate-800 border border-slate-700 hover:border-slate-600 rounded-xl p-4 transition-all"
             >
-              ← Back to Town Hall
-            </button>
-            <div className="flex items-center gap-3 mb-2">
-              <span className="text-4xl">{activeContent.icon}</span>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-3xl font-bold text-white">{activeContent.title}</h1>
-                  <span className={`text-xs ${activeContent.activityColor}`}>● {activeContent.activity}</span>
-                </div>
-                <p className="text-slate-400">{activeContent.members} members</p>
-              </div>
-            </div>
-          </header>
-
-          {/* Room Description */}
-          <section className="mb-8">
-            <p className="text-slate-300 leading-relaxed">{activeContent.content.description}</p>
-          </section>
-
-          {/* Topics */}
-          <section className="mb-8">
-            <h2 className="text-xl font-semibold text-emerald-400 mb-3">Popular Topics</h2>
-            <div className="flex flex-wrap gap-2">
-              {activeContent.content.topics.map((topic, index) => (
-                <span 
-                  key={index}
-                  className="bg-slate-800 border border-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-sm"
-                >
-                  {topic}
-                </span>
-              ))}
-            </div>
-          </section>
-
-          {/* Featured Discussions */}
-          <section className="mb-8">
-            <h2 className="text-xl font-semibold text-emerald-400 mb-3">Featured Discussions</h2>
-            <div className="space-y-3">
-              {activeContent.content.featuredDiscussions.map((discussion, index) => (
-                <div 
-                  key={index}
-                  className="bg-slate-800 border border-slate-700 rounded-lg p-4 hover:border-slate-600 transition-colors cursor-pointer"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      {discussion.hot && (
-                        <span className="text-orange-400 text-xs">🔥</span>
-                      )}
-                      <h3 className="text-white font-medium">{discussion.title}</h3>
-                    </div>
-                    <span className="text-slate-500 text-sm">{discussion.replies} replies</span>
+              <div className="flex items-start justify-between mb-2">
+                <div>
+                  <h3 className="font-semibold text-white mb-1">{session.title}</h3>
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="text-slate-400">{session.host.avatar}</span>
+                    <span className="text-slate-300">{session.host.name}</span>
+                    <span className="text-xs bg-slate-700 text-slate-400 px-2 py-0.5 rounded">{session.host.badge}</span>
                   </div>
                 </div>
-              ))}
+                <div className="text-right">
+                  <p className="text-emerald-400 font-medium">{session.date}</p>
+                  <p className="text-slate-400 text-sm">{session.time}</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between mt-3">
+                <div className="flex flex-wrap gap-2">
+                  {session.tags.map((tag, i) => (
+                    <span key={i} className="text-xs bg-slate-700 text-slate-400 px-2 py-1 rounded">{tag}</span>
+                  ))}
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-slate-400 text-sm">🔔 {session.interested} interested</span>
+                  <button className="bg-emerald-600 hover:bg-emerald-500 text-white text-sm px-3 py-1 rounded-lg transition-colors">
+                    Remind Me
+                  </button>
+                </div>
+              </div>
             </div>
-            <p className="text-slate-500 text-sm mt-4 text-center">
-              Full discussions coming soon - sign up to be notified!
-            </p>
-          </section>
+          ))}
+        </div>
+      </section>
 
-          {/* Room Rules */}
-          <section className="mb-8">
-            <h2 className="text-xl font-semibold text-emerald-400 mb-3">Room Guidelines</h2>
-            <ul className="space-y-2">
-              {activeContent.content.rules.map((rule, index) => (
-                <li key={index} className="flex gap-2 text-slate-300">
-                  <span className="text-emerald-400">✓</span>
-                  <span>{rule}</span>
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          {/* Join CTA */}
-          <section className="bg-slate-800/50 border border-slate-700 rounded-xl p-6 text-center">
-            <h3 className="text-lg font-semibold text-white mb-2">Join This Room</h3>
-            <p className="text-slate-400 text-sm mb-4">
-              Create a free account to participate in discussions.
-            </p>
-            <button className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-lg transition-colors">
-              Sign Up to Post
+      {/* Community Rooms */}
+      <section className="mb-8">
+        <h2 className="text-xl font-bold text-white mb-4">💬 Community Rooms</h2>
+        
+        <div className="space-y-2">
+          {rooms.map((room) => (
+            <button
+              key={room.id}
+              onClick={() => {
+                setActiveRoom(room)
+                setActiveView('room')
+              }}
+              className="w-full text-left bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-slate-600 rounded-xl p-4 transition-all group"
+            >
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <span className="text-2xl">{room.icon}</span>
+                  {room.unread > 0 && (
+                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                      {room.unread}
+                    </span>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <h3 className="font-semibold text-white group-hover:text-emerald-400 transition-colors">
+                      {room.title}
+                    </h3>
+                    <span className={`text-xs ${room.activityColor}`}>● {room.activity}</span>
+                  </div>
+                  <p className="text-slate-500 text-sm truncate">
+                    <span className="text-slate-400">{room.lastMessage.user}:</span> {room.lastMessage.text}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-slate-500 text-xs">{room.lastMessage.time}</p>
+                  <p className="text-slate-600 text-xs">{room.members} members</p>
+                </div>
+              </div>
             </button>
-          </section>
-        </article>
+          ))}
+        </div>
+      </section>
+
+      {/* Host CTA */}
+      <section className="bg-gradient-to-r from-emerald-900/40 to-teal-900/40 border border-emerald-700/50 rounded-xl p-6">
+        <div className="flex items-start gap-4">
+          <span className="text-4xl">🎙️</span>
+          <div className="flex-1">
+            <h3 className="text-xl font-bold text-white mb-2">Host Your Own Session</h3>
+            <p className="text-slate-300 mb-4">
+              Got expertise to share? Host a live session and help fellow expats. 
+              Tax tips, apartment hunting stories, language exchange - anything goes.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <button className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg transition-colors font-medium">
+                Start Live Now
+              </button>
+              <button className="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg transition-colors">
+                Schedule for Later
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Community Stats */}
+      <section className="mt-8 grid grid-cols-3 gap-4">
+        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 text-center">
+          <p className="text-2xl font-bold text-white">8.2k+</p>
+          <p className="text-slate-400 text-sm">Community Members</p>
+        </div>
+        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 text-center">
+          <p className="text-2xl font-bold text-emerald-400">156</p>
+          <p className="text-slate-400 text-sm">Sessions This Month</p>
+        </div>
+        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 text-center">
+          <p className="text-2xl font-bold text-white">24/7</p>
+          <p className="text-slate-400 text-sm">Active Community</p>
+        </div>
+      </section>
+    </>
+  )
+
+  // Live Session Detail View - The REAL Town Hall Experience
+  const renderLiveSession = () => (
+    <div className="flex flex-col h-[calc(100vh-200px)]">
+      {/* Session Header */}
+      <div className="bg-gradient-to-r from-red-900/60 to-orange-900/60 border border-red-700/50 rounded-t-xl p-4">
+        <button 
+          onClick={() => setActiveView('main')}
+          className="text-slate-300 hover:text-white mb-3 text-sm flex items-center gap-1"
+        >
+          ← Leave quietly
+        </button>
+        
+        <div className="flex items-center gap-2 mb-2">
+          <span className="bg-red-600 text-white text-xs px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
+            <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+            LIVE
+          </span>
+          <span className="text-slate-300 text-sm">Started 18 min ago</span>
+          <span className="text-slate-400 text-sm">• 👥 47 listening</span>
+        </div>
+        
+        <h1 className="text-xl font-bold text-white mb-2">{liveSessionDetail.title}</h1>
+        
+        <div className="flex items-center gap-2">
+          <span className="text-2xl">{liveSessionDetail.host.avatar}</span>
+          <div>
+            <p className="text-white font-medium">{liveSessionDetail.host.name}</p>
+            <p className="text-slate-400 text-xs">{liveSessionDetail.host.bio}</p>
+          </div>
+          <span className="bg-slate-700 text-slate-300 text-xs px-2 py-0.5 rounded ml-2">{liveSessionDetail.host.badge}</span>
+        </div>
+      </div>
+
+      {/* Speakers Section */}
+      <div className="bg-slate-800 border-x border-slate-700 p-4">
+        <h3 className="text-sm font-semibold text-slate-400 mb-3">🎤 Speakers</h3>
+        <div className="flex flex-wrap gap-4">
+          {liveSessionDetail.speakers.map((speaker, i) => (
+            <div key={i} className="flex flex-col items-center">
+              <div className={`relative w-14 h-14 rounded-full flex items-center justify-center text-2xl ${
+                speaker.speaking 
+                  ? 'bg-emerald-900 border-2 border-emerald-400 animate-pulse' 
+                  : 'bg-slate-700 border-2 border-slate-600'
+              }`}>
+                {speaker.avatar}
+                {speaker.speaking && (
+                  <span className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center">
+                    <span className="text-xs">🎤</span>
+                  </span>
+                )}
+              </div>
+              <p className="text-slate-300 text-xs mt-1">{speaker.name}</p>
+            </div>
+          ))}
+          
+          {/* Raise Hand Button */}
+          <button className="flex flex-col items-center justify-center w-14 h-14 rounded-full bg-slate-700 hover:bg-slate-600 border-2 border-dashed border-slate-500 transition-colors">
+            <span className="text-xl">✋</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Queue Section */}
+      {liveSessionDetail.queue.length > 0 && (
+        <div className="bg-slate-800/50 border-x border-slate-700 p-4">
+          <h3 className="text-sm font-semibold text-slate-400 mb-2">📋 Question Queue</h3>
+          <div className="space-y-2">
+            {liveSessionDetail.queue.map((person, i) => (
+              <div key={i} className="flex items-center gap-2 text-sm">
+                <span className="text-slate-400">{i + 1}.</span>
+                <span>{person.avatar}</span>
+                <span className="text-slate-300">{person.name}</span>
+                <span className="text-slate-500">-</span>
+                <span className="text-slate-400 italic">"{person.question}"</span>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
+
+      {/* Live Chat */}
+      <div className="flex-1 bg-slate-900 border-x border-slate-700 p-4 overflow-y-auto">
+        <div className="space-y-3">
+          {liveSessionDetail.chat.map((msg, i) => (
+            <div key={i} className={`${msg.pinned ? 'bg-emerald-900/30 border border-emerald-700/50 rounded-lg p-2' : ''}`}>
+              <span className={`font-medium ${msg.pinned ? 'text-emerald-400' : 'text-slate-300'}`}>{msg.user}: </span>
+              <span className="text-slate-400">{msg.message}</span>
+              <span className="text-slate-600 text-xs ml-2">{msg.time}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Bottom Controls */}
+      <div className="bg-slate-800 border border-slate-700 rounded-b-xl p-4">
+        <div className="flex items-center gap-3">
+          <input 
+            type="text" 
+            placeholder="Send a message..."
+            className="flex-1 bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500"
+          />
+          <button className="bg-slate-700 hover:bg-slate-600 text-white p-2 rounded-lg transition-colors">
+            ✋ Raise Hand
+          </button>
+          <button className="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg transition-colors">
+            Leave
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+
+  // Room Chat View
+  const renderRoom = () => (
+    <div className="flex flex-col h-[calc(100vh-200px)]">
+      {/* Room Header */}
+      <div className="bg-slate-800 border border-slate-700 rounded-t-xl p-4">
+        <button 
+          onClick={() => setActiveView('main')}
+          className="text-slate-400 hover:text-white mb-3 text-sm flex items-center gap-1"
+        >
+          ← Back to Town Hall
+        </button>
+        
+        <div className="flex items-center gap-3">
+          <span className="text-3xl">{activeRoom?.icon}</span>
+          <div>
+            <h1 className="text-xl font-bold text-white">{activeRoom?.title}</h1>
+            <p className="text-slate-400 text-sm">{activeRoom?.members} members • {activeRoom?.activity}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Placeholder Chat Area */}
+      <div className="flex-1 bg-slate-900 border-x border-slate-700 p-4 flex items-center justify-center">
+        <div className="text-center">
+          <span className="text-6xl mb-4 block">💬</span>
+          <h3 className="text-xl font-semibold text-white mb-2">Community Chat Coming Soon</h3>
+          <p className="text-slate-400 max-w-md">
+            Real-time messaging with fellow expats. Share tips, ask questions, help others.
+            Sign up to be notified when this launches!
+          </p>
+          <button className="mt-4 bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-lg transition-colors">
+            Get Notified
+          </button>
+        </div>
+      </div>
+
+      {/* Input Area */}
+      <div className="bg-slate-800 border border-slate-700 rounded-b-xl p-4">
+        <div className="flex items-center gap-3">
+          <input 
+            type="text" 
+            placeholder="Sign up to send messages..."
+            disabled
+            className="flex-1 bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-slate-400 placeholder-slate-500 cursor-not-allowed"
+          />
+          <button disabled className="bg-slate-600 text-slate-400 px-4 py-2 rounded-lg cursor-not-allowed">
+            Send
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+
+  return (
+    <div className="min-h-screen">
+      {/* Back Navigation - only show on main view */}
+      {activeView === 'main' && (
+        <Link 
+          to="/" 
+          className="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-6 transition-colors"
+        >
+          ← Back to Home
+        </Link>
+      )}
+
+      {activeView === 'main' && renderMainView()}
+      {activeView === 'live-session' && renderLiveSession()}
+      {activeView === 'room' && renderRoom()}
     </div>
   )
 }
