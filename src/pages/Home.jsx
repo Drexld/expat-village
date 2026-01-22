@@ -113,6 +113,15 @@ function Home() {
 
   const sections = [
     {
+      id: 'directory',
+      icon: '📍',
+      title: 'Directory',
+      description: 'Expat-verified banks, lawyers, doctors, gyms, restaurants & more.',
+      tags: ['Reviews', 'Verified', 'Expat Approved'],
+      path: '/directory',
+      featured: true
+    },
+    {
       id: 'get-things-done',
       icon: '📋',
       title: 'Get Things Done',
@@ -348,26 +357,99 @@ function Home() {
         </div>
       </section>
 
-      {/* My Checklist */}
+      {/* Village Vibes */}
       <Link 
-        to="/my-checklist"
-        className="block mb-10 bg-gradient-to-r from-purple-900/30 to-indigo-900/30 border border-purple-700/50 hover:border-purple-500 rounded-xl p-6 transition-all group"
+        to="/village-vibes"
+        className="block mb-6 bg-gradient-to-r from-pink-900/30 to-purple-900/30 border border-pink-700/50 hover:border-pink-500 rounded-xl p-5 transition-all group"
       >
-        <div className="flex items-start gap-4">
-          <span className="text-4xl">✅</span>
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              <h3 className="text-xl font-bold text-white group-hover:text-purple-300 transition-colors">My Checklist</h3>
-              <span className="bg-emerald-600 text-white text-xs px-2 py-0.5 rounded-full">New!</span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <span className="text-3xl">🎵</span>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-lg font-bold text-white group-hover:text-pink-300 transition-colors">Village Vibes</h3>
+                <span className="bg-pink-600 text-white text-xs px-2 py-0.5 rounded-full">Vote!</span>
+              </div>
+              <p className="text-slate-400 text-sm">Today's vibe: "APT." by ROSÉ & Bruno Mars • 2,847 votes</p>
             </div>
-            <p className="text-slate-300 mb-2">
-              Your personal "New to Poland" tracker. 22 tasks organized by priority, 
-              tick them off as you go. Never miss an important step.
-            </p>
-            <span className="text-purple-400 group-hover:text-purple-300 text-sm">Start tracking your progress →</span>
           </div>
+          <span className="text-pink-400 group-hover:text-pink-300">Vote now →</span>
         </div>
       </Link>
+
+      {/* Alerts Banner */}
+      <Link 
+        to="/alerts"
+        className="block mb-6 bg-gradient-to-r from-amber-900/30 to-red-900/30 border border-amber-700/50 hover:border-amber-500 rounded-xl p-5 transition-all group"
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <span className="text-3xl">🔔</span>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-lg font-bold text-white group-hover:text-amber-300 transition-colors">Alerts</h3>
+                <span className="bg-red-600 text-white text-xs px-2 py-0.5 rounded-full animate-pulse">2 Urgent</span>
+              </div>
+              <p className="text-slate-400 text-sm">Work permit delays • PIT-37 deadline extended • New appointment system</p>
+            </div>
+          </div>
+          <span className="text-amber-400 group-hover:text-amber-300">View all →</span>
+        </div>
+      </Link>
+
+      {/* Student Hub, My Checklist, Rewards Row */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+        <Link 
+          to="/student-hub"
+          className="bg-gradient-to-r from-indigo-900/30 to-slate-800 border border-indigo-700/50 hover:border-indigo-500 rounded-xl p-5 transition-all group"
+        >
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">🎓</span>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="font-semibold text-white group-hover:text-indigo-400 transition-colors">Student Hub</h3>
+              </div>
+              <p className="text-slate-400 text-sm mt-1">
+                Unis, roommates & discounts
+              </p>
+            </div>
+          </div>
+        </Link>
+
+        <Link 
+          to="/my-checklist"
+          className="bg-gradient-to-r from-purple-900/30 to-slate-800 border border-purple-700/50 hover:border-purple-500 rounded-xl p-5 transition-all group"
+        >
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">✅</span>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="font-semibold text-white group-hover:text-purple-400 transition-colors">My Checklist</h3>
+              </div>
+              <p className="text-slate-400 text-sm mt-1">
+                Track your Poland setup
+              </p>
+            </div>
+          </div>
+        </Link>
+
+        <Link 
+          to="/rewards"
+          className="bg-gradient-to-r from-yellow-900/30 to-slate-800 border border-yellow-700/50 hover:border-yellow-500 rounded-xl p-5 transition-all group"
+        >
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">🏆</span>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="font-semibold text-white group-hover:text-yellow-400 transition-colors">Rewards</h3>
+              </div>
+              <p className="text-slate-400 text-sm mt-1">
+                Points, badges & ranks
+              </p>
+            </div>
+          </div>
+        </Link>
+      </div>
 
       {/* Community Stats */}
       <section className="grid grid-cols-3 gap-4 mb-10">
