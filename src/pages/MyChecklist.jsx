@@ -1,316 +1,292 @@
+// src/pages/MyChecklist.jsx
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { useState } from 'react'
+import { useAuth } from '../contexts/AuthContext'
+import { supabase } from '../lib/supabase'
 
 function MyChecklist() {
-  // In real app, this would come from user's saved data
-  const [tasks, setTasks] = useState([
-    // URGENT - First Week
-    { id: 1, title: 'Get a Polish SIM card', category: 'urgent', required: true, completed: true, link: '/getting-around', note: 'Play, Orange, or Plus - all have English support' },
-    { id: 2, title: 'Open a bank account', category: 'urgent', required: true, completed: true, link: '/get-things-done', note: 'Millennium or mBank recommended for expats' },
-    { id: 3, title: 'Register your address (zameldowanie)', category: 'urgent', required: true, completed: false, link: '/get-things-done', note: 'Needed for PESEL - ask landlord for help' },
-    { id: 4, title: 'Get your PESEL number', category: 'urgent', required: true, completed: false, link: '/get-things-done', note: 'Apply at Urząd Miasta - bring passport + lease' },
-    
-    // IMPORTANT - First Month
-    { id: 5, title: 'Sign up for health insurance', category: 'important', required: true, completed: false, link: '/insurance-health', note: 'NFZ through employer or private (Medicover, LuxMed)' },
-    { id: 6, title: 'Get a transport card', category: 'important', required: false, completed: true, link: '/getting-around', note: 'Monthly pass saves money if you commute daily' },
-    { id: 7, title: 'Understand your rental contract', category: 'important', required: true, completed: false, link: '/housing', note: 'Use our Contract Analyzer tool' },
-    { id: 8, title: 'Set up Jakdojade app', category: 'important', required: false, completed: true, link: '/getting-around', note: 'Best app for public transport in Poland' },
-    { id: 9, title: 'Register for ZUS (if employed)', category: 'important', required: true, completed: false, link: '/get-things-done', note: 'Employer usually handles this' },
-    { id: 10, title: 'Get NIP number (if freelancing)', category: 'important', required: false, completed: false, link: '/jobs-careers', note: 'Needed for B2B contracts' },
-    
-    // SETTLING IN - First 3 Months
-    { id: 11, title: 'Apply for residency permit', category: 'settling', required: true, completed: false, link: '/get-things-done', note: 'If staying longer than 90 days (non-EU)' },
-    { id: 12, title: 'Find a doctor/clinic', category: 'settling', required: false, completed: false, link: '/insurance-health', note: 'English-speaking doctors in directory' },
-    { id: 13, title: 'Find a gym or fitness option', category: 'settling', required: false, completed: false, link: '/live-your-life', note: 'MultiSport card is great value' },
-    { id: 14, title: 'Explore your neighborhood', category: 'settling', required: false, completed: false, link: '/live-your-life', note: 'Find your local Żabka, pharmacy, restaurants' },
-    { id: 15, title: 'Join expat community events', category: 'settling', required: false, completed: false, link: '/town-hall', note: 'Check Town Hall for live sessions & meetups' },
-    { id: 16, title: 'Start learning basic Polish', category: 'settling', required: false, completed: false, link: '/live-your-life', note: 'Even basics help a lot - Duolingo or italki' },
-    { id: 17, title: 'Set up Polish streaming (Netflix/HBO)', category: 'settling', required: false, completed: false, link: null, note: 'Polish content helps with language learning' },
-    
-    // LONG TERM - First Year
-    { id: 18, title: 'File your first Polish tax return', category: 'longterm', required: true, completed: false, link: '/jobs-careers', note: 'PIT deadline is April 30th' },
-    { id: 19, title: 'Consider private health insurance', category: 'longterm', required: false, completed: false, link: '/insurance-health', note: 'Medicover, LuxMed, Enel-Med packages' },
-    { id: 20, title: 'Build your professional network', category: 'longterm', required: false, completed: false, link: '/town-hall', note: 'LinkedIn Poland, expat meetups, industry events' },
-    { id: 21, title: 'Open a savings account', category: 'longterm', required: false, completed: false, link: '/get-things-done', note: 'Consider PKO or foreign options' },
-    { id: 22, title: 'Get home/renters insurance', category: 'longterm', required: false, completed: false, link: '/insurance-health', note: 'Protects your belongings' },
-  ])
+  const { user, isAuthenticated, openAuthModal } = useAuth()
+  const [checkedItems, setCheckedItems] = useState({})
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
 
-  const [activeFilter, setActiveFilter] = useState('all')
-  const [showCompleted, setShowCompleted] = useState(true)
+  const categories = [
+    {
+      id: 'first-week',
+      title: '🚀 First Week in Poland',
+      tasks: [
+        { id: 'sim-card', label: 'Get a Polish SIM card', guide: '/get-things-done' },
+        { id: 'bank-account', label: 'Open a bank account', guide: '/get-things-done' },
+        { id: 'transport-card', label: 'Get a transport card', guide: '/getting-around' },
+        { id: 'grocery-store', label: 'Find your local grocery store', guide: '/live-your-life' },
+        { id: 'neighborhood', label: 'Explore your neighborhood', guide: null },
+      ]
+    },
+    {
+      id: 'first-month',
+      title: '📋 First Month Essentials',
+      tasks: [
+        { id: 'pesel', label: 'Get your PESEL number', guide: '/get-things-done' },
+        { id: 'zameldowanie', label: 'Register your address (Zameldowanie)', guide: '/get-things-done' },
+        { id: 'health-insurance', label: 'Sort out health insurance', guide: '/insurance-health' },
+        { id: 'polish-basics', label: 'Learn basic Polish phrases', guide: null },
+        { id: 'expat-groups', label: 'Join expat communities', guide: '/town-hall' },
+        { id: 'emergency-numbers', label: 'Save emergency numbers', guide: null },
+      ]
+    },
+    {
+      id: 'settling-in',
+      title: '🏠 Settling In',
+      tasks: [
+        { id: 'residence-permit', label: 'Apply for residence permit (if needed)', guide: '/get-things-done' },
+        { id: 'tax-number', label: 'Get your NIP (tax number)', guide: '/get-things-done' },
+        { id: 'doctor', label: 'Find an English-speaking doctor', guide: '/insurance-health' },
+        { id: 'dentist', label: 'Find a dentist', guide: '/insurance-health' },
+        { id: 'gym', label: 'Join a gym or fitness activity', guide: '/live-your-life' },
+        { id: 'social-hobby', label: 'Find a social hobby or group', guide: '/live-your-life' },
+      ]
+    },
+    {
+      id: 'long-term',
+      title: '🎯 Long-term Goals',
+      tasks: [
+        { id: 'polish-lessons', label: 'Start Polish language lessons', guide: null },
+        { id: 'driving-license', label: 'Get Polish driving license (if needed)', guide: '/getting-around' },
+        { id: 'apartment-own', label: 'Find your own apartment', guide: '/housing' },
+        { id: 'build-network', label: 'Build professional network', guide: '/jobs-careers' },
+        { id: 'travel-poland', label: 'Explore Poland (Kraków, Gdańsk, etc.)', guide: null },
+      ]
+    }
+  ]
 
-  const toggleTask = (taskId) => {
-    setTasks(tasks.map(task => 
-      task.id === taskId ? { ...task, completed: !task.completed } : task
-    ))
+  // Load checklist - with proper error handling
+  useEffect(() => {
+    let isMounted = true
+    
+    const loadData = async () => {
+      // Always start by loading from localStorage
+      const saved = localStorage.getItem('expat-checklist')
+      if (saved && isMounted) {
+        try {
+          setCheckedItems(JSON.parse(saved))
+        } catch (e) {
+          console.log('Could not parse localStorage checklist')
+        }
+      }
+
+      // If authenticated, try to load from database
+      if (isAuthenticated && user) {
+        try {
+          const { data, error } = await supabase
+            .from('checklist_progress')
+            .select('task_id, completed')
+            .eq('user_id', user.id)
+
+          if (!error && data && isMounted) {
+            const checked = {}
+            data.forEach(item => {
+              if (item.completed) {
+                checked[item.task_id] = true
+              }
+            })
+            setCheckedItems(checked)
+            // Also save to localStorage as backup
+            localStorage.setItem('expat-checklist', JSON.stringify(checked))
+          }
+        } catch (error) {
+          // Silently fail - just use localStorage data
+          console.log('Using localStorage checklist (db unavailable)')
+        }
+      }
+
+      if (isMounted) {
+        setLoading(false)
+      }
+    }
+
+    loadData()
+
+    return () => {
+      isMounted = false
+    }
+  }, [isAuthenticated, user])
+
+  const toggleTask = async (taskId) => {
+    const newChecked = { ...checkedItems }
+    const isNowChecked = !newChecked[taskId]
+    
+    if (isNowChecked) {
+      newChecked[taskId] = true
+    } else {
+      delete newChecked[taskId]
+    }
+    
+    setCheckedItems(newChecked)
+    
+    // Always save to localStorage first
+    localStorage.setItem('expat-checklist', JSON.stringify(newChecked))
+
+    // If authenticated, also save to database
+    if (isAuthenticated && user) {
+      setSaving(true)
+      try {
+        if (isNowChecked) {
+          await supabase
+            .from('checklist_progress')
+            .upsert({
+              user_id: user.id,
+              task_id: taskId,
+              completed: true,
+              completed_at: new Date().toISOString()
+            }, {
+              onConflict: 'user_id,task_id'
+            })
+        } else {
+          await supabase
+            .from('checklist_progress')
+            .update({ completed: false, completed_at: null })
+            .eq('user_id', user.id)
+            .eq('task_id', taskId)
+        }
+      } catch (error) {
+        console.log('Saved to localStorage only')
+      } finally {
+        setSaving(false)
+      }
+    }
   }
 
-  const categories = {
-    urgent: { label: '🔴 First Week', color: 'red', description: 'Do these ASAP' },
-    important: { label: '🟠 First Month', color: 'orange', description: 'Important but not urgent' },
-    settling: { label: '🟡 First 3 Months', color: 'yellow', description: 'Getting comfortable' },
-    longterm: { label: '🟢 First Year', color: 'green', description: 'Long-term setup' },
+  // Calculate progress
+  const totalTasks = categories.reduce((sum, cat) => sum + cat.tasks.length, 0)
+  const completedTasks = Object.keys(checkedItems).length
+  const progressPercent = Math.round((completedTasks / totalTasks) * 100)
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <div className="text-slate-400">Loading your checklist...</div>
+      </div>
+    )
   }
-
-  const filteredTasks = tasks.filter(task => {
-    if (activeFilter !== 'all' && task.category !== activeFilter) return false
-    if (!showCompleted && task.completed) return false
-    return true
-  })
-
-  const completedCount = tasks.filter(t => t.completed).length
-  const totalCount = tasks.length
-  const progressPercent = Math.round((completedCount / totalCount) * 100)
-
-  const requiredRemaining = tasks.filter(t => t.required && !t.completed).length
-  const urgentRemaining = tasks.filter(t => t.category === 'urgent' && !t.completed).length
 
   return (
-    <div className="min-h-screen">
-      {/* Back Navigation */}
-      <Link 
-        to="/" 
-        className="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-6 transition-colors"
-      >
-        ← Back to Home
-      </Link>
+    <div>
+      <nav className="mb-6">
+        <Link to="/" className="text-slate-400 hover:text-white transition-colors">
+          ← Back to Home
+        </Link>
+      </nav>
 
-      {/* Header */}
       <header className="mb-8">
         <div className="flex items-center gap-3 mb-4">
           <span className="text-4xl">✅</span>
-          <div>
-            <h1 className="text-3xl font-bold text-white">My Checklist</h1>
-            <p className="text-slate-400">Your personal "New to Poland" tracker</p>
-          </div>
+          <h1 className="text-3xl font-bold text-white">My Checklist</h1>
+          {saving && <span className="text-emerald-400 text-sm animate-pulse">Saving...</span>}
         </div>
+        <p className="text-slate-400 text-lg">
+          Track your expat journey. Check off tasks as you complete them.
+        </p>
       </header>
 
-      {/* Progress Card */}
-      <div className="bg-gradient-to-r from-emerald-900/40 to-teal-900/40 border border-emerald-700/50 rounded-xl p-6 mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="text-2xl font-bold text-white">{progressPercent}% Complete</h2>
-            <p className="text-emerald-300">{completedCount} of {totalCount} tasks done</p>
-          </div>
-          <div className="text-right">
-            {urgentRemaining > 0 ? (
-              <p className="text-red-400 font-medium">🔴 {urgentRemaining} urgent tasks remaining</p>
-            ) : (
-              <p className="text-green-400 font-medium">✅ All urgent tasks complete!</p>
-            )}
-            {requiredRemaining > 0 && (
-              <p className="text-orange-400 text-sm">{requiredRemaining} required tasks left</p>
-            )}
-          </div>
-        </div>
-        
-        {/* Progress Bar */}
-        <div className="w-full bg-slate-700 rounded-full h-4 overflow-hidden">
-          <div 
-            className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-500"
-            style={{ width: `${progressPercent}%` }}
-          ></div>
-        </div>
-        
-        {/* Category Progress */}
-        <div className="grid grid-cols-4 gap-4 mt-4">
-          {Object.entries(categories).map(([key, cat]) => {
-            const catTasks = tasks.filter(t => t.category === key)
-            const catDone = catTasks.filter(t => t.completed).length
-            return (
-              <div key={key} className="text-center">
-                <p className="text-2xl">{cat.label.split(' ')[0]}</p>
-                <p className="text-slate-300 text-sm">{catDone}/{catTasks.length}</p>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-
-      {/* Alerts */}
-      {urgentRemaining > 0 && (
-        <div className="bg-red-900/30 border border-red-700/50 rounded-xl p-4 mb-6">
+      {!isAuthenticated && (
+        <div className="bg-amber-900/30 border border-amber-700/50 rounded-xl p-4 mb-6">
           <div className="flex items-start gap-3">
-            <span className="text-2xl">⚠️</span>
+            <span className="text-xl">💡</span>
             <div>
-              <h3 className="font-semibold text-red-400">Priority Tasks Need Attention</h3>
-              <p className="text-slate-300 text-sm">
-                You have {urgentRemaining} urgent task{urgentRemaining > 1 ? 's' : ''} in your first week checklist. 
-                These are critical for settling in!
+              <p className="text-amber-200 font-medium">Sign in to save your progress!</p>
+              <p className="text-slate-400 text-sm mt-1">
+                Your checklist is saved locally, but signing in syncs it across devices.
               </p>
+              <button
+                onClick={() => openAuthModal('sign_up')}
+                className="mt-2 bg-amber-600 hover:bg-amber-500 text-white px-4 py-1.5 rounded-lg text-sm transition-colors"
+              >
+                Sign Up Free
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Filters */}
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => setActiveFilter('all')}
-            className={`px-4 py-2 rounded-lg transition-colors ${
-              activeFilter === 'all' 
-                ? 'bg-emerald-600 text-white' 
-                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-            }`}
-          >
-            All Tasks
-          </button>
-          {Object.entries(categories).map(([key, cat]) => (
-            <button
-              key={key}
-              onClick={() => setActiveFilter(key)}
-              className={`px-4 py-2 rounded-lg transition-colors ${
-                activeFilter === key 
-                  ? 'bg-emerald-600 text-white' 
-                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-              }`}
-            >
-              {cat.label}
-            </button>
-          ))}
+      {/* Progress Bar */}
+      <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 mb-8">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-lg font-semibold text-white">Your Progress</h3>
+          <span className="text-2xl font-bold text-emerald-400">{progressPercent}%</span>
         </div>
-        
-        <label className="flex items-center gap-2 text-slate-400 cursor-pointer">
-          <input 
-            type="checkbox" 
-            checked={showCompleted}
-            onChange={() => setShowCompleted(!showCompleted)}
-            className="w-4 h-4 rounded"
+        <div className="h-4 bg-slate-700 rounded-full overflow-hidden">
+          <div 
+            className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 transition-all duration-500"
+            style={{ width: `${progressPercent}%` }}
           />
-          Show completed
-        </label>
+        </div>
+        <p className="text-slate-400 text-sm mt-2">
+          {completedTasks} of {totalTasks} tasks completed
+        </p>
       </div>
 
-      {/* Task Lists by Category */}
-      {activeFilter === 'all' ? (
-        Object.entries(categories).map(([categoryKey, category]) => {
-          const categoryTasks = filteredTasks.filter(t => t.category === categoryKey)
-          if (categoryTasks.length === 0) return null
-          
+      {/* Categories */}
+      <div className="space-y-6">
+        {categories.map((category) => {
+          const categoryCompleted = category.tasks.filter(t => checkedItems[t.id]).length
+          const categoryTotal = category.tasks.length
+
           return (
-            <section key={categoryKey} className="mb-8">
-              <div className="flex items-center gap-2 mb-3">
-                <h2 className="text-lg font-semibold text-white">{category.label}</h2>
-                <span className="text-slate-500 text-sm">— {category.description}</span>
+            <div key={category.id} className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+              <div className="p-4 border-b border-slate-700 flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-white">{category.title}</h2>
+                <span className="text-sm text-slate-400">
+                  {categoryCompleted}/{categoryTotal}
+                </span>
               </div>
-              <div className="space-y-2">
-                {categoryTasks.map((task) => (
-                  <TaskItem key={task.id} task={task} onToggle={toggleTask} />
+
+              <div className="divide-y divide-slate-700/50">
+                {category.tasks.map((task) => (
+                  <div 
+                    key={task.id}
+                    className={`p-4 flex items-center gap-4 transition-colors ${
+                      checkedItems[task.id] ? 'bg-emerald-900/10' : 'hover:bg-slate-700/30'
+                    }`}
+                  >
+                    <button
+                      onClick={() => toggleTask(task.id)}
+                      className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all ${
+                        checkedItems[task.id]
+                          ? 'bg-emerald-500 border-emerald-500 text-white'
+                          : 'border-slate-600 hover:border-emerald-500'
+                      }`}
+                    >
+                      {checkedItems[task.id] && (
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </button>
+
+                    <span className={`flex-1 ${
+                      checkedItems[task.id] ? 'text-slate-400 line-through' : 'text-white'
+                    }`}>
+                      {task.label}
+                    </span>
+
+                    {task.guide && (
+                      <Link
+                        to={task.guide}
+                        className="text-emerald-400 hover:text-emerald-300 text-sm transition-colors"
+                      >
+                        Guide →
+                      </Link>
+                    )}
+                  </div>
                 ))}
               </div>
-            </section>
+            </div>
           )
-        })
-      ) : (
-        <section>
-          <div className="flex items-center gap-2 mb-3">
-            <h2 className="text-lg font-semibold text-white">{categories[activeFilter].label}</h2>
-            <span className="text-slate-500 text-sm">— {categories[activeFilter].description}</span>
-          </div>
-          <div className="space-y-2">
-            {filteredTasks.map((task) => (
-              <TaskItem key={task.id} task={task} onToggle={toggleTask} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Empty State */}
-      {filteredTasks.length === 0 && (
-        <div className="text-center py-12">
-          <span className="text-6xl mb-4 block">🎉</span>
-          <h3 className="text-xl font-semibold text-white mb-2">
-            {showCompleted ? 'No tasks here!' : 'All tasks completed!'}
-          </h3>
-          <p className="text-slate-400">
-            {showCompleted 
-              ? 'Select a different category to see more tasks.' 
-              : 'Amazing work! Toggle "Show completed" to see your progress.'}
-          </p>
-        </div>
-      )}
-
-      {/* Add Custom Task */}
-      <div className="mt-8 bg-slate-800 border border-slate-700 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-white mb-3">➕ Add Your Own Task</h3>
-        <p className="text-slate-400 text-sm mb-4">
-          Got something specific you need to do? Add it to your checklist.
-        </p>
-        <div className="flex gap-3">
-          <input 
-            type="text" 
-            placeholder="e.g., Find a good barber near Mokotow"
-            className="flex-1 bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
-          />
-          <button className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg transition-colors">
-            Add Task
-          </button>
-        </div>
+        })}
       </div>
 
-      {/* Share Progress */}
-      <div className="mt-6 bg-slate-800/50 border border-slate-700 rounded-xl p-6 text-center">
-        <p className="text-slate-400 mb-3">Share your progress and help other expats!</p>
-        <button className="bg-slate-700 hover:bg-slate-600 text-white px-6 py-2 rounded-lg transition-colors">
-          📤 Share My Progress
-        </button>
-      </div>
-    </div>
-  )
-}
-
-// Task Item Component
-function TaskItem({ task, onToggle }) {
-  return (
-    <div 
-      className={`bg-slate-800 border rounded-xl p-4 transition-all ${
-        task.completed 
-          ? 'border-slate-700 opacity-60' 
-          : task.required 
-            ? 'border-emerald-700/50' 
-            : 'border-slate-700'
-      }`}
-    >
-      <div className="flex items-start gap-4">
-        {/* Checkbox */}
-        <button
-          onClick={() => onToggle(task.id)}
-          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-all ${
-            task.completed
-              ? 'bg-emerald-600 border-emerald-600 text-white'
-              : 'border-slate-500 hover:border-emerald-500'
-          }`}
-        >
-          {task.completed && (
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-            </svg>
-          )}
-        </button>
-        
-        {/* Content */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <h3 className={`font-medium ${task.completed ? 'text-slate-400 line-through' : 'text-white'}`}>
-              {task.title}
-            </h3>
-            {task.required && !task.completed && (
-              <span className="bg-emerald-900/50 text-emerald-400 text-xs px-2 py-0.5 rounded">Required</span>
-            )}
-          </div>
-          <p className="text-slate-500 text-sm">{task.note}</p>
-        </div>
-        
-        {/* Link */}
-        {task.link && !task.completed && (
-          <Link
-            to={task.link}
-            className="text-emerald-400 hover:text-emerald-300 text-sm whitespace-nowrap"
-          >
-            Learn more →
-          </Link>
-        )}
+      <div className="mt-8 text-center text-slate-500 text-sm">
+        <p>Every checked box is a step toward feeling at home. 💪</p>
       </div>
     </div>
   )
