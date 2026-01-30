@@ -1,21 +1,23 @@
 // src/App.jsx
-// ============
-// Main application file with routing and auth
-
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
+import ScrollToTop from './components/ScrollToTop'
+
+// Layouts
 import MainLayout from './layouts/MainLayout'
 
-// Main Pages
+// Pages
 import Home from './pages/Home'
+import About from './pages/About'
+import Privacy from './pages/Privacy'
+
+// Main Sections
 import GetThingsDone from './pages/GetThingsDone'
 import InsuranceHealth from './pages/InsuranceHealth'
 import Housing from './pages/Housing'
 import JobsCareers from './pages/JobsCareers'
 import LiveYourLife from './pages/LiveYourLife'
 import GettingAround from './pages/GettingAround'
-import About from './pages/About'
-import Privacy from './pages/Privacy'
 
 // Interactive Features
 import TownHall from './pages/TownHall'
@@ -35,10 +37,15 @@ function App() {
   return (
     <AuthProvider>
       <Router>
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<MainLayout />}>
             {/* Home */}
             <Route index element={<Home />} />
+            
+            {/* About & Legal */}
+            <Route path="about" element={<About />} />
+            <Route path="privacy" element={<Privacy />} />
             
             {/* Main Sections */}
             <Route path="get-things-done" element={<GetThingsDone />} />
@@ -47,8 +54,6 @@ function App() {
             <Route path="jobs-careers" element={<JobsCareers />} />
             <Route path="live-your-life" element={<LiveYourLife />} />
             <Route path="getting-around" element={<GettingAround />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/privacy" element={<Privacy />} />
             
             {/* Interactive Features */}
             <Route path="town-hall" element={<TownHall />} />
