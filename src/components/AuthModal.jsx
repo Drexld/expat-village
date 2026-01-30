@@ -1,22 +1,22 @@
 // src/components/AuthModal.jsx
-// EXPAT VILLAGE - Premium Auth Modal with Warsaw Skyline & Animated Villagers
+// EXPAT VILLAGE - Premium Auth Modal
+// Warsaw Skyline + Walking Villagers Animation
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 
 function AuthModal() {
   const { authModal, closeAuthModal, signIn, signUp, signInWithGoogle } = useAuth()
-  const [activeTab, setActiveTab] = useState(authModal.view || 'sign_in')
+  const [activeTab, setActiveTab] = useState('sign_in')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   
-  // Form fields
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [displayName, setDisplayName] = useState('')
 
-  // Reset error when modal opens
+  // Reset when modal opens
   useEffect(() => {
     if (authModal.isOpen) {
       setError('')
@@ -44,9 +44,7 @@ function AuthModal() {
     e.preventDefault()
     setLoading(true)
     setError('')
-
     const { error } = await signIn(email, password)
-    
     if (error) {
       setError(error.message)
     } else {
@@ -60,15 +58,12 @@ function AuthModal() {
     e.preventDefault()
     setLoading(true)
     setError('')
-
     if (password.length < 6) {
       setError('Password must be at least 6 characters')
       setLoading(false)
       return
     }
-
     const { error } = await signUp(email, password, displayName)
-    
     if (error) {
       setError(error.message)
     } else {
@@ -80,165 +75,161 @@ function AuthModal() {
   const handleGoogleSignIn = async () => {
     setLoading(true)
     setError('')
-    
     const { error } = await signInWithGoogle()
-    
     if (error) {
       setError(error.message)
       setLoading(false)
     }
   }
 
-  // Animated Villagers Component
-  const AnimatedVillagers = () => (
-    <div className="absolute bottom-0 left-0 right-0 h-16 overflow-hidden pointer-events-none">
-      {/* Villager 1 - Walking right */}
-      <div 
-        className="absolute bottom-2 text-2xl"
-        style={{
-          animation: 'walkRight 12s linear infinite',
-          animationDelay: '0s'
-        }}
-      >
-        🚶
-      </div>
-      {/* Villager 2 - Walking right slower */}
-      <div 
-        className="absolute bottom-2 text-xl"
-        style={{
-          animation: 'walkRight 18s linear infinite',
-          animationDelay: '3s'
-        }}
-      >
-        🚶‍♀️
-      </div>
-      {/* Villager 3 - Walking right with bag */}
-      <div 
-        className="absolute bottom-2 text-2xl"
-        style={{
-          animation: 'walkRight 14s linear infinite',
-          animationDelay: '6s'
-        }}
-      >
-        🧳
-      </div>
-      {/* Cyclist */}
-      <div 
-        className="absolute bottom-2 text-xl"
-        style={{
-          animation: 'walkRight 8s linear infinite',
-          animationDelay: '2s'
-        }}
-      >
-        🚴
-      </div>
-      {/* Person with dog */}
-      <div 
-        className="absolute bottom-2 text-lg"
-        style={{
-          animation: 'walkRight 16s linear infinite',
-          animationDelay: '8s'
-        }}
-      >
-        🐕‍🦺
-      </div>
-    </div>
-  )
-
-  // Warsaw Skyline SVG Component
-  const WarsawSkyline = () => (
-    <svg 
-      viewBox="0 0 800 200" 
-      className="w-full h-auto absolute bottom-12 left-0 right-0 opacity-30"
-      style={{ filter: 'drop-shadow(0 0 20px rgba(139, 92, 246, 0.3))' }}
-    >
-      {/* Palace of Culture and Science (tallest) */}
-      <g fill="currentColor" className="text-purple-400">
-        {/* Main tower */}
-        <rect x="380" y="20" width="40" height="180" />
-        <rect x="370" y="60" width="60" height="140" />
-        <rect x="360" y="100" width="80" height="100" />
-        <rect x="350" y="140" width="100" height="60" />
-        {/* Spire */}
-        <polygon points="400,0 395,20 405,20" />
-        
-        {/* Left buildings */}
-        <rect x="50" y="120" width="40" height="80" />
-        <rect x="100" y="100" width="50" height="100" />
-        <rect x="160" y="130" width="35" height="70" />
-        <rect x="200" y="90" width="45" height="110" />
-        <rect x="255" y="110" width="40" height="90" />
-        <rect x="300" y="80" width="35" height="120" />
-        
-        {/* Right buildings */}
-        <rect x="470" y="100" width="50" height="100" />
-        <rect x="530" y="120" width="40" height="80" />
-        <rect x="580" y="90" width="55" height="110" />
-        <rect x="645" y="110" width="45" height="90" />
-        <rect x="700" y="130" width="50" height="70" />
-        
-        {/* Windows (dots) */}
-        {[...Array(20)].map((_, i) => (
-          <rect 
-            key={i} 
-            x={385 + (i % 4) * 8} 
-            y={70 + Math.floor(i / 4) * 25} 
-            width="4" 
-            height="6" 
-            className="text-amber-400/50"
-            fill="currentColor"
-          />
-        ))}
-      </g>
-      
-      {/* Ground line */}
-      <rect x="0" y="198" width="800" height="2" fill="currentColor" className="text-purple-500/50" />
-    </svg>
-  )
-
   return (
     <>
-      {/* Backdrop */}
+      {/* Backdrop with blur */}
       <div 
-        className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 animate-fadeIn"
+        className="fixed inset-0 bg-black/80 backdrop-blur-md z-50"
         onClick={() => { closeAuthModal(); resetForm(); }}
+        style={{ animation: 'fadeIn 0.3s ease' }}
       />
       
-      {/* Modal */}
+      {/* Modal Container */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
         <div 
-          className="relative w-full max-w-md pointer-events-auto animate-scaleIn"
-          onClick={(e) => e.stopPropagation()}
+          className="relative w-full max-w-md pointer-events-auto"
+          style={{ animation: 'scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)' }}
         >
-          {/* Glow Effect */}
-          <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 via-amber-500 to-purple-600 rounded-3xl blur-xl opacity-30 animate-pulse" />
+          {/* Animated Glow Border */}
+          <div className="absolute -inset-1 bg-gradient-to-r from-violet-600 via-amber-500 to-violet-600 rounded-3xl blur-xl opacity-50 animate-pulse" />
           
           {/* Modal Content */}
-          <div className="relative bg-gradient-to-b from-[#1A1625] to-[#0F0D1A] border border-purple-500/30 rounded-3xl overflow-hidden shadow-2xl">
+          <div className="relative bg-gradient-to-b from-slate-800 to-slate-900 border border-violet-500/40 rounded-3xl overflow-hidden shadow-2xl">
             
-            {/* Animated Background Scene */}
+            {/* ===== ANIMATED SCENE BACKGROUND ===== */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-              {/* Stars */}
-              <div className="absolute top-4 left-8 w-1 h-1 bg-white rounded-full animate-pulse" style={{ animationDelay: '0s' }} />
-              <div className="absolute top-8 left-20 w-1.5 h-1.5 bg-purple-300 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }} />
-              <div className="absolute top-6 right-16 w-1 h-1 bg-amber-300 rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
-              <div className="absolute top-12 right-8 w-1 h-1 bg-white rounded-full animate-pulse" style={{ animationDelay: '1.5s' }} />
-              <div className="absolute top-16 left-12 w-1 h-1 bg-purple-200 rounded-full animate-pulse" style={{ animationDelay: '2s' }} />
+              
+              {/* Night Sky Gradient */}
+              <div className="absolute inset-0 bg-gradient-to-b from-slate-900 via-violet-950/50 to-slate-900" />
+              
+              {/* Twinkling Stars */}
+              {[...Array(12)].map((_, i) => (
+                <div
+                  key={i}
+                  className="absolute rounded-full bg-white animate-pulse"
+                  style={{
+                    width: Math.random() * 3 + 1 + 'px',
+                    height: Math.random() * 3 + 1 + 'px',
+                    top: Math.random() * 40 + '%',
+                    left: Math.random() * 100 + '%',
+                    animationDelay: Math.random() * 2 + 's',
+                    animationDuration: Math.random() * 2 + 1 + 's',
+                    opacity: Math.random() * 0.5 + 0.3
+                  }}
+                />
+              ))}
               
               {/* Warsaw Skyline */}
-              <WarsawSkyline />
+              <svg 
+                viewBox="0 0 400 120" 
+                className="absolute bottom-16 left-0 right-0 w-full h-auto opacity-20"
+                preserveAspectRatio="xMidYMax meet"
+              >
+                <defs>
+                  <linearGradient id="skylineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor="#8B5CF6" stopOpacity="0.8" />
+                    <stop offset="100%" stopColor="#8B5CF6" stopOpacity="0.3" />
+                  </linearGradient>
+                </defs>
+                
+                {/* Palace of Culture (Center) */}
+                <rect x="180" y="10" width="40" height="110" fill="url(#skylineGradient)" />
+                <rect x="175" y="30" width="50" height="90" fill="url(#skylineGradient)" />
+                <polygon points="200,0 195,10 205,10" fill="url(#skylineGradient)" />
+                
+                {/* Left Buildings */}
+                <rect x="20" y="60" width="30" height="60" fill="url(#skylineGradient)" />
+                <rect x="55" y="45" width="35" height="75" fill="url(#skylineGradient)" />
+                <rect x="95" y="55" width="25" height="65" fill="url(#skylineGradient)" />
+                <rect x="125" y="40" width="40" height="80" fill="url(#skylineGradient)" />
+                
+                {/* Right Buildings */}
+                <rect x="230" y="50" width="35" height="70" fill="url(#skylineGradient)" />
+                <rect x="270" y="60" width="30" height="60" fill="url(#skylineGradient)" />
+                <rect x="305" y="45" width="40" height="75" fill="url(#skylineGradient)" />
+                <rect x="350" y="55" width="35" height="65" fill="url(#skylineGradient)" />
+                
+                {/* Ground Line */}
+                <rect x="0" y="118" width="400" height="2" fill="#8B5CF6" opacity="0.5" />
+              </svg>
               
-              {/* Animated Villagers */}
-              <AnimatedVillagers />
+              {/* Walking Villagers */}
+              <div className="absolute bottom-12 left-0 right-0 h-8 overflow-hidden">
+                {/* Person 1 */}
+                <div 
+                  className="absolute text-xl"
+                  style={{
+                    animation: 'walkRight 14s linear infinite',
+                    bottom: '0px'
+                  }}
+                >
+                  🚶
+                </div>
+                
+                {/* Person 2 */}
+                <div 
+                  className="absolute text-lg"
+                  style={{
+                    animation: 'walkRight 20s linear infinite',
+                    animationDelay: '4s',
+                    bottom: '0px'
+                  }}
+                >
+                  🚶‍♀️
+                </div>
+                
+                {/* Cyclist */}
+                <div 
+                  className="absolute text-xl"
+                  style={{
+                    animation: 'walkRight 10s linear infinite',
+                    animationDelay: '2s',
+                    bottom: '0px'
+                  }}
+                >
+                  🚴
+                </div>
+                
+                {/* Person with luggage */}
+                <div 
+                  className="absolute text-lg"
+                  style={{
+                    animation: 'walkRight 18s linear infinite',
+                    animationDelay: '7s',
+                    bottom: '0px'
+                  }}
+                >
+                  🧳
+                </div>
+                
+                {/* Dog walker */}
+                <div 
+                  className="absolute text-base"
+                  style={{
+                    animation: 'walkRight 22s linear infinite',
+                    animationDelay: '10s',
+                    bottom: '0px'
+                  }}
+                >
+                  🐕
+                </div>
+              </div>
             </div>
             
-            {/* Header */}
+            {/* ===== HEADER ===== */}
             <div className="relative z-10 flex items-center justify-between p-6 pb-4">
               <div>
                 <h2 className="text-2xl font-bold text-white">
                   {activeTab === 'sign_in' ? 'Welcome Back!' : 'Join the Village'}
                 </h2>
-                <p className="text-purple-300/70 text-sm mt-1">
+                <p className="text-violet-300/70 text-sm mt-1">
                   {activeTab === 'sign_in' 
                     ? 'Your village missed you 💜' 
                     : 'Your Poland journey starts here ✨'}
@@ -246,7 +237,7 @@ function AuthModal() {
               </div>
               <button 
                 onClick={() => { closeAuthModal(); resetForm(); }}
-                className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition-all hover:rotate-90 duration-300"
+                className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-400 hover:text-white transition-all duration-300 hover:rotate-90"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -254,46 +245,44 @@ function AuthModal() {
               </button>
             </div>
 
-            {/* Tabs */}
-            <div className="relative z-10 flex mx-6 mb-6 bg-[#0F0D1A] rounded-xl p-1">
+            {/* ===== TABS ===== */}
+            <div className="relative z-10 flex mx-6 mb-6 bg-slate-900/80 rounded-xl p-1.5">
               <button
                 onClick={() => handleTabChange('sign_in')}
-                className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all duration-300 ${
+                className={`flex-1 py-3 px-4 rounded-lg text-sm font-bold transition-all duration-300 ${
                   activeTab === 'sign_in'
-                    ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg shadow-purple-500/25'
-                    : 'text-gray-400 hover:text-white'
+                    ? 'bg-gradient-to-r from-violet-600 to-violet-700 text-white shadow-lg shadow-violet-500/30'
+                    : 'text-slate-400 hover:text-white'
                 }`}
               >
                 Sign In
               </button>
               <button
                 onClick={() => handleTabChange('sign_up')}
-                className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all duration-300 ${
+                className={`flex-1 py-3 px-4 rounded-lg text-sm font-bold transition-all duration-300 ${
                   activeTab === 'sign_up'
-                    ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg shadow-purple-500/25'
-                    : 'text-gray-400 hover:text-white'
+                    ? 'bg-gradient-to-r from-violet-600 to-violet-700 text-white shadow-lg shadow-violet-500/30'
+                    : 'text-slate-400 hover:text-white'
                 }`}
               >
                 Sign Up
               </button>
             </div>
 
-            {/* Content */}
+            {/* ===== FORM CONTENT ===== */}
             <div className="relative z-10 px-6 pb-8">
               
               {/* Error Message */}
               {error && (
-                <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl mb-4 text-sm flex items-center gap-2 animate-shake">
-                  <span>⚠️</span>
-                  {error}
+                <div className="bg-red-500/20 border border-red-500/40 text-red-300 px-4 py-3 rounded-xl mb-4 text-sm flex items-center gap-2 animate-shake">
+                  <span>⚠️</span> {error}
                 </div>
               )}
 
               {/* Success Message */}
               {success && (
-                <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-4 py-3 rounded-xl mb-4 text-sm flex items-center gap-2">
-                  <span>✅</span>
-                  {success}
+                <div className="bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 px-4 py-3 rounded-xl mb-4 text-sm flex items-center gap-2">
+                  <span>✅</span> {success}
                 </div>
               )}
 
@@ -301,7 +290,7 @@ function AuthModal() {
               <button
                 onClick={handleGoogleSignIn}
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-100 text-gray-800 font-semibold py-4 rounded-xl transition-all hover:scale-[1.02] hover:shadow-lg disabled:opacity-50 disabled:hover:scale-100 mb-4"
+                className="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-100 text-slate-800 font-bold py-4 rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg disabled:opacity-50 mb-5"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -312,54 +301,51 @@ function AuthModal() {
                 Continue with Google
               </button>
 
-              <div className="flex items-center gap-4 mb-4">
-                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent"></div>
-                <span className="text-gray-500 text-sm">or</span>
-                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent"></div>
+              <div className="flex items-center gap-4 mb-5">
+                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-violet-500/30 to-transparent" />
+                <span className="text-slate-500 text-sm">or</span>
+                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-violet-500/30 to-transparent" />
               </div>
 
               {/* Sign In Form */}
               {activeTab === 'sign_in' && (
                 <form onSubmit={handleSignIn} className="space-y-4">
                   <div>
-                    <label className="block text-gray-400 text-sm mb-2 font-medium">Email</label>
+                    <label className="block text-slate-400 text-sm mb-2 font-medium">Email</label>
                     <input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="w-full bg-[#0F0D1A] border border-purple-500/30 focus:border-purple-500 rounded-xl px-4 py-3.5 text-white placeholder-gray-600 outline-none transition-all focus:ring-2 focus:ring-purple-500/20"
+                      className="w-full bg-slate-900/80 border border-violet-500/30 focus:border-violet-500 rounded-xl px-4 py-3.5 text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/30"
                       placeholder="you@example.com"
                     />
                   </div>
                   <div>
-                    <label className="block text-gray-400 text-sm mb-2 font-medium">Password</label>
+                    <label className="block text-slate-400 text-sm mb-2 font-medium">Password</label>
                     <input
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="w-full bg-[#0F0D1A] border border-purple-500/30 focus:border-purple-500 rounded-xl px-4 py-3.5 text-white placeholder-gray-600 outline-none transition-all focus:ring-2 focus:ring-purple-500/20"
+                      className="w-full bg-slate-900/80 border border-violet-500/30 focus:border-violet-500 rounded-xl px-4 py-3.5 text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/30"
                       placeholder="••••••••"
                     />
                   </div>
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full relative overflow-hidden bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white font-bold py-4 rounded-xl transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-purple-500/25 disabled:opacity-50 disabled:hover:scale-100"
+                    className="w-full relative overflow-hidden bg-gradient-to-r from-violet-600 to-violet-700 hover:from-violet-500 hover:to-violet-600 text-white font-bold py-4 rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-violet-500/30 disabled:opacity-50"
                   >
-                    <span className="relative z-10">
-                      {loading ? (
-                        <span className="flex items-center justify-center gap-2">
-                          <svg className="animate-spin w-5 h-5" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                          </svg>
-                          Signing in...
-                        </span>
-                      ) : 'Sign In'}
-                    </span>
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full hover:translate-x-full transition-transform duration-700" />
+                    {loading ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <svg className="animate-spin w-5 h-5" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                        Signing in...
+                      </span>
+                    ) : 'Sign In'}
                   </button>
                 </form>
               )}
@@ -368,65 +354,62 @@ function AuthModal() {
               {activeTab === 'sign_up' && !success && (
                 <form onSubmit={handleSignUp} className="space-y-4">
                   <div>
-                    <label className="block text-gray-400 text-sm mb-2 font-medium">What should we call you?</label>
+                    <label className="block text-slate-400 text-sm mb-2 font-medium">What should we call you?</label>
                     <input
                       type="text"
                       value={displayName}
                       onChange={(e) => setDisplayName(e.target.value)}
                       required
-                      className="w-full bg-[#0F0D1A] border border-purple-500/30 focus:border-purple-500 rounded-xl px-4 py-3.5 text-white placeholder-gray-600 outline-none transition-all focus:ring-2 focus:ring-purple-500/20"
+                      className="w-full bg-slate-900/80 border border-violet-500/30 focus:border-violet-500 rounded-xl px-4 py-3.5 text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/30"
                       placeholder="Your name or nickname"
                     />
                   </div>
                   <div>
-                    <label className="block text-gray-400 text-sm mb-2 font-medium">Email</label>
+                    <label className="block text-slate-400 text-sm mb-2 font-medium">Email</label>
                     <input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="w-full bg-[#0F0D1A] border border-purple-500/30 focus:border-purple-500 rounded-xl px-4 py-3.5 text-white placeholder-gray-600 outline-none transition-all focus:ring-2 focus:ring-purple-500/20"
+                      className="w-full bg-slate-900/80 border border-violet-500/30 focus:border-violet-500 rounded-xl px-4 py-3.5 text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/30"
                       placeholder="you@example.com"
                     />
                   </div>
                   <div>
-                    <label className="block text-gray-400 text-sm mb-2 font-medium">Password</label>
+                    <label className="block text-slate-400 text-sm mb-2 font-medium">Password</label>
                     <input
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
                       minLength={6}
-                      className="w-full bg-[#0F0D1A] border border-purple-500/30 focus:border-purple-500 rounded-xl px-4 py-3.5 text-white placeholder-gray-600 outline-none transition-all focus:ring-2 focus:ring-purple-500/20"
+                      className="w-full bg-slate-900/80 border border-violet-500/30 focus:border-violet-500 rounded-xl px-4 py-3.5 text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/30"
                       placeholder="At least 6 characters"
                     />
                   </div>
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full relative overflow-hidden bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-bold py-4 rounded-xl transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-amber-500/25 disabled:opacity-50 disabled:hover:scale-100"
+                    className="w-full relative overflow-hidden bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-900 font-bold py-4 rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-amber-500/30 disabled:opacity-50"
                   >
-                    <span className="relative z-10">
-                      {loading ? (
-                        <span className="flex items-center justify-center gap-2">
-                          <svg className="animate-spin w-5 h-5" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                          </svg>
-                          Creating account...
-                        </span>
-                      ) : 'Join the Village 🏘️'}
-                    </span>
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full hover:translate-x-full transition-transform duration-700" />
+                    {loading ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <svg className="animate-spin w-5 h-5" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                        Creating account...
+                      </span>
+                    ) : 'Join the Village 🏘️'}
                   </button>
                 </form>
               )}
 
               {/* Terms */}
               {activeTab === 'sign_up' && !success && (
-                <p className="text-gray-500 text-xs text-center mt-4">
+                <p className="text-slate-500 text-xs text-center mt-4">
                   By joining, you agree to our{' '}
-                  <a href="/privacy" className="text-purple-400 hover:text-purple-300 underline">Privacy Policy</a>
+                  <a href="/privacy" className="text-violet-400 hover:text-violet-300 underline">Privacy Policy</a>
                 </p>
               )}
             </div>
@@ -434,8 +417,8 @@ function AuthModal() {
         </div>
       </div>
 
-      {/* Custom Keyframes */}
-      <style jsx>{`
+      {/* Animation Keyframes */}
+      <style>{`
         @keyframes fadeIn {
           from { opacity: 0; }
           to { opacity: 1; }
@@ -453,22 +436,14 @@ function AuthModal() {
         }
         
         @keyframes walkRight {
-          from { transform: translateX(-50px); }
-          to { transform: translateX(450px); }
+          from { transform: translateX(-30px); }
+          to { transform: translateX(430px); }
         }
         
         @keyframes shake {
           0%, 100% { transform: translateX(0); }
           25% { transform: translateX(-5px); }
           75% { transform: translateX(5px); }
-        }
-        
-        .animate-fadeIn {
-          animation: fadeIn 0.3s ease forwards;
-        }
-        
-        .animate-scaleIn {
-          animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
         
         .animate-shake {
