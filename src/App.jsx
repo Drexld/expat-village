@@ -14,6 +14,8 @@ import Housing from './pages/Housing'
 import JobsCareers from './pages/JobsCareers'
 import LiveYourLife from './pages/LiveYourLife'
 import GettingAround from './pages/GettingAround'
+import About from './pages/About'
+import Privacy from './pages/Privacy'
 
 // Interactive Features
 import TownHall from './pages/TownHall'
@@ -45,6 +47,8 @@ function App() {
             <Route path="jobs-careers" element={<JobsCareers />} />
             <Route path="live-your-life" element={<LiveYourLife />} />
             <Route path="getting-around" element={<GettingAround />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/privacy" element={<Privacy />} />
             
             {/* Interactive Features */}
             <Route path="town-hall" element={<TownHall />} />
