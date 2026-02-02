@@ -32,6 +32,7 @@ import StudentHub from './pages/StudentHub'
 import Directory from './pages/Directory'
 import Rewards from './pages/Rewards'
 import Alerts from './pages/Alerts'
+import Settings from './pages/Settings'
 
 import './App.css'
 
@@ -96,6 +97,7 @@ function App() {
             <Route path="directory" element={<Directory />} />
             <Route path="rewards" element={<Rewards />} />
             <Route path="alerts" element={<Alerts />} />
+            <Route path="settings" element={<Settings />} />
           </Route>
         </Routes>
       </Router>

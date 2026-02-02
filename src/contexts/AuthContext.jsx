@@ -100,21 +100,44 @@ export const AuthProvider = ({ children }) => {
 
   const signOut = async () => {
     console.log('Sign out clicked!')
-    
+
     // Clear local storage directly
     localStorage.removeItem('sb-nkybxminaowwtrmoffzw-auth-token')
-    
+
     // Clear state
     setUser(null)
     setProfile(null)
-    
+
     // Try Supabase signOut in background (don't await)
     supabase.auth.signOut().catch(err => console.log('Background signout:', err))
-    
+
     console.log('Signed out locally')
-    
+
     // Reload page to ensure clean state
     window.location.reload()
+  }
+
+  const updateProfile = async (updates) => {
+    if (!user) return { error: 'Not authenticated' }
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .update(updates)
+      .eq('id', user.id)
+      .select()
+      .single()
+
+    if (!error && data) {
+      setProfile(data)
+    }
+
+    return { data, error }
+  }
+
+  const refreshProfile = async () => {
+    if (!user) return
+    const p = await fetchProfile(user.id)
+    setProfile(p)
   }
 
   const openAuthModal = (view = 'sign_in') => setAuthModal({ isOpen: true, view })
@@ -133,6 +156,8 @@ export const AuthProvider = ({ children }) => {
       signIn,
       signInWithGoogle,
       signOut,
+      updateProfile,
+      refreshProfile,
       authModal,
       openAuthModal,
       closeAuthModal,

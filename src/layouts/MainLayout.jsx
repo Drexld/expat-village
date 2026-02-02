@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import AuthModal from '../components/AuthModal'
+import BottomNav from '../components/BottomNav'
 
 function MainLayout() {
   const navigate = useNavigate()
@@ -54,14 +55,10 @@ function MainLayout() {
     }
   }
 
-  const navLinks = [
-    { path: '/about', label: 'About', protected: false },
-    { path: '/directory', label: 'Directory', protected: true },
-    { path: '/town-hall', label: 'Community', protected: true },
-  ]
-
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
+    <div className="min-h-screen bg-slate-950 text-white flex justify-center">
+      {/* Mobile container - constrain width on desktop to simulate mobile */}
+      <div className="w-full max-w-md relative">
       <AuthModal />
 
       {/* ===== HEADER ===== */}
@@ -91,25 +88,7 @@ function MainLayout() {
               </div>
             </Link>
 
-            {/* Navigation */}
-            <nav className="hidden md:flex items-center">
-              <div className="flex items-center gap-1 bg-slate-800/50 backdrop-blur-sm rounded-full px-2 py-1.5 border border-slate-700/50">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.path}
-                    to={link.protected && !isAuthenticated ? '#' : link.path}
-                    onClick={(e) => link.protected && handleProtectedClick(e, link.path)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-                      location.pathname === link.path
-                        ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/30'
-                        : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-              </div>
-            </nav>
+            {/* Navigation - Hidden (using bottom nav instead) */}
 
             {/* Auth Buttons / User Menu */}
             <div className="flex items-center gap-3">
@@ -161,6 +140,13 @@ function MainLayout() {
                         >
                           <span>🔔</span> My Alerts
                         </Link>
+                        <Link
+                          to="/settings"
+                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors"
+                          onClick={() => setShowUserMenu(false)}
+                        >
+                          <span>⚙️</span> Settings
+                        </Link>
                         <div className="border-t border-slate-700 mt-2 pt-2">
                           <button
                             onClick={handleSignOut}
@@ -197,13 +183,16 @@ function MainLayout() {
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="pt-20 md:pt-24 pb-16 px-4 sm:px-6 max-w-7xl mx-auto">
+      {/* Main Content - extra padding at bottom for mobile nav */}
+      <main className="pt-20 md:pt-24 pb-24 md:pb-16 px-4 sm:px-6 max-w-7xl mx-auto">
         <Outlet />
       </main>
 
-      {/* ===== FOOTER ===== */}
-      <footer className="bg-slate-900 border-t border-slate-800">
+      {/* Bottom Navigation - Always visible (mobile-first layout) */}
+      <BottomNav />
+
+      {/* ===== FOOTER ===== (Hidden - we use bottom nav for navigation) */}
+      <footer className="hidden bg-slate-900 border-t border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {/* Brand */}
@@ -340,6 +329,7 @@ function MainLayout() {
           animation: fadeIn 0.2s ease-out;
         }
       `}</style>
+      </div>{/* End mobile container */}
     </div>
   )
 }

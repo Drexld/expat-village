@@ -394,11 +394,35 @@ IMPORTANT: Respond ONLY with valid JSON:
   }
 }
 
+// ============================================
+// GENERIC AI RESPONSE
+// ============================================
+
+/**
+ * Generic function to generate AI responses
+ * Used by briefing service and other features
+ */
+export async function generateGroqResponse(prompt, options = {}) {
+  const { maxTokens = 500, temperature = 0.7 } = options
+
+  try {
+    const content = await callGroqAPI([
+      { role: 'user', content: prompt }
+    ], temperature, maxTokens)
+
+    return content
+  } catch (error) {
+    console.error('generateGroqResponse error:', error)
+    throw error
+  }
+}
+
 export default {
   analyzeContract,
   analyzeDocument,
   generateBanter,
   generateInitialBanter,
   generateQuiz,
-  generateFinalBanter
+  generateFinalBanter,
+  generateGroqResponse
 }

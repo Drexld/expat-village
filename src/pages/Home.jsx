@@ -6,6 +6,8 @@ import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { getWarsawWeather } from '../services/weather'
+import MorningBriefing from '../components/MorningBriefing'
+import Announcements from '../components/Announcements'
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // WEATHER STATES
@@ -51,12 +53,22 @@ const ACTIVITY = [
 ]
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// THREE PATHS
+// THREE PATHS (for non-authenticated users - onboarding style)
 // ═══════════════════════════════════════════════════════════════════════════════
 const PATHS = [
   { icon: "📋", label: "Get set up", color: "#8B5CF6", glow: "rgba(139,92,246,0.22)", path: "/get-things-done" },
   { icon: "🏠", label: "Find a place", color: "#f59e0b", glow: "rgba(245,158,11,0.18)", path: "/housing" },
   { icon: "🤝", label: "Meet people", color: "#10b981", glow: "rgba(16,185,129,0.18)", path: "/town-hall" },
+]
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// QUICK ACTIONS (for authenticated users - dashboard style)
+// ═══════════════════════════════════════════════════════════════════════════════
+const QUICK_ACTIONS = [
+  { icon: "✅", label: "My Checklist", path: "/my-checklist", color: "#8B5CF6" },
+  { icon: "🏛️", label: "Town Hall", path: "/town-hall", color: "#f59e0b" },
+  { icon: "📖", label: "Directory", path: "/directory", color: "#10b981" },
+  { icon: "🎯", label: "Get Things Done", path: "/get-things-done", color: "#ec4899" },
 ]
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -243,16 +255,28 @@ function ActivityStrip() {
 // MAIN HOME COMPONENT
 // ═══════════════════════════════════════════════════════════════════════════════
 function Home() {
-  const { isAuthenticated, profile, user, openAuthModal } = useAuth()
+  const { isAuthenticated, openAuthModal, profile } = useAuth()
   const navigate = useNavigate()
   const [weatherData, setWeatherData] = useState({ state: "night", temp: -5, condition: "Clear night", icon: "🌙" })
   const [tapped, setTapped] = useState(null)
+  const [showMorningBriefing, setShowMorningBriefing] = useState(false)
   const w = WEATHER[weatherData.state]
+  const points = profile?.points || profile?.reward_points || 1280
 
-  const displayName = profile?.display_name
-    || user?.user_metadata?.display_name
-    || user?.email?.split('@')[0]
-    || 'friend'
+  const MUSIC_PULSE = [
+    { genre: "Afrohouse", listeners: 1204 },
+    { genre: "Lo‑fi Beats", listeners: 932 },
+    { genre: "Polish Indie", listeners: 711 },
+    { genre: "Jazz Café", listeners: 486 },
+  ]
+
+  const missionCta = (label) => {
+    if (label === "My Checklist") return "Continue"
+    if (label === "Town Hall") return "Join room"
+    if (label === "Directory") return "Explore"
+    if (label === "Get Things Done") return "Get started"
+    return "Open"
+  }
 
   // Fetch real Warsaw weather on mount
   useEffect(() => {
@@ -262,6 +286,30 @@ function Home() {
     }
     fetchWeather()
   }, [])
+
+  // Show Morning Briefing once per day for authenticated users
+  useEffect(() => {
+    if (isAuthenticated) {
+      const todayKey = new Date().toLocaleDateString('en-CA')
+      const storageKey = `expat_morning_briefing_seen_${todayKey}`
+      const hasSeenBriefing = localStorage.getItem(storageKey)
+      if (!hasSeenBriefing) {
+        // Small delay to let the page render first
+        const timer = setTimeout(() => {
+          setShowMorningBriefing(true)
+        }, 500)
+        return () => clearTimeout(timer)
+      }
+    }
+  }, [isAuthenticated])
+
+  // Handle closing the morning briefing
+  const handleCloseMorningBriefing = () => {
+    setShowMorningBriefing(false)
+    const todayKey = new Date().toLocaleDateString('en-CA')
+    const storageKey = `expat_morning_briefing_seen_${todayKey}`
+    localStorage.setItem(storageKey, 'true')
+  }
 
   return (
     <div 
@@ -285,132 +333,278 @@ function Home() {
       {/* CONTENT */}
       <div className="relative z-10 flex flex-col min-h-[calc(100vh-6rem)]">
 
-        {/* Activity strip */}
-        <div className="px-4 pt-6">
-          <ActivityStrip />
-        </div>
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* AUTHENTICATED USER EXPERIENCE */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {isAuthenticated ? (
+          <div className="flex flex-col gap-6 px-4 pt-4 pb-10">
+            {/* Village signal strip */}
+            <div className="relative overflow-hidden rounded-2xl px-4 py-3" style={{
+              background: "rgba(15,23,42,0.55)",
+              border: "1px solid rgba(139,92,246,0.18)",
+              backdropFilter: "blur(10px)",
+            }}>
+              <div className="flex items-center justify-between gap-3 mb-2">
+                <p className="text-[11px] uppercase tracking-widest text-slate-400">Village Signal</p>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-amber-200">⭐ {points.toLocaleString()}</span>
+                  <span className="text-[10px] text-slate-500">points</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 overflow-hidden">
+                <div className="flex gap-4 animate-signalMarquee" style={{ width: "max-content" }}>
+                  {MUSIC_PULSE.map((m, i) => (
+                    <div key={i} className="flex items-center gap-2 text-xs text-slate-300 whitespace-nowrap">
+                      <span>🎧</span>
+                      <span>Village is listening:</span>
+                      <span className="text-white font-semibold">{m.genre}</span>
+                      <span className="text-slate-500">· {m.listeners} villagers</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
 
-        {/* Main content */}
-        <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
-          
-          {/* Live indicator */}
-          <div className="flex items-center gap-2 mb-4">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
-            </span>
-            <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: "#a78bfa" }}>
-              Warsaw · Live
-            </span>
+            {/* Daily Pulse - Tap to reopen morning briefing */}
+            <button
+              onClick={() => setShowMorningBriefing(true)}
+              className="relative overflow-hidden rounded-3xl p-4 text-left transition-all active:scale-[0.99]"
+              style={{
+                background: "linear-gradient(135deg, rgba(139,92,246,0.22), rgba(30,27,75,0.75))",
+                border: "1px solid rgba(139,92,246,0.35)",
+                boxShadow: "0 18px 40px rgba(20,16,38,0.45)",
+              }}
+            >
+              <div className="absolute inset-0 opacity-30" style={{
+                background: "radial-gradient(120px 120px at 85% 20%, rgba(251,191,36,0.35), transparent 70%)",
+              }} />
+              <div className="relative flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="text-4xl">{weatherData.icon}</div>
+                  <div>
+                    <p className="text-xs uppercase tracking-widest text-slate-300">Daily Pulse</p>
+                    <p className="text-2xl font-bold text-white leading-tight">{weatherData.temp}°C</p>
+                    <p className="text-xs text-slate-400 capitalize">{weatherData.condition}</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-purple-300">Tap for briefing</p>
+                  <p className="text-xs text-slate-500">Warsaw · Live</p>
+                </div>
+              </div>
+              <div className="relative mt-4 flex items-center gap-3 text-xs text-slate-300">
+                <span className="px-2 py-1 rounded-full border border-purple-400/30 bg-purple-400/10">City mood: {weatherData.state}</span>
+                <span className="px-2 py-1 rounded-full border border-amber-300/30 bg-amber-300/10">Tonight: cozy</span>
+              </div>
+            </button>
+
+            {/* Announcements */}
+            <Announcements />
+
+            {/* Choose your path */}
+            <div>
+              <p className="text-xs font-medium text-slate-500 mb-3 px-1">Choose your path</p>
+              <div className="grid grid-cols-2 gap-3">
+                {PATHS.map((p, i) => (
+                  <button
+                    key={i}
+                    onClick={() => navigate(p.path)}
+                    className="relative overflow-hidden rounded-3xl p-4 text-left transition-all duration-200 active:scale-95"
+                    style={{
+                      background: `linear-gradient(145deg, ${p.glow}, rgba(20,16,38,0.75))`,
+                      border: `1px solid ${p.color}55`,
+                      boxShadow: `0 10px 24px ${p.glow}`,
+                    }}
+                  >
+                    <div className="absolute -top-6 -right-6 w-16 h-16 rounded-full" style={{ background: p.color, opacity: 0.15 }} />
+                    <div className="text-2xl mb-2">{p.icon}</div>
+                    <p className="text-sm font-semibold text-white">{p.label}</p>
+                    <p className="text-[11px] text-slate-300 mt-1">Jump in →</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Daily missions */}
+            <div>
+              <p className="text-xs font-medium text-slate-500 mb-3 px-1">Daily missions</p>
+              <div className="grid grid-cols-1 gap-3">
+                {QUICK_ACTIONS.map((action, i) => (
+                  <button
+                    key={i}
+                    onClick={() => navigate(action.path)}
+                    className="flex items-center justify-between gap-3 px-4 py-4 rounded-2xl transition-all duration-200 active:scale-95"
+                    style={{
+                      background: "rgba(17,24,39,0.65)",
+                      border: "1px solid rgba(139,92,246,0.18)",
+                    }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-lg">{action.icon}</span>
+                      <div className="text-left">
+                        <p className="text-sm font-medium text-white">{action.label}</p>
+                        <p className="text-[11px] text-slate-400">Make progress today</p>
+                      </div>
+                    </div>
+                    <span className="text-xs text-purple-300">{missionCta(action.label)} →</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Featured rooms */}
+            <div>
+              <p className="text-xs font-medium text-slate-500 mb-3 px-1">Featured rooms</p>
+              <div className="grid grid-cols-1 gap-3">
+                {ACTIVITY.slice(0, 1).map((a, i) => (
+                  <button
+                    key={i}
+                    className="relative overflow-hidden rounded-3xl p-4 text-left transition-all active:scale-95"
+                    style={{
+                      background: "linear-gradient(135deg, rgba(239,68,68,0.18), rgba(30,27,75,0.7))",
+                      border: "1px solid rgba(239,68,68,0.35)",
+                    }}
+                  >
+                    <div className="absolute -top-10 -right-10 h-24 w-24 rounded-full bg-red-500/20" />
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
+                      </span>
+                      <span className="text-sm">{a.icon}</span>
+                      <span className="text-sm text-white">{a.text}</span>
+                    </div>
+                    <p className="text-xs text-slate-300">Drop in and say hi — it’s live now.</p>
+                    <div className="mt-3 text-xs text-red-300">Join room →</div>
+                  </button>
+                ))}
+                {ACTIVITY.slice(1, 3).map((a, i) => (
+                  <button
+                    key={i}
+                    className="flex items-center justify-between gap-3 px-4 py-4 rounded-2xl transition-all active:scale-95"
+                    style={{
+                      background: "rgba(30,27,75,0.55)",
+                      border: "1px solid rgba(139,92,246,0.15)",
+                    }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm">{a.icon}</span>
+                      <span className="text-sm text-white">{a.text}</span>
+                    </div>
+                    <span className="text-xs text-slate-300">Enter →</span>
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
+        ) : (
+          <>
+            {/* ═══════════════════════════════════════════════════════════════════ */}
+            {/* NON-AUTHENTICATED USER EXPERIENCE (Landing page) */}
+            {/* ═══════════════════════════════════════════════════════════════════ */}
 
-          {/* Headline */}
-          <h1 className="text-white font-extrabold mb-3" style={{ 
-            fontSize: 'clamp(2rem, 8vw, 3rem)', 
-            lineHeight: 1.1, 
-            textShadow: "0 2px 30px rgba(0,0,0,0.5)" 
-          }}>
-            {isAuthenticated ? (
-              <>
-                Hey, <span style={{
-                  background: "linear-gradient(90deg, #a78bfa 0%, #c4b5fd 35%, #fbbf24 100%)",
-                  WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
-                }}>{displayName}</span> 👋
-              </>
-            ) : (
-              <>
+            {/* Activity strip */}
+            <div className="px-4 pt-6">
+              <ActivityStrip />
+            </div>
+
+            {/* Main content */}
+            <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
+
+              {/* Live indicator */}
+              <div className="flex items-center gap-2 mb-4">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
+                </span>
+                <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: "#a78bfa" }}>
+                  Warsaw · Live
+                </span>
+              </div>
+
+              {/* Headline */}
+              <h1 className="text-white font-extrabold mb-3" style={{
+                fontSize: 'clamp(2rem, 8vw, 3rem)',
+                lineHeight: 1.1,
+                textShadow: "0 2px 30px rgba(0,0,0,0.5)"
+              }}>
                 Your village<br />is already{' '}
                 <span style={{
                   background: "linear-gradient(90deg, #a78bfa 0%, #c4b5fd 35%, #fbbf24 100%)",
                   WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
                 }}>here.</span>
-              </>
-            )}
-          </h1>
+              </h1>
 
-          {/* Subtitle */}
-          <p className="text-slate-400 text-sm mb-8 max-w-xs">
-            Everything you need to thrive as an expat in Poland.
-          </p>
+              {/* Subtitle */}
+              <p className="text-slate-400 text-sm mb-8 max-w-xs">
+                Everything you need to thrive as an expat in Poland.
+              </p>
 
-          {/* Weather badge */}
-          <div className="flex items-center gap-2 mb-6 px-4 py-2 rounded-full" style={{
-            background: "rgba(30,27,75,0.5)",
-            border: "1px solid rgba(139,92,246,0.2)",
-          }}>
-            <span className="text-lg">{weatherData.icon}</span>
-            <span className="text-sm text-slate-300">{weatherData.temp}°C · {weatherData.condition}</span>
-          </div>
-        </div>
+              {/* Weather badge */}
+              <div className="flex items-center gap-2 mb-6 px-4 py-2 rounded-full" style={{
+                background: "rgba(30,27,75,0.5)",
+                border: "1px solid rgba(139,92,246,0.2)",
+              }}>
+                <span className="text-lg">{weatherData.icon}</span>
+                <span className="text-sm text-slate-300">{weatherData.temp}°C · {weatherData.condition}</span>
+              </div>
+            </div>
 
-        {/* Bottom zone */}
-        <div className="flex flex-col items-center gap-4 px-5 pb-8">
-          
-          {/* What do you need */}
-          <p className="text-xs font-medium text-slate-500">What do you need?</p>
+            {/* Bottom zone */}
+            <div className="flex flex-col items-center gap-4 px-5 pb-8">
 
-          {/* Three path buttons */}
-          <div className="flex gap-2.5 w-full max-w-sm justify-center">
-            {PATHS.map((p, i) => (
+              {/* What do you need */}
+              <p className="text-xs font-medium text-slate-500">What do you need?</p>
+
+              {/* Three path buttons - all lead to sign up for non-authenticated */}
+              <div className="flex gap-2.5 w-full max-w-sm justify-center">
+                {PATHS.map((p, i) => (
+                  <button
+                    key={i}
+                    onClick={() => openAuthModal('sign_up')}
+                    onTouchStart={() => setTapped(i)}
+                    onTouchEnd={() => setTapped(null)}
+                    onMouseDown={() => setTapped(i)}
+                    onMouseUp={() => setTapped(null)}
+                    onMouseLeave={() => setTapped(null)}
+                    className="flex-1 flex flex-col items-center gap-1.5 py-4 rounded-2xl transition-all duration-200"
+                    style={{
+                      background: tapped === i
+                        ? `linear-gradient(145deg, ${p.glow}, rgba(20,16,38,0.75))`
+                        : "rgba(20,16,38,0.55)",
+                      border: `1px solid ${tapped === i ? p.color + "50" : "rgba(139,92,246,0.2)"}`,
+                      backdropFilter: "blur(10px)",
+                      WebkitBackdropFilter: "blur(10px)",
+                      transform: tapped === i ? "scale(0.96)" : "scale(1)",
+                      boxShadow: tapped === i ? `0 4px 18px ${p.glow}` : "0 2px 10px rgba(0,0,0,0.3)",
+                    }}
+                  >
+                    <span className="text-2xl">{p.icon}</span>
+                    <span className="text-xs font-bold text-white">{p.label}</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Join CTA */}
               <button
-                key={i}
-                onClick={() => isAuthenticated ? navigate(p.path) : openAuthModal('sign_up')}
-                onTouchStart={() => setTapped(i)}
-                onTouchEnd={() => setTapped(null)}
-                onMouseDown={() => setTapped(i)}
-                onMouseUp={() => setTapped(null)}
-                onMouseLeave={() => setTapped(null)}
-                className="flex-1 flex flex-col items-center gap-1.5 py-4 rounded-2xl transition-all duration-200"
+                onClick={() => openAuthModal('sign_up')}
+                className="flex items-center gap-2 px-5 py-3 rounded-full transition-all duration-200 active:scale-95"
                 style={{
-                  background: tapped === i
-                    ? `linear-gradient(145deg, ${p.glow}, rgba(20,16,38,0.75))`
-                    : "rgba(20,16,38,0.55)",
-                  border: `1px solid ${tapped === i ? p.color + "50" : "rgba(139,92,246,0.2)"}`,
-                  backdropFilter: "blur(10px)",
-                  WebkitBackdropFilter: "blur(10px)",
-                  transform: tapped === i ? "scale(0.96)" : "scale(1)",
-                  boxShadow: tapped === i ? `0 4px 18px ${p.glow}` : "0 2px 10px rgba(0,0,0,0.3)",
+                  background: "rgba(20,16,38,0.55)",
+                  border: "1px solid rgba(251,191,36,0.3)",
+                  backdropFilter: "blur(8px)",
+                  boxShadow: "0 2px 14px rgba(251,191,36,0.1)",
                 }}
               >
-                <span className="text-2xl">{p.icon}</span>
-                <span className="text-xs font-bold text-white">{p.label}</span>
+                <span>🏘️</span>
+                <span className="text-sm font-semibold text-white">Join the village — it's free</span>
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                  <path d="M4.5 2.5L8.5 6L4.5 9.5" stroke="#fbbf24" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
               </button>
-            ))}
-          </div>
-
-          {/* Join CTA */}
-          {!isAuthenticated && (
-            <button
-              onClick={() => openAuthModal('sign_up')}
-              className="flex items-center gap-2 px-5 py-3 rounded-full transition-all duration-200 active:scale-95"
-              style={{
-                background: "rgba(20,16,38,0.55)",
-                border: "1px solid rgba(251,191,36,0.3)",
-                backdropFilter: "blur(8px)",
-                boxShadow: "0 2px 14px rgba(251,191,36,0.1)",
-              }}
-            >
-              <span>🏘️</span>
-              <span className="text-sm font-semibold text-white">Join the village — it's free</span>
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                <path d="M4.5 2.5L8.5 6L4.5 9.5" stroke="#fbbf24" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-          )}
-
-          {isAuthenticated && (
-            <button
-              onClick={() => navigate('/get-things-done')}
-              className="flex items-center gap-2 px-6 py-3 rounded-full transition-all duration-200 active:scale-95"
-              style={{
-                background: "linear-gradient(135deg, #7c3aed, #a78bfa)",
-                boxShadow: "0 4px 20px rgba(124,58,237,0.4)",
-              }}
-            >
-              <span className="text-sm font-bold text-white">Let's go →</span>
-            </button>
-          )}
-        </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Weather switcher - dev only */}
@@ -436,7 +630,17 @@ function Home() {
         @keyframes twinkle { from { opacity: 0.15; } to { opacity: 0.85; } }
         @keyframes fogDrift { from { transform: translateX(-5px) scaleX(1); } to { transform: translateX(5px) scaleX(1.02); } }
         @keyframes windowPulse { from { opacity: 0.2; } to { opacity: 0.75; } }
+        @keyframes signalMarquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        .animate-signalMarquee { animation: signalMarquee 18s linear infinite; }
       `}</style>
+
+      {/* Morning Briefing Overlay - shows once per session for authenticated users */}
+      {showMorningBriefing && (
+        <MorningBriefing
+          weatherData={weatherData}
+          onClose={handleCloseMorningBriefing}
+        />
+      )}
     </div>
   )
 }
