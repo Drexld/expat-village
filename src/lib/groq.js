@@ -1,7 +1,6 @@
 // src/lib/groq.js
-// Groq API integration for AI-powered features - POLISH LAW EDITION
+// Groq API integration for AI-powered features
 
-// API key from environment variable (set in .env file)
 const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
 
@@ -19,7 +18,7 @@ async function callGroqAPI(messages, temperature = 0.3, maxTokens = 2000) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'llama-3.1-8b-instant',
+        model: 'llama-3.3-70b-versatile',
         messages: messages,
         temperature: temperature,
         max_tokens: maxTokens,
@@ -40,7 +39,178 @@ async function callGroqAPI(messages, temperature = 0.3, maxTokens = 2000) {
   }
 }
 
-// Polish law-based fallback analysis
+// ============================================
+// PERSONALITY ONBOARDING - AI FUNCTIONS
+// ============================================
+
+// Generate initial banter when user selects their interest
+export async function generateInitialBanter(tribe, interest) {
+  const systemPrompt = `You are a witty, sarcastic friend who loves playful banter about sports, music, movies, gaming, and fandoms. You're helping onboard new users to Expat Village (a community for expats in Poland).
+
+The user just told you they're a fan of "${interest}" (in the ${tribe} category).
+
+Your task: Generate a SHORT, funny, playful roast/tease about their choice.
+
+Rules:
+- Be cheeky but NOT mean or offensive
+- Reference something specific about their choice (a meme, controversy, famous moment, rival, etc.)
+- Keep it to 2-3 sentences MAX
+- End with something like "Let's see if you're a real fan..."
+- Use 1-2 emojis max
+
+Examples of good banter:
+- For "Manchester United": "A Man United fan? Still living off the Fergie years, I see. Haven't won the league since Instagram was invented. 😏 Let's see if you actually know your stuff..."
+- For "Taylor Swift": "A Swiftie! Let me guess, you have a ranking of all her albums and get personally offended when someone says Fearless is mid. 💀 Let's test that superfan status..."
+- For "One Piece": "One Piece fan? So you've dedicated 1000+ episodes of your life to watching a rubber boy punch people. Respect. 🏴‍☠️ Let's see if you're nakama material..."
+
+IMPORTANT: Respond ONLY with valid JSON:
+{
+  "banter": "Your witty 2-3 sentence roast here",
+  "emoji": "A single relevant emoji"
+}`
+
+  try {
+    const content = await callGroqAPI([
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: `Generate banter for someone who says they're a ${interest} fan (${tribe} category)` }
+    ], 0.9, 300)
+
+    const jsonMatch = content.match(/\{[\s\S]*\}/)
+    if (jsonMatch) {
+      return JSON.parse(jsonMatch[0])
+    }
+    throw new Error('No JSON found')
+  } catch (error) {
+    console.error('Generate initial banter error:', error)
+    return {
+      banter: `A ${interest} fan? Interesting choice... Let's see if you're actually a real fan or just here for the vibes. 😏`,
+      emoji: '🤔'
+    }
+  }
+}
+
+// Generate quiz questions dynamically based on user's interest
+export async function generateQuiz(tribe, interest) {
+  const systemPrompt = `You are a quiz master creating fun trivia questions about "${interest}" (${tribe} category).
+
+Create exactly 5 multiple choice questions to test if someone is a TRUE fan of ${interest}.
+
+Rules:
+- Questions should range from medium to hard difficulty
+- Mix factual questions with fan culture questions
+- Each question has exactly 4 options
+- "correct" is the index (0-3) of the right answer
+- Questions should be specific to ${interest}, not generic
+- Make it fun - include some questions about memes, controversies, or deep cuts that only real fans would know
+
+Question types to include:
+- Historical/founding facts
+- Famous moments or achievements
+- Key people (players, members, characters, etc.)
+- Fan culture (memes, nicknames, rivalries)
+- Recent events or changes
+
+IMPORTANT: Respond ONLY with valid JSON:
+{
+  "questions": [
+    {
+      "q": "Question text here?",
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "correct": 2
+    }
+  ]
+}`
+
+  try {
+    const content = await callGroqAPI([
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: `Create 5 quiz questions for a ${interest} fan (${tribe})` }
+    ], 0.7, 1000)
+
+    const jsonMatch = content.match(/\{[\s\S]*\}/)
+    if (jsonMatch) {
+      const result = JSON.parse(jsonMatch[0])
+      if (result.questions && result.questions.length >= 5) {
+        return result
+      }
+    }
+    throw new Error('Invalid quiz format')
+  } catch (error) {
+    console.error('Generate quiz error:', error)
+    // Return fallback generic questions
+    return {
+      questions: [
+        { q: `How long have you been following ${interest}?`, options: ["Just discovered them", "A few years", "5+ years", "Since the very beginning"], correct: 3 },
+        { q: `How would friends describe your ${interest} fandom?`, options: ["Casual observer", "Regular fan", "Super dedicated", "It's my entire personality"], correct: 2 },
+        { q: `Do you own any ${interest} merchandise?`, options: ["Nothing", "A few items", "A solid collection", "My room is a shrine"], correct: 3 },
+        { q: `How do you react when someone criticizes ${interest}?`, options: ["Don't care", "Mild disagreement", "Heated debate", "Personal attack"], correct: 2 },
+        { q: `Would you travel internationally to see/experience ${interest}?`, options: ["Probably not", "If convenient", "Definitely yes", "Already have multiple times"], correct: 3 }
+      ]
+    }
+  }
+}
+
+// Generate final banter based on quiz score
+export async function generateFinalBanter(tribe, interest, score, totalQuestions) {
+  const percentage = Math.round((score / totalQuestions) * 100)
+  
+  const systemPrompt = `You are a witty friend delivering quiz results for someone who just completed a ${interest} (${tribe}) fan quiz.
+
+They scored ${score}/${totalQuestions} (${percentage}%).
+
+Generate personalized banter based on their score:
+- 80-100%: Praise them! They're legit. But still be cheeky about it.
+- 50-79%: Tease them. Decent but room for improvement. Maybe a casual fan?
+- Below 50%: Roast them gently! Are they sure they're a fan? Wikipedia is free. 😂
+
+Rules:
+- 2-3 sentences MAX
+- Reference something specific about ${interest}
+- Be funny but not mean
+- Give them a fun badge name based on their score
+- Suggest they find fellow fans in Town Hall (our community feature)
+
+IMPORTANT: Respond ONLY with valid JSON:
+{
+  "banter": "Your personalized response here",
+  "badge": "Creative badge name like 'True Believer' or 'Bandwagon Jumper'",
+  "townHallSuggestion": "A suggestion to find their community in Town Hall"
+}`
+
+  try {
+    const content = await callGroqAPI([
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: `Generate final banter for a ${interest} fan who scored ${score}/${totalQuestions}` }
+    ], 0.9, 400)
+
+    const jsonMatch = content.match(/\{[\s\S]*\}/)
+    if (jsonMatch) {
+      return JSON.parse(jsonMatch[0])
+    }
+    throw new Error('No JSON found')
+  } catch (error) {
+    console.error('Generate final banter error:', error)
+    return {
+      banter: score >= 4 
+        ? `${score}/${totalQuestions}! Okay, you actually know your stuff. Welcome to the village, true ${interest} fan! 🔥`
+        : score >= 2
+        ? `${score}/${totalQuestions}... Not terrible, but there's room for improvement. We'll let you in anyway. 😏`
+        : `${score}/${totalQuestions}?! Are you SURE you're a ${interest} fan? Wikipedia is free, my friend. 😂 We're letting you in anyway... on probation.`,
+      badge: score >= 4 ? 'Certified Superfan' : score >= 2 ? 'Casual Enjoyer' : 'Work in Progress',
+      townHallSuggestion: `Head to Town Hall to find fellow ${interest} fans in Poland!`
+    }
+  }
+}
+
+// Legacy function for backwards compatibility
+export async function generateBanter(tribe, club, quizScore, totalQuestions) {
+  return generateFinalBanter(tribe, club, quizScore, totalQuestions)
+}
+
+// ============================================
+// CONTRACT & DOCUMENT ANALYSIS
+// ============================================
+
 function getFallbackContractAnalysis(contractText) {
   const textLower = contractText.toLowerCase()
   
@@ -48,461 +218,187 @@ function getFallbackContractAnalysis(contractText) {
   const hasEntryClause = textLower.includes('dowolnym momencie') || textLower.includes('any time') || textLower.includes('bez uprzedzenia') || textLower.includes('without notice')
   const hasShortNotice = textLower.includes('2-tygodn') || textLower.includes('2 week') || textLower.includes('dwutygodni')
   const hasRepairClause = textLower.includes('wszystkie naprawy') || textLower.includes('all repairs') || textLower.includes('wszelkie naprawy')
-  const hasNoPets = textLower.includes('zwierz') || textLower.includes('pet')
   const hasNoZameldowanie = textLower.includes('bez zameldowania') || textLower.includes('no registration') || textLower.includes('zameldowanie niemożliwe')
-  const hasImmediateTermination = textLower.includes('ze skutkiem natychmiastowym') || textLower.includes('immediate effect') || textLower.includes('natychmiastowe wypowiedzenie')
-  const hasPenaltyClause = textLower.includes('kara umowna') || textLower.includes('penalty') || textLower.includes('odszkodowanie')
-  const hasRentIncrease = textLower.includes('podwyżka') || textLower.includes('rent increase') || textLower.includes('zmiana czynszu')
 
   const redFlags = []
   const warnings = []
   const goodClauses = []
 
-  // RED FLAGS - Violations of Polish law
   if (hasEntryClause) {
     redFlags.push({
-      clause: "Wynajmujący ma prawo wejść do lokalu w dowolnym momencie",
-      issue: "ILLEGAL under Polish law. Article 10 of the Tenant Protection Act (Ustawa o ochronie praw lokatorów) requires landlord to give notice and obtain tenant consent except in emergencies (fire, gas leak, flood).",
-      recommendation: "Remove this clause or modify to: 'Landlord may enter with 24-hour notice and tenant consent, except in emergencies.' This clause is unenforceable in Polish courts.",
-      polishLaw: "Art. 10 Ustawy o ochronie praw lokatorów"
-    })
-  }
-
-  if (hasImmediateTermination) {
-    redFlags.push({
-      clause: "Wypowiedzenie ze skutkiem natychmiastowym",
-      issue: "Under Polish Civil Code (Art. 688), landlords cannot terminate without cause. Immediate termination is only allowed for serious breaches (non-payment for 3+ months, illegal activity, major damage).",
-      recommendation: "Ensure the clause specifies LEGAL grounds for immediate termination only. Generic immediate termination clauses are unenforceable.",
-      polishLaw: "Art. 688 Kodeksu Cywilnego, Art. 11 Ustawy o ochronie praw lokatorów"
-    })
-  }
-
-  if (hasRepairClause) {
-    redFlags.push({
-      clause: "Najemca odpowiada za wszystkie naprawy",
-      issue: "VIOLATES Polish Civil Code Article 662. Landlord is legally responsible for major repairs (heating system, plumbing, electrical, structural). Only minor repairs (painting, small fixes) can be tenant's responsibility.",
-      recommendation: "Modify to comply with Art. 662 KC: tenant handles minor repairs, landlord handles major repairs and appliances.",
-      polishLaw: "Art. 662 Kodeksu Cywilnego"
+      clause: "Landlord entry without notice",
+      issue: "ILLEGAL under Polish law. Art. 10 of Tenant Protection Act requires tenant consent.",
+      recommendation: "Request removal of this clause",
+      polishLaw: "Art. 10 Ustawa o ochronie praw lokatorów"
     })
   }
 
   if (hasShortNotice) {
     redFlags.push({
-      clause: "2-tygodniowy okres wypowiedzenia",
-      issue: "TOO SHORT under Polish law. For indefinite-term contracts, minimum notice is 3 months (Art. 688 KC). For fixed-term, early termination must be explicitly allowed in the contract.",
-      recommendation: "For your protection, negotiate minimum 1-month notice. Standard in Poland is 1-3 months.",
-      polishLaw: "Art. 688 Kodeksu Cywilnego"
+      clause: "2-week notice period",
+      issue: "Below legal minimum. Art. 688 Kodeks Cywilny requires minimum 3 months for indefinite contracts.",
+      recommendation: "Negotiate longer notice period",
+      polishLaw: "Art. 688 Kodeks Cywilny"
+    })
+  }
+
+  if (hasHighDeposit) {
+    warnings.push({
+      clause: "3-month deposit",
+      issue: "High but legal. Maximum allowed is 12x monthly rent under Art. 6.",
+      recommendation: "Try to negotiate down to 1-2 months",
+      polishLaw: "Art. 6 Ustawa o ochronie praw lokatorów"
     })
   }
 
   if (hasNoZameldowanie) {
     redFlags.push({
-      clause: "Zakaz zameldowania / No registration allowed",
-      issue: "Landlords CANNOT legally prevent zameldowanie (registration). Under Polish law, tenants have the right to register their residence. This is required for many official purposes (PESEL, healthcare, voting).",
-      recommendation: "This clause is unenforceable. You have a legal right to register. However, landlord obstruction can make it difficult - consider a different apartment.",
+      clause: "No registration allowed",
+      issue: "ILLEGAL. Landlord cannot prohibit zameldowanie.",
+      recommendation: "This clause is unenforceable - you have the right to register",
       polishLaw: "Ustawa o ewidencji ludności"
     })
   }
 
-  // WARNINGS - Unusual but not illegal
-  if (hasHighDeposit) {
-    warnings.push({
-      clause: "Kaucja: 3 miesiące czynszu",
-      issue: "While legal (max is 12x monthly rent under Art. 6 Tenant Protection Act), 3 months is above market standard. Typical deposit in Poland is 1-2 months.",
-      recommendation: "Try negotiating down to 2 months. Ensure contract specifies conditions for full return (inspection checklist, timeline).",
-      polishLaw: "Art. 6 Ustawy o ochronie praw lokatorów"
-    })
-  }
-
-  if (hasNoPets) {
-    warnings.push({
-      clause: "Zakaz posiadania zwierząt bez zgody",
-      issue: "Pet restrictions are legal in Poland. However, landlord cannot unreasonably refuse if pet doesn't cause damage or disturbance.",
-      recommendation: "If you have pets, get written permission BEFORE signing. If landlord agrees verbally, it's not binding.",
-      polishLaw: "Dozwolone w umowie najmu"
-    })
-  }
-
-  if (hasPenaltyClause) {
-    warnings.push({
-      clause: "Kara umowna (Contractual penalty)",
-      issue: "Penalty clauses are legal but must be proportionate. Polish courts can reduce excessive penalties (Art. 484 KC).",
-      recommendation: "Check the penalty amounts. If they seem excessive (e.g., 3x monthly rent for early termination), negotiate or know that courts may reduce them.",
-      polishLaw: "Art. 484 Kodeksu Cywilnego"
-    })
-  }
-
-  if (hasRentIncrease) {
-    warnings.push({
-      clause: "Możliwość podwyżki czynszu",
-      issue: "Rent increases are regulated. For indefinite contracts, landlord must give written notice with justification. For fixed-term, rent is usually locked unless contract specifies otherwise.",
-      recommendation: "Check if increase frequency and amount are specified. Ensure any increase requires written notice (typically 3 months in advance).",
-      polishLaw: "Art. 8a Ustawy o ochronie praw lokatorów"
-    })
-  }
-
-  // GOOD CLAUSES - Look for tenant protections
-  if (textLower.includes('protokół zdawczo-odbiorczy') || textLower.includes('inventory') || textLower.includes('protokol')) {
-    goodClauses.push({
-      clause: "Protokół zdawczo-odbiorczy (Handover protocol)",
-      why: "This protects you! Document the apartment condition at move-in to avoid disputes about deposit return."
-    })
-  }
-
-  if (textLower.includes('zwrot kaucji') || textLower.includes('deposit return')) {
-    goodClauses.push({
-      clause: "Deposit return conditions specified",
-      why: "Having clear deposit return terms protects you. Under Polish law, landlord must return deposit within 30 days of move-out (minus legitimate deductions)."
-    })
-  }
-
-  // Always add at least one good clause for balance
-  if (goodClauses.length === 0) {
-    if (textLower.includes('czynsz') || textLower.includes('rent')) {
-      goodClauses.push({
-        clause: "Clear rent amount specified",
-        why: "Transparency about monthly costs is important. Make sure you understand what's included (czynsz administracyjny, media, etc.)"
-      })
-    } else {
-      goodClauses.push({
-        clause: "Written contract",
-        why: "Having a written umowa najmu is always better than verbal agreement. It provides legal protection for both parties."
-      })
-    }
-  }
-
-  // Calculate score based on Polish law compliance
-  let score = 100
-  score -= redFlags.length * 20  // Serious violations
-  score -= warnings.length * 8   // Concerns
-  score = Math.max(score, 15)    // Minimum score
-
-  let verdict = 'SAFE TO SIGN'
-  if (score < 40) verdict = 'DO NOT SIGN'
-  else if (score < 70) verdict = 'REVIEW CAREFULLY'
-
+  const score = Math.max(0, 100 - (redFlags.length * 25) - (warnings.length * 10))
+  
   return {
-    score: score,
-    verdict: verdict,
-    summary: `Found ${redFlags.length} clause(s) that may violate Polish law and ${warnings.length} unusual terms. ${redFlags.length > 0 ? 'Some clauses may be unenforceable in Polish courts.' : 'Contract appears to comply with basic Polish rental law.'}`,
-    redFlags: redFlags,
-    warnings: warnings,
-    goodClauses: goodClauses,
+    score,
+    verdict: redFlags.length > 0 ? "DO NOT SIGN" : warnings.length > 1 ? "REVIEW CAREFULLY" : "SAFE TO SIGN",
+    summary: `Found ${redFlags.length} red flags and ${warnings.length} warnings. ${redFlags.length > 0 ? 'Contract contains illegal clauses.' : 'Contract appears generally compliant with Polish law.'}`,
+    redFlags,
+    warnings,
+    goodClauses,
     questions: [
-      "Czy mogę się zameldować pod tym adresem? (Can I register at this address?)",
-      "Jaki jest dokładny okres wypowiedzenia dla obu stron? (What is the exact notice period for both parties?)",
-      "Kto odpowiada za naprawy instalacji (ogrzewanie, hydraulika)? (Who is responsible for repairs to installations?)",
-      "Jakie są warunki zwrotu kaucji? (What are the deposit return conditions?)",
-      "Czy będzie protokół zdawczo-odbiorczy? (Will there be a handover protocol?)"
+      "Can we remove the entry clause? (Czy możemy usunąć klauzulę o wejściu?)",
+      "Can we extend the notice period? (Czy możemy wydłużyć okres wypowiedzenia?)"
     ],
-    disclaimer: "This analysis is based on Polish rental law including Kodeks Cywilny and Ustawa o ochronie praw lokatorów. For legally binding advice, consult a Polish lawyer."
+    disclaimer: "This is AI analysis, not legal advice. Consult a Polish lawyer for binding guidance."
   }
 }
 
 function getFallbackDocumentAnalysis(documentText) {
   const textLower = documentText.toLowerCase()
-  
   const isZUS = textLower.includes('zus') || textLower.includes('składk') || textLower.includes('ubezpiecz')
-  const isTax = textLower.includes('pit') || textLower.includes('podatk') || textLower.includes('urząd skarbowy') || textLower.includes('skarbowy')
-  const isResidency = textLower.includes('pobyt') || textLower.includes('karta') || textLower.includes('cudzoziemiec') || textLower.includes('wojewod')
-  const isCity = textLower.includes('urząd miasta') || textLower.includes('urząd gminy') || textLower.includes('meldunek') || textLower.includes('zameldowanie')
-
-  let docType = 'Government Document'
-  let polishName = 'Dokument urzędowy'
-  let urgency = 'FOR YOUR RECORDS'
-  let summary = ''
-  let whatItMeans = ''
-  let actionRequired = ''
-
-  if (isZUS) {
-    docType = 'ZUS Social Security Document'
-    polishName = 'Dokument ZUS (Zakład Ubezpieczeń Społecznych)'
-    summary = 'This is from ZUS - the Polish Social Security office. They handle health insurance, pension, and disability contributions.'
-    whatItMeans = 'ZUS documents usually relate to your social security contributions (składki). If you work legally in Poland, your employer pays ZUS contributions for you. Self-employed (B2B) must pay their own contributions.'
-    actionRequired = 'Check if this is informational or requires action. Look for words like "należność" (amount due) or "termin" (deadline).'
-  } else if (isTax) {
-    docType = 'Tax Office Notice'
-    polishName = 'Pismo z Urzędu Skarbowego'
-    urgency = 'ACTION NEEDED'
-    summary = 'This is from the Polish Tax Office (Urząd Skarbowy). It may relate to income tax (PIT), VAT, or other tax matters.'
-    whatItMeans = 'Tax office letters often require a response. They may be asking for documents, notifying you of a tax assessment, or requesting payment.'
-    actionRequired = 'Look for deadlines (termin) and amounts (kwota, należność). Tax deadlines are strict - missing them results in penalties.'
-  } else if (isResidency) {
-    docType = 'Residency/Immigration Document'
-    polishName = 'Dokument pobytowy (Urząd Wojewódzki)'
-    urgency = 'ACTION NEEDED'
-    summary = 'This relates to your residency status in Poland - from the Voivodeship Office (Urząd Wojewódzki) which handles residence permits.'
-    whatItMeans = 'This could be about your residence card (karta pobytu), visa, or temporary residence permit (zezwolenie na pobyt czasowy). These are critical for your legal stay.'
-    actionRequired = 'Read carefully for deadlines. Residency matters are time-sensitive. Look for "decyzja" (decision), "wezwanie" (summons), or "brakujące dokumenty" (missing documents).'
-  } else if (isCity) {
-    docType = 'City/Municipal Office Document'
-    polishName = 'Dokument z Urzędu Miasta/Gminy'
-    summary = 'This is from your local city or municipal office. They handle registration (zameldowanie), civil matters, and local administration.'
-    whatItMeans = 'City office documents may relate to your registration (meldunek), local taxes, or administrative matters.'
-    actionRequired = 'Check if you need to visit the office (stawić się) or provide documents (dostarczyć dokumenty).'
-  } else {
-    summary = 'This appears to be an official Polish document. For accurate understanding, consider professional translation.'
-    whatItMeans = 'Without more context, we recommend having someone who reads Polish review this, or using our certified translation service.'
-    actionRequired = 'Look for dates, amounts in PLN, and official stamps or signatures.'
-  }
-
+  const isTax = textLower.includes('pit') || textLower.includes('podatk') || textLower.includes('skarbowy')
+  const isResidency = textLower.includes('pobyt') || textLower.includes('karta') || textLower.includes('wojewod')
+  
   return {
-    documentType: docType,
-    polishName: polishName,
-    urgency: urgency,
-    summary: summary,
-    whatItMeans: whatItMeans,
-    actionRequired: actionRequired,
+    documentType: isZUS ? "ZUS/Social Security Document" : isTax ? "Tax Document" : isResidency ? "Residency Document" : "Official Government Document",
+    polishName: "Dokument urzędowy",
+    urgency: "ACTION NEEDED",
+    summary: "This appears to be an official Polish government document. Please review the content carefully.",
+    whatItMeans: "Government documents in Poland often require timely responses. Check for any deadlines mentioned.",
+    actionRequired: "Review the document and note any deadlines. Consider consulting with a Polish speaker or official translator.",
     deadline: null,
     keyInformation: [],
-    polishTerms: [
-      { term: "Decyzja", translation: "Decision", explanation: "Official ruling - pay attention to this" },
-      { term: "Termin", translation: "Deadline", explanation: "Date by which you must act" },
-      { term: "Należność", translation: "Amount due", explanation: "Money you need to pay" },
-      { term: "Wezwanie", translation: "Summons/Request", explanation: "You're being asked to do something" },
-      { term: "Odwołanie", translation: "Appeal", explanation: "You can contest this decision" },
-      { term: "Pouczenie", translation: "Legal instruction", explanation: "Explains your rights and options" }
-    ],
-    nextSteps: [
-      "Look for any dates (daty) - these are likely deadlines",
-      "Check for amounts in PLN - this may indicate payment required",
-      "Find the 'pouczenie' section - it explains your rights",
-      "If unsure, visit the issuing office with the document"
-    ],
-    relatedGuides: isZUS ? ["ZUS Registration", "Health Insurance"] : 
-                   isTax ? ["Tax Guide", "PIT Filing"] : 
-                   isResidency ? ["Residency Permit", "Karta Pobytu"] : 
-                   ["PESEL", "Zameldowanie"]
+    polishTerms: [],
+    nextSteps: ["Identify the issuing office", "Check for response deadlines", "Seek translation if needed"],
+    relatedGuides: isZUS ? ["ZUS Registration", "Health Insurance"] : isTax ? ["Tax Guide", "PIT Filing"] : isResidency ? ["Residency Permit", "Karta Pobytu"] : ["PESEL", "Zameldowanie"]
   }
 }
 
 export async function analyzeContract(contractText) {
-  const systemPrompt = `You are an expert Polish rental law attorney helping expats understand rental contracts (umowa najmu) in Poland.
+  const systemPrompt = `You are an expert Polish rental law attorney helping expats understand rental contracts in Poland.
 
-YOUR LEGAL KNOWLEDGE BASE - POLISH RENTAL LAW:
+Analyze the contract for:
+1. RED FLAGS - clauses that VIOLATE Polish law (cite specific articles)
+2. WARNINGS - unusual but legal clauses
+3. GOOD CLAUSES - tenant-friendly terms
+4. Safety score (0-100)
+5. Verdict: SAFE TO SIGN, REVIEW CAREFULLY, or DO NOT SIGN
 
-1. KODEKS CYWILNY (Civil Code):
-   - Art. 659-692: General rental provisions
-   - Art. 662: Landlord responsible for major repairs (heating, plumbing, electrical, structural)
-   - Art. 664: Tenant can demand rent reduction if apartment has defects
-   - Art. 668: Subletting requires landlord consent
-   - Art. 673: Fixed-term contracts end automatically; indefinite need notice
-   - Art. 688: Minimum notice period for indefinite contracts is 3 months
+Key Polish rental laws:
+- Art. 662 Kodeks Cywilny: Landlord responsible for major repairs
+- Art. 688 KC: Minimum 3-month notice for indefinite contracts
+- Art. 6 Tenant Protection Act: Deposit max 12x monthly rent
+- Art. 10: Landlord cannot enter without consent
 
-2. USTAWA O OCHRONIE PRAW LOKATORÓW (Tenant Protection Act):
-   - Art. 6: Deposit cannot exceed 12x monthly rent
-   - Art. 6a: Deposit must be returned within 30 days of move-out
-   - Art. 8a: Rent increases require written justification and notice
-   - Art. 10: Landlord cannot enter without tenant consent (except emergencies)
-   - Art. 11: Lists ONLY legal grounds for eviction/termination
-
-3. KEY TENANT RIGHTS IN POLAND:
-   - Right to zameldowanie (registration) - landlord cannot refuse
-   - Right to peaceful enjoyment of the property
-   - Right to receive receipts for rent payments
-   - Protection from arbitrary eviction
-   - Right to proper notice periods
-
-4. COMMON ILLEGAL CLAUSES (unenforceable in Polish courts):
-   - Landlord entry without notice/consent
-   - Notice periods shorter than legal minimum
-   - Tenant responsible for ALL repairs
-   - Prohibition of zameldowanie
-   - Automatic rent increases without notice
-   - Penalties for normal wear and tear
-
-YOUR TASK:
-1. Identify RED FLAGS - clauses that VIOLATE Polish law (cite specific articles)
-2. Identify WARNINGS - unusual but legal clauses that need attention
-3. Identify GOOD CLAUSES - tenant-friendly terms
-4. Provide safety score (0-100) based on Polish law compliance
-5. Give verdict: SAFE TO SIGN, REVIEW CAREFULLY, or DO NOT SIGN
-6. Suggest questions to ask in Polish and English
-
-Be specific. Quote the actual clause. Cite Polish law articles. Explain in plain English.
-
-IMPORTANT: Respond ONLY with valid JSON, no other text. Format:
+IMPORTANT: Respond ONLY with valid JSON:
 {
   "score": 72,
   "verdict": "REVIEW CAREFULLY",
-  "summary": "Brief 2-sentence summary mentioning Polish law compliance",
-  "redFlags": [
-    {"clause": "quoted text", "issue": "explanation with Polish law reference", "recommendation": "what to do", "polishLaw": "Article reference"}
-  ],
-  "warnings": [
-    {"clause": "quoted text", "issue": "explanation", "recommendation": "what to do", "polishLaw": "Article reference if applicable"}
-  ],
-  "goodClauses": [
-    {"clause": "quoted text or description", "why": "explanation"}
-  ],
-  "questions": ["Question in English (Polish translation)", "Question 2"],
-  "disclaimer": "Standard legal disclaimer"
+  "summary": "Brief summary",
+  "redFlags": [{"clause": "text", "issue": "explanation", "recommendation": "action", "polishLaw": "Article"}],
+  "warnings": [{"clause": "text", "issue": "explanation", "recommendation": "action", "polishLaw": "Article"}],
+  "goodClauses": [{"clause": "text", "why": "explanation"}],
+  "questions": ["Question to ask landlord"],
+  "disclaimer": "Legal disclaimer"
 }`
 
   try {
     const content = await callGroqAPI([
       { role: 'system', content: systemPrompt },
-      { role: 'user', content: `Please analyze this Polish rental contract under Polish law:\n\n${contractText}` }
+      { role: 'user', content: `Analyze this Polish rental contract:\n\n${contractText}` }
     ], 0.3, 2500)
 
-    try {
-      const jsonMatch = content.match(/\{[\s\S]*\}/)
-      if (jsonMatch) {
-        const result = JSON.parse(jsonMatch[0])
-        // Ensure disclaimer is always present
-        if (!result.disclaimer) {
-          result.disclaimer = "This analysis is based on Polish rental law including Kodeks Cywilny and Ustawa o ochronie praw lokatorów. For legally binding advice, consult a licensed Polish lawyer (radca prawny or adwokat)."
-        }
-        return result
+    const jsonMatch = content.match(/\{[\s\S]*\}/)
+    if (jsonMatch) {
+      const result = JSON.parse(jsonMatch[0])
+      if (!result.disclaimer) {
+        result.disclaimer = "This is AI analysis based on Polish rental law. Consult a licensed Polish lawyer for binding advice."
       }
-      throw new Error('No JSON found in response')
-    } catch (parseError) {
-      console.error('Failed to parse Groq response:', parseError)
-      return getFallbackContractAnalysis(contractText)
+      return result
     }
+    throw new Error('No JSON found')
   } catch (error) {
-    console.error('Groq API error, using fallback:', error)
+    console.error('Contract analysis error:', error)
     return getFallbackContractAnalysis(contractText)
   }
 }
 
 export async function analyzeDocument(documentText) {
-  const systemPrompt = `You are a helpful Polish government document expert assisting expats who receive confusing official letters in Polish.
+  const systemPrompt = `You are a Polish government document expert helping expats understand official letters.
 
-YOUR KNOWLEDGE OF POLISH GOVERNMENT DOCUMENTS:
+Common Polish government offices:
+- ZUS: Social security, health insurance
+- Urząd Skarbowy: Tax office
+- Urząd Wojewódzki: Residency permits
+- Urząd Miasta/Gminy: Local registration
 
-1. ZUS (Zakład Ubezpieczeń Społecznych) - Social Security:
-   - Handles health insurance (NFZ), pension, disability
-   - Common documents: RMUA (contribution statement), ZUS ZUA (registration), payment demands
-
-2. URZĄD SKARBOWY - Tax Office:
-   - Handles PIT (income tax), VAT, CIT
-   - Common documents: Tax assessments, PIT-11 (from employer), payment requests, audit notices
-
-3. URZĄD WOJEWÓDZKI - Voivodeship Office:
-   - Handles residence permits, work permits for foreigners
-   - Common documents: Karta pobytu decisions, summons (wezwanie), document requests
-
-4. URZĄD MIASTA/GMINY - City/Municipal Office:
-   - Handles zameldowanie (registration), local taxes, civil registry
-   - Common documents: Registration confirmations, local tax notices
-
-5. KEY POLISH TERMS:
-   - Decyzja = Decision (official ruling)
-   - Wezwanie = Summons (you must respond)
-   - Zawiadomienie = Notification (FYI)
-   - Pouczenie = Legal instruction (your rights)
-   - Termin = Deadline
-   - Należność = Amount due
-   - Odwołanie = Appeal
-   - Wniosek = Application
-
-YOUR TASK:
-1. Identify document type and issuing authority
-2. Explain what it means in simple English
-3. Identify urgency level and any deadlines
-4. Translate key Polish terms
-5. Give clear next steps
-
-Be friendly and reassuring. Expats are often stressed by official Polish documents.
-
-IMPORTANT: Respond ONLY with valid JSON, no other text. Format:
-{
-  "documentType": "Document type in English",
-  "polishName": "Polish name with issuing authority",
-  "urgency": "FOR YOUR RECORDS | ACTION NEEDED | URGENT",
-  "summary": "2-3 sentence plain English explanation",
-  "whatItMeans": "Detailed explanation",
-  "actionRequired": "What to do, if anything",
-  "deadline": "Any deadline mentioned, or null",
-  "keyInformation": [
-    {"label": "Reference Number", "value": "ABC123"}
-  ],
-  "polishTerms": [
-    {"term": "Polish word", "translation": "English", "explanation": "Context"}
-  ],
-  "nextSteps": ["Step 1", "Step 2"],
-  "relatedGuides": ["PESEL", "ZUS Registration"]
-}`
-
-  try {
-    const content = await callGroqAPI([
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: `Please analyze this Polish government document and explain it in English:\n\n${documentText}` }
-    ], 0.3, 2000)
-
-    try {
-      const jsonMatch = content.match(/\{[\s\S]*\}/)
-      if (jsonMatch) {
-        return JSON.parse(jsonMatch[0])
-      }
-      throw new Error('No JSON found in response')
-    } catch (parseError) {
-      console.error('Failed to parse Groq response:', parseError)
-      return getFallbackDocumentAnalysis(documentText)
-    }
-  } catch (error) {
-    console.error('Groq API error, using fallback:', error)
-    return getFallbackDocumentAnalysis(documentText)
-  }
-}
-
-export async function generateBanter(tribe, club, quizScore, totalQuestions) {
-  const systemPrompt = `You are a witty, sarcastic friend who loves banter about sports and fandoms. You're helping onboard new users to Expat Village, a community for expats in Poland.
-
-The user just completed a quiz about their favorite ${tribe} (${club}).
-They scored ${quizScore}/${totalQuestions}.
-
-Generate fun, playful banter based on their score:
-- 100%: They're a true fan, praise them but keep it cheeky
-- 60-80%: Decent fan, tease them a bit
-- Below 60%: Roast them gently (they might be a bandwagon fan 😂)
-
-Include:
-- A joke or reference specific to their club/team
-- A welcome message to Expat Village
-- Mention they're now part of the expat community in Poland
-
-Keep it SHORT (3-4 sentences max). Be funny but not mean. Use emojis sparingly.
+Key terms:
+- Decyzja = Decision
+- Wezwanie = Summons (must respond)
+- Termin = Deadline
+- Odwołanie = Appeal
 
 IMPORTANT: Respond ONLY with valid JSON:
 {
-  "banter": "Your witty response here",
-  "badge": "Badge name like 'True Red Devil' or 'Bandwagon Fan'",
-  "townHallSuggestion": "Suggestion to find their tribe in Town Hall"
+  "documentType": "Type in English",
+  "polishName": "Polish name",
+  "urgency": "FOR YOUR RECORDS | ACTION NEEDED | URGENT",
+  "summary": "Plain English explanation",
+  "whatItMeans": "Detailed explanation",
+  "actionRequired": "What to do",
+  "deadline": "Any deadline or null",
+  "keyInformation": [{"label": "Field", "value": "Value"}],
+  "polishTerms": [{"term": "Polish", "translation": "English", "explanation": "Context"}],
+  "nextSteps": ["Step 1", "Step 2"],
+  "relatedGuides": ["Guide 1", "Guide 2"]
 }`
 
   try {
     const content = await callGroqAPI([
       { role: 'system', content: systemPrompt },
-      { role: 'user', content: `Generate banter for a ${club} fan who scored ${quizScore}/${totalQuestions}` }
-    ], 0.8, 500)
+      { role: 'user', content: `Analyze this Polish document:\n\n${documentText}` }
+    ], 0.3, 2000)
 
-    try {
-      const jsonMatch = content.match(/\{[\s\S]*\}/)
-      if (jsonMatch) {
-        return JSON.parse(jsonMatch[0])
-      }
-      throw new Error('No JSON found in response')
-    } catch (parseError) {
-      return {
-        banter: `Welcome to Expat Village, ${club} fan! Your quiz score of ${quizScore}/${totalQuestions} was... interesting. 😏 Ready to find your people in Poland?`,
-        badge: `${club} Supporter`,
-        townHallSuggestion: `Head to Town Hall to find your fellow ${club} fans in Poland!`
-      }
+    const jsonMatch = content.match(/\{[\s\S]*\}/)
+    if (jsonMatch) {
+      return JSON.parse(jsonMatch[0])
     }
+    throw new Error('No JSON found')
   } catch (error) {
-    console.error('Groq API error:', error)
-    return {
-      banter: `Welcome to Expat Village! We're happy you're here, ${club} fan! 🎉 Poland awaits!`,
-      badge: `${club} Fan`,
-      townHallSuggestion: `Check out Town Hall to meet other expats in Poland!`
-    }
+    console.error('Document analysis error:', error)
+    return getFallbackDocumentAnalysis(documentText)
   }
 }
 
 export default {
   analyzeContract,
   analyzeDocument,
-  generateBanter
+  generateBanter,
+  generateInitialBanter,
+  generateQuiz,
+  generateFinalBanter
 }

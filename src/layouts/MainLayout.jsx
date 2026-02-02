@@ -1,16 +1,27 @@
 // src/layouts/MainLayout.jsx
 // EXPAT VILLAGE - Premium Layout with Glassmorphism Header
+// Handles redirect to onboarding for new users
 
 import { useState, useEffect } from 'react'
-import { Link, Outlet, useLocation } from 'react-router-dom'
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import AuthModal from '../components/AuthModal'
 
 function MainLayout() {
-  const { user, profile, isAuthenticated, signOut, openAuthModal } = useAuth()
+  const navigate = useNavigate()
+  const { user, profile, isAuthenticated, signOut, openAuthModal, shouldRedirectToOnboarding, clearOnboardingRedirect } = useAuth()
   const [showUserMenu, setShowUserMenu] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const location = useLocation()
+
+  // Handle redirect to onboarding for new users
+  useEffect(() => {
+    if (shouldRedirectToOnboarding) {
+      console.log('Redirecting new user to onboarding...')
+      clearOnboardingRedirect()
+      navigate('/onboarding')
+    }
+  }, [shouldRedirectToOnboarding, clearOnboardingRedirect, navigate])
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20)
@@ -36,10 +47,17 @@ function MainLayout() {
 
   const avatarLetter = displayName.charAt(0).toUpperCase()
 
+  const handleProtectedClick = (e, path) => {
+    if (!isAuthenticated) {
+      e.preventDefault()
+      openAuthModal('sign_up')
+    }
+  }
+
   const navLinks = [
-    { path: '/about', label: 'About' },
-    { path: '/directory', label: 'Directory' },
-    { path: '/town-hall', label: 'Community' },
+    { path: '/about', label: 'About', protected: false },
+    { path: '/directory', label: 'Directory', protected: true },
+    { path: '/town-hall', label: 'Community', protected: true },
   ]
 
   return (
@@ -50,121 +68,105 @@ function MainLayout() {
       <header 
         className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ${
           scrolled 
-            ? 'bg-slate-950/80 backdrop-blur-xl border-b border-violet-500/20 shadow-lg shadow-violet-500/5' 
+            ? 'bg-slate-900/80 backdrop-blur-xl border-b border-slate-800/50 shadow-lg shadow-purple-500/5' 
             : 'bg-transparent'
         }`}
       >
-        <div className="max-w-6xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between h-16 md:h-20">
             
             {/* Logo */}
             <Link to="/" className="flex items-center gap-3 group">
-              <div className="w-11 h-11 bg-gradient-to-br from-violet-600 to-amber-500 rounded-xl flex items-center justify-center text-xl shadow-lg shadow-violet-500/30 group-hover:shadow-violet-500/50 group-hover:scale-105 transition-all duration-300">
-                🏘️
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-amber-500 rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
+                <div className="relative w-10 h-10 md:w-12 md:h-12 rounded-xl shadow-lg overflow-hidden">
+                  <img src="/icon.svg" alt="Expat Village" className="w-full h-full object-cover" />
+                </div>
               </div>
               <div className="hidden sm:block">
-                <span className="font-bold text-lg text-white group-hover:text-violet-300 transition-colors">Expat Village</span>
-                <span className="block text-xs text-slate-500 -mt-0.5">Warsaw & Beyond</span>
+                <h1 className="text-lg md:text-xl font-bold text-white group-hover:text-purple-300 transition-colors">
+                  Expat Village
+                </h1>
+                <p className="text-xs text-slate-500 -mt-0.5">Warsaw & Beyond</p>
               </div>
             </Link>
 
-            {/* Center Nav */}
-            <nav className="hidden md:flex items-center gap-1 bg-slate-900/50 backdrop-blur-sm rounded-full px-2 py-1.5 border border-violet-500/10">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-                    location.pathname === link.path
-                      ? 'bg-violet-500/20 text-violet-300'
-                      : 'text-slate-400 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
+            {/* Navigation */}
+            <nav className="hidden md:flex items-center">
+              <div className="flex items-center gap-1 bg-slate-800/50 backdrop-blur-sm rounded-full px-2 py-1.5 border border-slate-700/50">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.path}
+                    to={link.protected && !isAuthenticated ? '#' : link.path}
+                    onClick={(e) => link.protected && handleProtectedClick(e, link.path)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                      location.pathname === link.path
+                        ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/30'
+                        : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
             </nav>
 
-            {/* Right Side */}
+            {/* Auth Buttons / User Menu */}
             <div className="flex items-center gap-3">
               {isAuthenticated ? (
                 <div className="relative">
                   <button
                     onClick={() => setShowUserMenu(!showUserMenu)}
-                    className="flex items-center gap-2 bg-slate-800/80 hover:bg-slate-700/80 border border-violet-500/20 hover:border-violet-500/40 rounded-full pl-1.5 pr-4 py-1.5 transition-all duration-300"
+                    className="flex items-center gap-2 bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700/50 rounded-full pl-1 pr-3 py-1 transition-all"
                   >
-                    <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-amber-500 rounded-full flex items-center justify-center text-sm font-bold shadow-lg">
+                    <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-amber-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
                       {avatarLetter}
                     </div>
-                    <span className="text-sm text-slate-300 hidden sm:block">{displayName}</span>
-                    <svg 
-                      className={`w-4 h-4 text-slate-400 transition-transform duration-300 ${showUserMenu ? 'rotate-180' : ''}`} 
-                      fill="none" 
-                      stroke="currentColor" 
-                      viewBox="0 0 24 24"
-                    >
+                    <span className="text-sm font-medium text-white hidden sm:block">{displayName}</span>
+                    <svg className={`w-4 h-4 text-slate-400 transition-transform ${showUserMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </button>
 
-                  {/* Dropdown */}
+                  {/* Dropdown Menu */}
                   {showUserMenu && (
                     <>
-                      <div className="fixed inset-0 z-30" onClick={() => setShowUserMenu(false)} />
                       <div 
-                        className="absolute right-0 mt-3 w-72 bg-slate-900/95 backdrop-blur-xl border border-violet-500/30 rounded-2xl shadow-2xl shadow-violet-500/10 overflow-hidden z-40"
-                        style={{ animation: 'scaleIn 0.2s ease' }}
-                      >
-                        {/* User Info Header */}
-                        <div className="px-5 py-4 bg-gradient-to-r from-violet-900/40 to-transparent border-b border-violet-500/20">
-                          <p className="text-white font-bold text-lg">{displayName}</p>
-                          <p className="text-slate-400 text-sm truncate">{user?.email}</p>
-                          <div className="flex items-center gap-2 mt-3">
-                            <span className="bg-violet-500/20 text-violet-300 text-xs font-bold px-3 py-1 rounded-full border border-violet-500/30">
-                              {profile?.level || 'Newcomer'}
-                            </span>
-                            <span className="text-amber-400 text-xs font-bold">
-                              ⭐ {profile?.points || 0} points
-                            </span>
-                          </div>
+                        className="fixed inset-0 z-40"
+                        onClick={() => setShowUserMenu(false)}
+                      />
+                      <div className="absolute right-0 mt-2 w-56 bg-slate-800 border border-slate-700 rounded-xl shadow-xl shadow-black/20 py-2 z-50 animate-fadeIn">
+                        <div className="px-4 py-2 border-b border-slate-700">
+                          <p className="text-sm font-medium text-white">{displayName}</p>
+                          <p className="text-xs text-slate-500 truncate">{user?.email}</p>
                         </div>
-
-                        {/* Menu Items */}
-                        <div className="py-2">
-                          <Link
-                            to="/rewards"
-                            onClick={() => setShowUserMenu(false)}
-                            className="flex items-center gap-3 px-5 py-3 text-slate-300 hover:bg-violet-500/10 hover:text-white transition-colors"
-                          >
-                            <span className="text-xl">🏆</span>
-                            <span className="font-medium">My Rewards</span>
-                          </Link>
-                          <Link
-                            to="/my-checklist"
-                            onClick={() => setShowUserMenu(false)}
-                            className="flex items-center gap-3 px-5 py-3 text-slate-300 hover:bg-violet-500/10 hover:text-white transition-colors"
-                          >
-                            <span className="text-xl">✅</span>
-                            <span className="font-medium">My Checklist</span>
-                          </Link>
-                          <Link
-                            to="/onboarding"
-                            onClick={() => setShowUserMenu(false)}
-                            className="flex items-center gap-3 px-5 py-3 text-slate-300 hover:bg-violet-500/10 hover:text-white transition-colors"
-                          >
-                            <span className="text-xl">🎭</span>
-                            <span className="font-medium">Update My Tribe</span>
-                          </Link>
-                        </div>
-
-                        {/* Sign Out */}
-                        <div className="border-t border-violet-500/20 py-2">
+                        <Link
+                          to="/my-checklist"
+                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors"
+                          onClick={() => setShowUserMenu(false)}
+                        >
+                          <span>📋</span> My Checklist
+                        </Link>
+                        <Link
+                          to="/rewards"
+                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors"
+                          onClick={() => setShowUserMenu(false)}
+                        >
+                          <span>🏆</span> Rewards & Badges
+                        </Link>
+                        <Link
+                          to="/alerts"
+                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors"
+                          onClick={() => setShowUserMenu(false)}
+                        >
+                          <span>🔔</span> My Alerts
+                        </Link>
+                        <div className="border-t border-slate-700 mt-2 pt-2">
                           <button
                             onClick={handleSignOut}
-                            className="flex items-center gap-3 px-5 py-3 text-red-400 hover:bg-red-500/10 transition-colors w-full"
+                            className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors"
                           >
-                            <span className="text-xl">🚪</span>
-                            <span className="font-medium">Sign Out</span>
+                            <span>🚪</span> Sign Out
                           </button>
                         </div>
                       </div>
@@ -172,100 +174,170 @@ function MainLayout() {
                   )}
                 </div>
               ) : (
-                <div className="flex items-center gap-2">
+                <>
                   <button
                     onClick={() => openAuthModal('sign_in')}
-                    className="text-slate-400 hover:text-white transition-colors text-sm font-medium px-4 py-2.5"
+                    className="text-sm font-medium text-slate-400 hover:text-white transition-colors px-3 py-2"
                   >
                     Sign In
                   </button>
                   <button
                     onClick={() => openAuthModal('sign_up')}
-                    className="relative overflow-hidden bg-gradient-to-r from-violet-600 to-violet-700 hover:from-violet-500 hover:to-violet-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 hover:shadow-lg hover:shadow-violet-500/30 hover:scale-105"
+                    className="relative group"
                   >
-                    <span className="relative z-10">Join Free</span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-amber-500 rounded-full blur-md opacity-50 group-hover:opacity-75 transition-opacity" />
+                    <span className="relative flex items-center gap-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white text-sm font-semibold px-5 py-2.5 rounded-full transition-all">
+                      Join Free
+                    </span>
                   </button>
-                </div>
+                </>
               )}
             </div>
           </div>
         </div>
       </header>
 
-      {/* ===== MAIN CONTENT ===== */}
-      <main className="pt-24 pb-12 px-4">
-        <div className="max-w-6xl mx-auto">
-          <Outlet />
-        </div>
+      {/* Main Content */}
+      <main className="pt-20 md:pt-24 pb-16 px-4 sm:px-6 max-w-7xl mx-auto">
+        <Outlet />
       </main>
 
       {/* ===== FOOTER ===== */}
-      <footer className="border-t border-violet-500/10 bg-slate-950">
-        <div className="max-w-6xl mx-auto px-4 py-16">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-10 mb-12">
-            
+      <footer className="bg-slate-900 border-t border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {/* Brand */}
             <div className="col-span-2 md:col-span-1">
               <Link to="/" className="flex items-center gap-2 mb-4">
-                <div className="w-9 h-9 bg-gradient-to-br from-violet-600 to-amber-500 rounded-lg flex items-center justify-center text-base">
-                  🏘️
+                <div className="w-10 h-10 rounded-xl overflow-hidden">
+                  <img src="/icon.svg" alt="Expat Village" className="w-full h-full object-cover" />
                 </div>
                 <span className="font-bold text-white">Expat Village</span>
               </Link>
-              <p className="text-slate-500 text-sm leading-relaxed">
-                Your village, your people, your Poland. Made with 💜 in Warsaw.
+              <p className="text-slate-500 text-sm">
+                Your complete guide to thriving as an expat in Poland.
               </p>
             </div>
 
             {/* Explore */}
             <div>
-              <h4 className="text-white font-bold mb-4">Explore</h4>
-              <ul className="space-y-3">
-                <li><Link to="/get-things-done" className="text-slate-400 hover:text-violet-400 text-sm transition-colors">Get Things Done</Link></li>
-                <li><Link to="/housing" className="text-slate-400 hover:text-violet-400 text-sm transition-colors">Housing</Link></li>
-                <li><Link to="/jobs-careers" className="text-slate-400 hover:text-violet-400 text-sm transition-colors">Jobs & Careers</Link></li>
-                <li><Link to="/directory" className="text-slate-400 hover:text-violet-400 text-sm transition-colors">Directory</Link></li>
+              <h4 className="font-semibold text-white mb-4">Explore</h4>
+              <ul className="space-y-2">
+                <li>
+                  <Link 
+                    to={isAuthenticated ? '/get-things-done' : '#'}
+                    onClick={(e) => handleProtectedClick(e, '/get-things-done')}
+                    className="text-slate-500 hover:text-purple-400 text-sm transition-colors"
+                  >
+                    Get Things Done
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    to={isAuthenticated ? '/housing' : '#'}
+                    onClick={(e) => handleProtectedClick(e, '/housing')}
+                    className="text-slate-500 hover:text-purple-400 text-sm transition-colors"
+                  >
+                    Housing
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    to={isAuthenticated ? '/jobs-careers' : '#'}
+                    onClick={(e) => handleProtectedClick(e, '/jobs-careers')}
+                    className="text-slate-500 hover:text-purple-400 text-sm transition-colors"
+                  >
+                    Jobs & Careers
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    to={isAuthenticated ? '/directory' : '#'}
+                    onClick={(e) => handleProtectedClick(e, '/directory')}
+                    className="text-slate-500 hover:text-purple-400 text-sm transition-colors"
+                  >
+                    Directory
+                  </Link>
+                </li>
               </ul>
             </div>
 
             {/* AI Tools */}
             <div>
-              <h4 className="text-white font-bold mb-4">AI Tools</h4>
-              <ul className="space-y-3">
-                <li><Link to="/contract-analyzer" className="text-slate-400 hover:text-violet-400 text-sm transition-colors">Contract Analyzer</Link></li>
-                <li><Link to="/document-analyzer" className="text-slate-400 hover:text-violet-400 text-sm transition-colors">Document Translator</Link></li>
-                <li><Link to="/my-checklist" className="text-slate-400 hover:text-violet-400 text-sm transition-colors">My Checklist</Link></li>
+              <h4 className="font-semibold text-white mb-4">AI Tools</h4>
+              <ul className="space-y-2">
+                <li>
+                  <Link 
+                    to={isAuthenticated ? '/contract-analyzer' : '#'}
+                    onClick={(e) => handleProtectedClick(e, '/contract-analyzer')}
+                    className="text-slate-500 hover:text-purple-400 text-sm transition-colors"
+                  >
+                    Contract Analyzer
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    to={isAuthenticated ? '/document-analyzer' : '#'}
+                    onClick={(e) => handleProtectedClick(e, '/document-analyzer')}
+                    className="text-slate-500 hover:text-purple-400 text-sm transition-colors"
+                  >
+                    Document Translator
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    to={isAuthenticated ? '/my-checklist' : '#'}
+                    onClick={(e) => handleProtectedClick(e, '/my-checklist')}
+                    className="text-slate-500 hover:text-purple-400 text-sm transition-colors"
+                  >
+                    Arrival Checklist
+                  </Link>
+                </li>
               </ul>
             </div>
 
-            {/* Company */}
+            {/* Company - PUBLIC LINKS */}
             <div>
-              <h4 className="text-white font-bold mb-4">Company</h4>
-              <ul className="space-y-3">
-                <li><Link to="/about" className="text-slate-400 hover:text-violet-400 text-sm transition-colors">About Us</Link></li>
-                <li><Link to="/privacy" className="text-slate-400 hover:text-violet-400 text-sm transition-colors">Privacy Policy</Link></li>
-                <li><a href="mailto:hello@expatvillage.com" className="text-slate-400 hover:text-violet-400 text-sm transition-colors">Contact</a></li>
+              <h4 className="font-semibold text-white mb-4">Company</h4>
+              <ul className="space-y-2">
+                <li>
+                  <Link to="/about" className="text-slate-500 hover:text-purple-400 text-sm transition-colors">
+                    About Us
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/privacy" className="text-slate-500 hover:text-purple-400 text-sm transition-colors">
+                    Privacy Policy
+                  </Link>
+                </li>
+                <li>
+                  <a href="mailto:hello@expatvillage.pl" className="text-slate-500 hover:text-purple-400 text-sm transition-colors">
+                    Contact
+                  </a>
+                </li>
               </ul>
             </div>
           </div>
 
-          {/* Bottom */}
-          <div className="pt-8 border-t border-violet-500/10 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-slate-500 text-sm">
-              © 2026 Expat Village • Built in Warsaw, Poland 🇵🇱
+          <div className="border-t border-slate-800 mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <p className="text-slate-600 text-sm">
+              © 2025 Expat Village. Made with 💜 in Warsaw.
             </p>
-            <p className="text-slate-600 text-xs">
-              By expats, for expats
-            </p>
+            <div className="flex items-center gap-4">
+              <span className="text-slate-600 text-sm">🇵🇱 Pomagamy obcokrajowcom</span>
+            </div>
           </div>
         </div>
       </footer>
 
-      {/* Dropdown Animation */}
+      {/* Animation styles */}
       <style>{`
-        @keyframes scaleIn {
-          from { opacity: 0; transform: scale(0.95) translateY(-10px); }
-          to { opacity: 1; transform: scale(1) translateY(0); }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.2s ease-out;
         }
       `}</style>
     </div>

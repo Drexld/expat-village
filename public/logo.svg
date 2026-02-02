@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" width="800" height="480">
+  <defs>
+    <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8B5CF6"/>
+      <stop offset="55%" stop-color="#A78BFA"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+    <linearGradient id="underlineFade" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F59E0B" stop-opacity="0.7"/>
+      <stop offset="60%" stop-color="#F59E0B" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#F59E0B" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="orbGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#8B5CF6" stop-opacity="0.25"/>
+      <stop offset="70%" stop-color="#8B5CF6" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#8B5CF6" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A"/>
+      <stop offset="100%" stop-color="#1E1B4B"/>
+    </linearGradient>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="4" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.04"/>
+      </feComponentTransfer>
+      <feBlend in="SourceGraphic" mode="overlay"/>
+    </filter>
+    <filter id="spireGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#8B5CF6" flood-opacity="0.18"/>
+    </filter>
+    <clipPath id="iconClip">
+      <rect x="140" y="80" width="240" height="240" rx="48"/>
+    </clipPath>
+  </defs>
+
+  <rect width="800" height="480" fill="url(#bgGrad)"/>
+  <rect width="800" height="480" filter="url(#grain)" fill="white" opacity="0.3"/>
+  <ellipse cx="200" cy="200" rx="220" ry="220" fill="url(#orbGlow)"/>
+  <ellipse cx="580" cy="300" rx="140" ry="140" fill="#F59E0B" fill-opacity="0.04"/>
+
+  <g filter="url(#softShadow)">
+    <rect x="140" y="80" width="240" height="240" rx="48" fill="#1E1B4B" stroke="#8B5CF6" stroke-width="1.5" stroke-opacity="0.35"/>
+    <rect x="140" y="80" width="240" height="240" rx="48" fill="url(#brandGrad)" fill-opacity="0.08"/>
+
+    <g clip-path="url(#iconClip)">
+      <circle cx="260" cy="200" r="88" fill="none" stroke="#8B5CF6" stroke-width="1" stroke-opacity="0.22"/>
+      <ellipse cx="260" cy="200" rx="88" ry="28" fill="none" stroke="#8B5CF6" stroke-width="0.8" stroke-opacity="0.18"/>
+      <ellipse cx="260" cy="200" rx="88" ry="58" fill="none" stroke="#8B5CF6" stroke-width="0.8" stroke-opacity="0.18"/>
+      <ellipse cx="260" cy="200" rx="30" ry="88" fill="none" stroke="#8B5CF6" stroke-width="0.8" stroke-opacity="0.18"/>
+      <ellipse cx="260" cy="200" rx="60" ry="88" fill="none" stroke="#8B5CF6" stroke-width="0.8" stroke-opacity="0.18"/>
+      <line x1="260" y1="112" x2="260" y2="288" stroke="#8B5CF6" stroke-width="0.8" stroke-opacity="0.18"/>
+    </g>
+
+    <g clip-path="url(#iconClip)">
+      <rect x="140" y="255" width="240" height="65" fill="#0F172A" fill-opacity="0.6"/>
+
+      <rect x="155" y="228" width="22" height="92" fill="url(#brandGrad)" fill-opacity="0.55" rx="2"/>
+      <rect x="161" y="236" width="4" height="4" fill="#F59E0B" fill-opacity="0.6" rx="1"/>
+      <rect x="169" y="236" width="4" height="4" fill="#F59E0B" fill-opacity="0.4" rx="1"/>
+      <rect x="161" y="248" width="4" height="4" fill="#F59E0B" fill-opacity="0.5" rx="1"/>
+
+      <rect x="181" y="210" width="28" height="110" fill="url(#brandGrad)" fill-opacity="0.65" rx="2"/>
+      <rect x="187" y="218" width="4" height="4" fill="#F59E0B" fill-opacity="0.7" rx="1"/>
+      <rect x="197" y="218" width="4" height="4" fill="#F59E0B" fill-opacity="0.45" rx="1"/>
+      <rect x="187" y="230" width="4" height="4" fill="#F59E0B" fill-opacity="0.5" rx="1"/>
+      <rect x="197" y="230" width="4" height="4" fill="#F59E0B" fill-opacity="0.6" rx="1"/>
+      <rect x="187" y="242" width="4" height="4" fill="#F59E0B" fill-opacity="0.4" rx="1"/>
+
+      <polygon points="213,185 226,168 239,185" fill="url(#brandGrad)" fill-opacity="0.72"/>
+      <rect x="213" y="185" width="26" height="135" fill="url(#brandGrad)" fill-opacity="0.72" rx="2"/>
+      <rect x="219" y="193" width="4" height="4" fill="#F59E0B" fill-opacity="0.7" rx="1"/>
+      <rect x="228" y="193" width="4" height="4" fill="#F59E0B" fill-opacity="0.5" rx="1"/>
+      <rect x="219" y="205" width="4" height="4" fill="#F59E0B" fill-opacity="0.6" rx="1"/>
+      <rect x="228" y="205" width="4" height="4" fill="#F59E0B" fill-opacity="0.7" rx="1"/>
+      <rect x="219" y="217" width="4" height="4" fill="#F59E0B" fill-opacity="0.45" rx="1"/>
+      <rect x="228" y="217" width="4" height="4" fill="#F59E0B" fill-opacity="0.6" rx="1"/>
+
+      <rect x="248" y="200" width="24" height="120" fill="url(#brandGrad)" fill-opacity="0.88" rx="2"/>
+      <rect x="244" y="182" width="32" height="22" fill="url(#brandGrad)" fill-opacity="0.82" rx="2"/>
+      <rect x="250" y="162" width="20" height="24" fill="url(#brandGrad)" fill-opacity="0.78" rx="2"/>
+      <line x1="260" y1="162" x2="260" y2="128" stroke="url(#brandGrad)" stroke-width="2.5" stroke-linecap="round"/>
+      <g filter="url(#spireGlow)">
+        <circle cx="260" cy="126" r="4" fill="url(#goldGrad)"/>
+        <polygon points="260,119 261.5,124 266,126 261.5,128 260,133 258.5,128 254,126 258.5,124" fill="url(#goldGrad)"/>
+      </g>
+      <rect x="253" y="208" width="3" height="5" fill="#F59E0B" fill-opacity="0.8" rx="0.5"/>
+      <rect x="260" y="208" width="3" height="5" fill="#F59E0B" fill-opacity="0.6" rx="0.5"/>
+      <rect x="267" y="208" width="3" height="5" fill="#F59E0B" fill-opacity="0.75" rx="0.5"/>
+      <rect x="253" y="222" width="3" height="5" fill="#F59E0B" fill-opacity="0.5" rx="0.5"/>
+      <rect x="260" y="222" width="3" height="5" fill="#F59E0B" fill-opacity="0.7" rx="0.5"/>
+      <rect x="267" y="222" width="3" height="5" fill="#F59E0B" fill-opacity="0.55" rx="0.5"/>
+      <rect x="253" y="236" width="3" height="5" fill="#F59E0B" fill-opacity="0.65" rx="0.5"/>
+      <rect x="260" y="236" width="3" height="5" fill="#F59E0B" fill-opacity="0.45" rx="0.5"/>
+      <rect x="267" y="236" width="3" height="5" fill="#F59E0B" fill-opacity="0.7" rx="0.5"/>
+
+      <polygon points="279,190 292,172 305,190" fill="url(#brandGrad)" fill-opacity="0.7"/>
+      <rect x="279" y="190" width="26" height="130" fill="url(#brandGrad)" fill-opacity="0.7" rx="2"/>
+      <rect x="285" y="198" width="4" height="4" fill="#F59E0B" fill-opacity="0.6" rx="1"/>
+      <rect x="294" y="198" width="4" height="4" fill="#F59E0B" fill-opacity="0.7" rx="1"/>
+      <rect x="285" y="210" width="4" height="4" fill="#F59E0B" fill-opacity="0.5" rx="1"/>
+      <rect x="294" y="210" width="4" height="4" fill="#F59E0B" fill-opacity="0.45" rx="1"/>
+      <rect x="285" y="222" width="4" height="4" fill="#F59E0B" fill-opacity="0.65" rx="1"/>
+
+      <rect x="309" y="215" width="26" height="105" fill="url(#brandGrad)" fill-opacity="0.6" rx="2"/>
+      <rect x="315" y="223" width="4" height="4" fill="#F59E0B" fill-opacity="0.55" rx="1"/>
+      <rect x="325" y="223" width="4" height="4" fill="#F59E0B" fill-opacity="0.7" rx="1"/>
+      <rect x="315" y="235" width="4" height="4" fill="#F59E0B" fill-opacity="0.6" rx="1"/>
+
+      <rect x="339" y="232" width="20" height="88" fill="url(#brandGrad)" fill-opacity="0.5" rx="2"/>
+      <rect x="345" y="240" width="4" height="4" fill="#F59E0B" fill-opacity="0.5" rx="1"/>
+      <rect x="345" y="252" width="4" height="4" fill="#F59E0B" fill-opacity="0.4" rx="1"/>
+    </g>
+
+    <line x1="148" y1="320" x2="372" y2="320" stroke="url(#goldGrad)" stroke-width="1.2" stroke-opacity="0.45"/>
+  </g>
+
+  <text x="420" y="215" font-family="Georgia, 'Times New Roman', serif" font-size="62" font-weight="700" fill="url(#brandGrad)" letter-spacing="-1">Expat</text>
+  <text x="420" y="272" font-family="Georgia, 'Times New Roman', serif" font-size="62" font-weight="700" fill="url(#brandGrad)" letter-spacing="-1">Village</text>
+  <rect x="420" y="282" width="180" height="2.5" rx="1.25" fill="url(#underlineFade)"/>
+  <text x="424" y="315" font-family="Georgia, 'Times New Roman', serif" font-size="15" fill="#94A3B8" letter-spacing="2.5" font-style="italic">Warsaw &amp; Beyond</text>
+
+  <g opacity="0.55">
+    <rect x="530" y="348" width="218" height="36" rx="18" fill="#8B5CF6" fill-opacity="0.12" stroke="#8B5CF6" stroke-width="0.8" stroke-opacity="0.35"/>
+    <text x="639" y="372" font-family="Georgia, 'Times New Roman', serif" font-size="12.5" fill="#A78BFA" text-anchor="middle" letter-spacing="1.2">By Expats · For Expats</text>
+  </g>
+</svg>

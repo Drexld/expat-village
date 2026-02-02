@@ -11,6 +11,7 @@ export const AuthProvider = ({ children }) => {
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
   const [authModal, setAuthModal] = useState({ isOpen: false, view: 'sign_in' })
+  const [shouldRedirectToOnboarding, setShouldRedirectToOnboarding] = useState(false)
 
   const fetchProfile = async (userId) => {
     const { data } = await supabase
@@ -38,11 +39,27 @@ export const AuthProvider = ({ children }) => {
       async (event, session) => {
         console.log('Auth event:', event, session?.user?.email || 'no user')
         
-        if (session?.user) {
+        if (event === 'SIGNED_IN' && session?.user) {
           setUser(session.user)
           const p = await fetchProfile(session.user.id)
           setProfile(p)
-        } else {
+          
+          // Check if this is a NEW user (created within last 60 seconds)
+          const createdAt = new Date(session.user.created_at)
+          const now = new Date()
+          const secondsSinceCreation = (now - createdAt) / 1000
+          const isNewUser = secondsSinceCreation < 60
+          
+          // Check if they've already completed onboarding
+          const hasCompletedOnboarding = localStorage.getItem('expat-village-tribe')
+          
+          console.log('User created:', secondsSinceCreation, 'seconds ago. Is new:', isNewUser, 'Has onboarding:', !!hasCompletedOnboarding)
+          
+          if (isNewUser && !hasCompletedOnboarding) {
+            console.log('New user detected - triggering onboarding redirect')
+            setShouldRedirectToOnboarding(true)
+          }
+        } else if (event === 'SIGNED_OUT') {
           setUser(null)
           setProfile(null)
         }
@@ -54,6 +71,9 @@ export const AuthProvider = ({ children }) => {
   }, [])
 
   const signUp = async (email, password, displayName) => {
+    // Store display name for onboarding page to use
+    localStorage.setItem('expat-village-pending-name', displayName)
+    
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -79,27 +99,29 @@ export const AuthProvider = ({ children }) => {
   }
 
   const signOut = async () => {
-  console.log('Sign out clicked!')
-  
-  // Clear local storage directly
-  localStorage.removeItem('sb-nkybxminaowwtrmoffzw-auth-token')
-  
-  // Clear state
-  setUser(null)
-  setProfile(null)
-  
-  // Try Supabase signOut in background (don't await)
-  supabase.auth.signOut().catch(err => console.log('Background signout:', err))
-  
-  console.log('Signed out locally')
-  
-  // Reload page to ensure clean state
-  window.location.reload()
-
+    console.log('Sign out clicked!')
+    
+    // Clear local storage directly
+    localStorage.removeItem('sb-nkybxminaowwtrmoffzw-auth-token')
+    
+    // Clear state
+    setUser(null)
+    setProfile(null)
+    
+    // Try Supabase signOut in background (don't await)
+    supabase.auth.signOut().catch(err => console.log('Background signout:', err))
+    
+    console.log('Signed out locally')
+    
+    // Reload page to ensure clean state
+    window.location.reload()
   }
 
   const openAuthModal = (view = 'sign_in') => setAuthModal({ isOpen: true, view })
   const closeAuthModal = () => setAuthModal({ isOpen: false, view: 'sign_in' })
+  
+  // Clear the redirect flag after it's been used
+  const clearOnboardingRedirect = () => setShouldRedirectToOnboarding(false)
 
   return (
     <AuthContext.Provider value={{
@@ -113,7 +135,9 @@ export const AuthProvider = ({ children }) => {
       signOut,
       authModal,
       openAuthModal,
-      closeAuthModal
+      closeAuthModal,
+      shouldRedirectToOnboarding,
+      clearOnboardingRedirect
     }}>
       {children}
     </AuthContext.Provider>
