@@ -1,7 +1,8 @@
 // src/App.jsx
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import ScrollToTop from './components/ScrollToTop'
+import { useDeviceDetection } from './hooks/useDeviceDetection'
 
 // Layouts
 import MainLayout from './layouts/MainLayout'
@@ -10,6 +11,7 @@ import MainLayout from './layouts/MainLayout'
 import Home from './pages/Home'
 import About from './pages/About'
 import Privacy from './pages/Privacy'
+import DesktopRedirect from './pages/DesktopRedirect'
 
 // Main Sections
 import GetThingsDone from './pages/GetThingsDone'
@@ -33,13 +35,41 @@ import Alerts from './pages/Alerts'
 
 import './App.css'
 
+// Component to check device and redirect desktop users
+function DeviceCheck({ children }) {
+  const { isDesktop, isChecking } = useDeviceDetection()
+
+  // Check if user has bypassed the redirect
+  const hasBypassed = localStorage.getItem('bypass_desktop_redirect') === 'true'
+
+  // Show loading while checking
+  if (isChecking) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="text-purple-400">Loading...</div>
+      </div>
+    )
+  }
+
+  // Redirect desktop users to desktop page (unless bypassed)
+  if (isDesktop && !hasBypassed) {
+    return <Navigate to="/desktop" replace />
+  }
+
+  return children
+}
+
 function App() {
   return (
     <AuthProvider>
       <Router>
         <ScrollToTop />
         <Routes>
-          <Route path="/" element={<MainLayout />}>
+          {/* Desktop redirect page (no MainLayout) */}
+          <Route path="/desktop" element={<DesktopRedirect />} />
+
+          {/* Main app routes with device check */}
+          <Route path="/" element={<DeviceCheck><MainLayout /></DeviceCheck>}>
             {/* Home */}
             <Route index element={<Home />} />
             
