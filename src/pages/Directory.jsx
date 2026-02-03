@@ -6,6 +6,7 @@ import {
   getDirectoryListings,
   getListingReviews,
   createReview,
+  submitBusinessSuggestion,
   DIRECTORY_CATEGORIES
 } from '../services/directory'
 
@@ -20,6 +21,18 @@ function Directory() {
   const [reviews, setReviews] = useState([])
   const [loading, setLoading] = useState(true)
   const [reviewsLoading, setReviewsLoading] = useState(false)
+  const [showSuggestModal, setShowSuggestModal] = useState(false)
+  const [suggestionForm, setSuggestionForm] = useState({
+    name: '',
+    category: 'restaurant',
+    description: '',
+    address: '',
+    website: '',
+    phone: '',
+    why_recommend: ''
+  })
+  const [suggestionSubmitting, setSuggestionSubmitting] = useState(false)
+  const [suggestionSuccess, setSuggestionSuccess] = useState(false)
 
   // Fetch listings on mount and category change
   useEffect(() => {
@@ -82,6 +95,51 @@ function Directory() {
     setShowReviewForm(false)
     setReviewForm({ rating: 5, title: '', content: '' })
     setSubmitting(false)
+  }
+
+  const submitSuggestion = async () => {
+    if (!isAuthenticated) {
+      openAuthModal('sign_up')
+      return
+    }
+
+    if (!suggestionForm.name.trim() || !suggestionForm.description.trim()) return
+
+    setSuggestionSubmitting(true)
+
+    const suggestion = {
+      user_id: user.id,
+      user_email: user.email,
+      business_name: suggestionForm.name,
+      category: suggestionForm.category,
+      description: suggestionForm.description,
+      address: suggestionForm.address || null,
+      website: suggestionForm.website || null,
+      phone: suggestionForm.phone || null,
+      why_recommend: suggestionForm.why_recommend || null,
+      status: 'pending'
+    }
+
+    const { error } = await submitBusinessSuggestion(suggestion)
+
+    if (!error) {
+      setSuggestionSuccess(true)
+      setTimeout(() => {
+        setShowSuggestModal(false)
+        setSuggestionSuccess(false)
+        setSuggestionForm({
+          name: '',
+          category: 'restaurant',
+          description: '',
+          address: '',
+          website: '',
+          phone: '',
+          why_recommend: ''
+        })
+      }, 2000)
+    }
+
+    setSuggestionSubmitting(false)
   }
 
   const renderStars = (rating, interactive = false, onChange = null) => {
@@ -387,10 +445,138 @@ function Directory() {
       <div className="mt-8 bg-gradient-to-r from-emerald-900/30 to-teal-900/30 border border-emerald-700/50 rounded-xl p-6 text-center">
         <h3 className="text-lg font-semibold text-white mb-2">Know a great expat-friendly place?</h3>
         <p className="text-slate-400 text-sm mb-4">Help the community by suggesting a business</p>
-        <button className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+        <button
+          onClick={() => isAuthenticated ? setShowSuggestModal(true) : openAuthModal('sign_up')}
+          className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+        >
           Suggest a Business
         </button>
       </div>
+
+      {/* Suggest Business Modal */}
+      {showSuggestModal && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            {suggestionSuccess ? (
+              <div className="text-center py-8">
+                <div className="text-5xl mb-4">✅</div>
+                <h3 className="text-xl font-bold text-white mb-2">Thank you!</h3>
+                <p className="text-slate-400">Your suggestion has been submitted for review.</p>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-bold text-white">Suggest a Business</h3>
+                  <button
+                    onClick={() => setShowSuggestModal(false)}
+                    className="text-slate-400 hover:text-white"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-slate-400 text-sm mb-2">Business Name *</label>
+                    <input
+                      type="text"
+                      value={suggestionForm.name}
+                      onChange={(e) => setSuggestionForm({...suggestionForm, name: e.target.value})}
+                      placeholder="e.g., Warsaw Wellness Clinic"
+                      className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-slate-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-400 text-sm mb-2">Category *</label>
+                    <select
+                      value={suggestionForm.category}
+                      onChange={(e) => setSuggestionForm({...suggestionForm, category: e.target.value})}
+                      className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white"
+                    >
+                      {DIRECTORY_CATEGORIES.filter(c => c.id !== 'all').map(cat => (
+                        <option key={cat.id} value={cat.id}>{cat.icon} {cat.label}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-400 text-sm mb-2">Description *</label>
+                    <textarea
+                      value={suggestionForm.description}
+                      onChange={(e) => setSuggestionForm({...suggestionForm, description: e.target.value})}
+                      placeholder="What do they offer? What makes them great for expats?"
+                      rows={3}
+                      className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-slate-500 resize-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-400 text-sm mb-2">Address</label>
+                    <input
+                      type="text"
+                      value={suggestionForm.address}
+                      onChange={(e) => setSuggestionForm({...suggestionForm, address: e.target.value})}
+                      placeholder="Street address or area"
+                      className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-slate-500"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-slate-400 text-sm mb-2">Website</label>
+                      <input
+                        type="url"
+                        value={suggestionForm.website}
+                        onChange={(e) => setSuggestionForm({...suggestionForm, website: e.target.value})}
+                        placeholder="https://..."
+                        className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-slate-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-slate-400 text-sm mb-2">Phone</label>
+                      <input
+                        type="tel"
+                        value={suggestionForm.phone}
+                        onChange={(e) => setSuggestionForm({...suggestionForm, phone: e.target.value})}
+                        placeholder="+48..."
+                        className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-slate-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-400 text-sm mb-2">Why do you recommend it?</label>
+                    <textarea
+                      value={suggestionForm.why_recommend}
+                      onChange={(e) => setSuggestionForm({...suggestionForm, why_recommend: e.target.value})}
+                      placeholder="Share your personal experience..."
+                      rows={2}
+                      className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-slate-500 resize-none"
+                    />
+                  </div>
+
+                  <div className="flex gap-3 pt-2">
+                    <button
+                      onClick={submitSuggestion}
+                      disabled={suggestionSubmitting || !suggestionForm.name.trim() || !suggestionForm.description.trim()}
+                      className="flex-1 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white py-3 rounded-lg font-medium transition-colors"
+                    >
+                      {suggestionSubmitting ? 'Submitting...' : 'Submit Suggestion'}
+                    </button>
+                    <button
+                      onClick={() => setShowSuggestModal(false)}
+                      className="px-4 py-3 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

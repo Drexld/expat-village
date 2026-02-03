@@ -245,3 +245,28 @@ export async function getAllListingsAdmin() {
     return { data: [], error }
   }
 }
+
+/**
+ * Submit a business suggestion
+ * @param {Object} suggestion - Suggestion data
+ * @returns {Promise<{data: Object|null, error: Object|null}>}
+ */
+export async function submitBusinessSuggestion(suggestion) {
+  try {
+    const { data, error } = await supabase
+      .from('business_suggestions')
+      .insert(suggestion)
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Error submitting suggestion:', error)
+      return { data: null, error }
+    }
+
+    return { data, error: null }
+  } catch (error) {
+    console.error('Suggestion service error:', error)
+    return { data: null, error }
+  }
+}
