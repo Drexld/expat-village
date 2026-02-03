@@ -45,6 +45,8 @@ function Pricing() {
   const canceled = searchParams.get('canceled')
 
   const handleSelectPlan = async (planId) => {
+    console.log('Button clicked:', planId, { isAuthenticated, subLoading, currentPlan })
+
     if (planId === 'free') return
 
     if (!isAuthenticated) {
@@ -95,6 +97,10 @@ function Pricing() {
         <h1 className="text-3xl font-bold text-white">Choose Your Plan</h1>
         <p className="text-slate-400 text-lg mt-2">
           Unlock premium features to make the most of your expat journey
+        </p>
+        {/* Debug info - remove later */}
+        <p className="text-xs text-slate-600 mt-2">
+          Debug: subLoading={String(subLoading)}, currentPlan={currentPlan}, isAuth={String(isAuthenticated)}
         </p>
       </div>
 
