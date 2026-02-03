@@ -2,8 +2,11 @@
 // User preferences and settings page
 
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { useSubscription } from '../hooks/useSubscription'
+import { openCustomerPortal } from '../services/subscription'
+import SubscriptionBadge from '../components/SubscriptionBadge'
 
 const INTEREST_OPTIONS = [
   { id: 'events', label: 'Community Events', icon: '🎉' },
@@ -21,9 +24,11 @@ const INTEREST_OPTIONS = [
 function Settings() {
   const navigate = useNavigate()
   const { user, profile, updateProfile, isAuthenticated } = useAuth()
+  const { subscription, plan, isPremium, loading: subLoading } = useSubscription()
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState(null)
+  const [portalLoading, setPortalLoading] = useState(false)
 
   // Form state
   const [trcExpiryDate, setTrcExpiryDate] = useState('')
@@ -245,6 +250,70 @@ function Settings() {
               </button>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Subscription Section */}
+      <section className="mb-8">
+        <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+          <span>💎</span> Subscription
+        </h2>
+        <div className="p-4 rounded-2xl" style={{
+          background: isPremium
+            ? 'linear-gradient(135deg, rgba(251,191,36,0.1), rgba(139,92,246,0.1))'
+            : 'rgba(255,255,255,0.05)',
+          border: isPremium
+            ? '1px solid rgba(251,191,36,0.3)'
+            : '1px solid rgba(255,255,255,0.1)',
+        }}>
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <div className="flex items-center gap-2">
+                <p className="text-white font-medium">
+                  {plan === 'free' ? 'Free Plan' : `${plan.charAt(0).toUpperCase() + plan.slice(1)} Plan`}
+                </p>
+                <SubscriptionBadge />
+              </div>
+              {subscription?.current_period_end && (
+                <p className="text-xs text-slate-500 mt-1">
+                  {subscription.status === 'active'
+                    ? `Renews ${new Date(subscription.current_period_end).toLocaleDateString()}`
+                    : `Expires ${new Date(subscription.current_period_end).toLocaleDateString()}`}
+                </p>
+              )}
+            </div>
+            {plan === 'free' ? (
+              <Link
+                to="/pricing"
+                className="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium transition-colors"
+              >
+                Upgrade
+              </Link>
+            ) : (
+              <button
+                onClick={async () => {
+                  if (!user?.id) return
+                  setPortalLoading(true)
+                  const { data, error: portalError } = await openCustomerPortal(user.id)
+                  if (data?.url) {
+                    window.location.href = data.url
+                  } else {
+                    setError(portalError || 'Could not open subscription portal')
+                  }
+                  setPortalLoading(false)
+                }}
+                disabled={portalLoading || subLoading}
+                className="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-sm font-medium transition-colors disabled:opacity-50"
+              >
+                {portalLoading ? 'Loading...' : 'Manage'}
+              </button>
+            )}
+          </div>
+          {plan !== 'free' && (
+            <p className="text-xs text-slate-400">
+              Manage your subscription, update payment methods, or cancel via the Stripe portal.
+            </p>
+          )}
         </div>
       </section>
 

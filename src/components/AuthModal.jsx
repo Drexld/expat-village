@@ -18,14 +18,14 @@ function AuthModal() {
 
   // Reset when modal opens
   useEffect(() => {
-    if (authModal.isOpen) {
+    if (authModal?.isOpen) {
       setError('')
       setSuccess('')
       setActiveTab(authModal.view || 'sign_in')
     }
-  }, [authModal.isOpen, authModal.view])
+  }, [authModal?.isOpen, authModal?.view])
 
-  if (!authModal.isOpen) return null
+  if (!authModal?.isOpen) return null
 
   const resetForm = () => {
     setEmail('')

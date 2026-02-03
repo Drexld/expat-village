@@ -6,6 +6,10 @@ import { useDeviceDetection } from './hooks/useDeviceDetection'
 
 // Layouts
 import MainLayout from './layouts/MainLayout'
+import AdminLayout from './layouts/AdminLayout'
+
+// Admin Components
+import AdminRoute from './components/AdminRoute'
 
 // Pages
 import Home from './pages/Home'
@@ -33,6 +37,14 @@ import Directory from './pages/Directory'
 import Rewards from './pages/Rewards'
 import Alerts from './pages/Alerts'
 import Settings from './pages/Settings'
+import Pricing from './pages/Pricing'
+
+// Admin Pages
+import AdminDashboard from './pages/admin/Dashboard'
+import AdminAnnouncements from './pages/admin/Announcements'
+import AdminAlerts from './pages/admin/Alerts'
+import AdminListings from './pages/admin/Listings'
+import AdminUsers from './pages/admin/Users'
 
 import './App.css'
 
@@ -69,6 +81,15 @@ function App() {
           {/* Desktop redirect page (no MainLayout) */}
           <Route path="/desktop" element={<DesktopRedirect />} />
 
+          {/* Admin routes (protected, separate layout) */}
+          <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="announcements" element={<AdminAnnouncements />} />
+            <Route path="alerts" element={<AdminAlerts />} />
+            <Route path="listings" element={<AdminListings />} />
+            <Route path="users" element={<AdminUsers />} />
+          </Route>
+
           {/* Main app routes with device check */}
           <Route path="/" element={<DeviceCheck><MainLayout /></DeviceCheck>}>
             {/* Home */}
@@ -98,6 +119,7 @@ function App() {
             <Route path="rewards" element={<Rewards />} />
             <Route path="alerts" element={<Alerts />} />
             <Route path="settings" element={<Settings />} />
+            <Route path="pricing" element={<Pricing />} />
           </Route>
         </Routes>
       </Router>

@@ -14,18 +14,23 @@ export const AuthProvider = ({ children }) => {
   const [shouldRedirectToOnboarding, setShouldRedirectToOnboarding] = useState(false)
 
   const fetchProfile = async (userId) => {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single()
-    return data
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single()
+      if (error) console.error('Profile fetch error:', error)
+      return data
+    } catch (err) {
+      console.error('fetchProfile error:', err)
+      return null
+    }
   }
 
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(async ({ data: { session } }) => {
-      console.log('Initial session check:', session?.user?.email || 'no session')
       if (session?.user) {
         setUser(session.user)
         const p = await fetchProfile(session.user.id)
@@ -37,7 +42,6 @@ export const AuthProvider = ({ children }) => {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth event:', event, session?.user?.email || 'no user')
         
         if (event === 'SIGNED_IN' && session?.user) {
           setUser(session.user)
@@ -49,14 +53,11 @@ export const AuthProvider = ({ children }) => {
           const now = new Date()
           const secondsSinceCreation = (now - createdAt) / 1000
           const isNewUser = secondsSinceCreation < 60
-          
+
           // Check if they've already completed onboarding
           const hasCompletedOnboarding = localStorage.getItem('expat-village-tribe')
-          
-          console.log('User created:', secondsSinceCreation, 'seconds ago. Is new:', isNewUser, 'Has onboarding:', !!hasCompletedOnboarding)
-          
+
           if (isNewUser && !hasCompletedOnboarding) {
-            console.log('New user detected - triggering onboarding redirect')
             setShouldRedirectToOnboarding(true)
           }
         } else if (event === 'SIGNED_OUT') {

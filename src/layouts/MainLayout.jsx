@@ -147,6 +147,15 @@ function MainLayout() {
                         >
                           <span>⚙️</span> Settings
                         </Link>
+                        {profile?.is_admin && (
+                          <Link
+                            to="/admin"
+                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-purple-400 hover:text-purple-300 hover:bg-purple-500/10 transition-colors"
+                            onClick={() => setShowUserMenu(false)}
+                          >
+                            <span>🛠️</span> Admin Dashboard
+                          </Link>
+                        )}
                         <div className="border-t border-slate-700 mt-2 pt-2">
                           <button
                             onClick={handleSignOut}
