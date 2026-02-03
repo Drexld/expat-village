@@ -101,27 +101,39 @@ export const AuthProvider = ({ children }) => {
 
   const signOut = async () => {
     console.log('Sign out clicked!')
+    let signOutError = null
 
     try {
-      // Actually await the Supabase signOut
       const { error } = await supabase.auth.signOut()
-      if (error) console.error('Supabase signOut error:', error)
+      if (error) {
+        signOutError = error
+        console.error('Supabase signOut error:', error)
+      }
     } catch (err) {
+      signOutError = err
       console.error('SignOut error:', err)
     }
 
-    // Clear all Supabase auth keys from localStorage
-    Object.keys(localStorage).forEach(key => {
-      if (key.startsWith('sb-') && key.includes('-auth-')) {
-        localStorage.removeItem(key)
-      }
-    })
+    try {
+      // Clear all Supabase auth keys from localStorage
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('sb-') && key.includes('-auth-')) {
+          localStorage.removeItem(key)
+        }
+      })
+    } catch (err) {
+      console.error('LocalStorage clear error:', err)
+    }
 
     // Clear state
     setUser(null)
     setProfile(null)
 
     console.log('Signed out successfully')
+
+    if (signOutError) {
+      console.warn('Sign-out completed with errors; forcing redirect.')
+    }
 
     // Redirect to home
     window.location.href = '/'
