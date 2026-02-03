@@ -132,19 +132,30 @@ async function handleCheckoutComplete(supabase, session) {
     .delete()
     .eq('user_id', userId)
 
+  // Build insert data with safe date handling
+  const insertData = {
+    user_id: userId,
+    stripe_subscription_id: subscriptionId,
+    stripe_customer_id: customerId,
+    plan: plan,
+    status: STATUS_MAP[subscription.status] || 'active',
+    cancel_at_period_end: subscription.cancel_at_period_end || false,
+  }
+
+  // Only add period dates if they exist and are valid
+  if (subscription.current_period_start) {
+    insertData.current_period_start = new Date(subscription.current_period_start * 1000).toISOString()
+  }
+  if (subscription.current_period_end) {
+    insertData.current_period_end = new Date(subscription.current_period_end * 1000).toISOString()
+  }
+
+  console.log('Inserting subscription data:', insertData)
+
   // Insert new subscription record
   const { error } = await supabase
     .from('subscriptions')
-    .insert({
-      user_id: userId,
-      stripe_subscription_id: subscriptionId,
-      stripe_customer_id: customerId,
-      plan: plan,
-      status: STATUS_MAP[subscription.status] || 'active',
-      current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-      current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
-      cancel_at_period_end: subscription.cancel_at_period_end || false,
-    })
+    .insert(insertData)
 
   if (error) {
     console.error('Error inserting subscription:', error)
