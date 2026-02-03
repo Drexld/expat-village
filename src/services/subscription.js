@@ -65,7 +65,18 @@ export const PLAN_FEATURES = {
  */
 export async function getSubscription(userId) {
   if (!userId) {
-    return { data: null, error: 'User ID required' }
+    // Return free plan for unauthenticated users
+    const freePlan = {
+      user_id: null,
+      plan: 'free',
+      status: 'active',
+      isPremium: false,
+      isBasic: false,
+      isFree: true,
+      isActive: true,
+      features: PLAN_FEATURES.free,
+    }
+    return { data: freePlan, error: null }
   }
 
   // Check cache first
@@ -75,14 +86,16 @@ export async function getSubscription(userId) {
   }
 
   try {
+    // Use maybeSingle() instead of single() to handle no rows gracefully
     const { data, error } = await supabase
       .from('subscriptions')
       .select('*')
       .eq('user_id', userId)
-      .single()
+      .maybeSingle()
 
-    if (error && error.code !== 'PGRST116') { // PGRST116 = no rows found
-      throw error
+    if (error) {
+      console.error('Supabase subscription query error:', error)
+      // Return free plan on error instead of failing
     }
 
     // Default to free plan if no subscription exists
@@ -97,7 +110,7 @@ export async function getSubscription(userId) {
       ...subscription,
       isPremium: subscription.plan === 'premium',
       isBasic: subscription.plan === 'basic',
-      isFree: subscription.plan === 'free',
+      isFree: subscription.plan === 'free' || !subscription.plan,
       isActive: ['active', 'trialing'].includes(subscription.status),
       features: PLAN_FEATURES[subscription.plan] || PLAN_FEATURES.free,
     }
@@ -108,7 +121,18 @@ export async function getSubscription(userId) {
     return { data: enrichedSubscription, error: null }
   } catch (error) {
     console.error('Error fetching subscription:', error)
-    return { data: null, error }
+    // Return free plan on error so buttons still work
+    const freePlan = {
+      user_id: userId,
+      plan: 'free',
+      status: 'active',
+      isPremium: false,
+      isBasic: false,
+      isFree: true,
+      isActive: true,
+      features: PLAN_FEATURES.free,
+    }
+    return { data: freePlan, error: null }
   }
 }
 
