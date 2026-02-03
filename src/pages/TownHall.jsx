@@ -21,6 +21,8 @@ function TownHall() {
   const [messagesLoading, setMessagesLoading] = useState(false)
   const [messageInput, setMessageInput] = useState('')
   const [sending, setSending] = useState(false)
+  const [messageError, setMessageError] = useState(null)
+  const [joinError, setJoinError] = useState(null)
   const channelRef = useRef(null)
 
   const activityLabel = useMemo(() => ({
@@ -89,7 +91,12 @@ function TownHall() {
     }
 
     if (!room?.conversation_id) return
-    await joinRoomConversation(room.conversation_id, user.id)
+    const { error } = await joinRoomConversation(room.conversation_id, user.id)
+    if (error) {
+      setJoinError('Could not join room. Please try again.')
+      return
+    }
+    setJoinError(null)
     setActiveRoom(room)
     setActiveView('room')
   }
@@ -102,9 +109,21 @@ function TownHall() {
     }
 
     setSending(true)
+    setMessageError(null)
+
+    // Ensure the user is a participant before sending
+    const { error: joinErr } = await joinRoomConversation(activeRoom.conversation_id, user.id)
+    if (joinErr) {
+      setMessageError('Unable to join this room right now.')
+      setSending(false)
+      return
+    }
+
     const { error } = await sendMessage(activeRoom.conversation_id, user.id, messageInput)
     if (!error) {
       setMessageInput('')
+    } else {
+      setMessageError('Message failed to send. Please try again.')
     }
     setSending(false)
   }
@@ -127,6 +146,11 @@ function TownHall() {
       <section className="mb-8">
         <h2 className="text-xl font-bold text-white mb-4">💬 Community Rooms</h2>
 
+        {joinError && (
+          <div className="mb-3 p-3 rounded-xl bg-red-900/30 border border-red-700/50 text-red-300 text-sm">
+            {joinError}
+          </div>
+        )}
         {roomsLoading ? (
           <div className="p-6 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 text-sm">
             Loading rooms...
@@ -278,6 +302,9 @@ function TownHall() {
 
       {/* Input Area */}
       <div className="bg-slate-800 border border-slate-700 rounded-b-xl p-4">
+        {messageError && (
+          <div className="mb-2 text-xs text-red-300">{messageError}</div>
+        )}
         <div className="flex items-center gap-3">
           <input
             type="text"
