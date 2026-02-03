@@ -40,6 +40,9 @@ CREATE TABLE IF NOT EXISTS payments (
 
 ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own payments" ON payments;
+DROP POLICY IF EXISTS "Admins can view all payments" ON payments;
+
 CREATE POLICY "Users can view own payments" ON payments
   FOR SELECT USING (auth.uid() = user_id);
 
@@ -63,6 +66,9 @@ CREATE TABLE IF NOT EXISTS subscriptions (
 
 ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own subscription" ON subscriptions;
+DROP POLICY IF EXISTS "Admins can view all subscriptions" ON subscriptions;
+
 CREATE POLICY "Users can view own subscription" ON subscriptions
   FOR SELECT USING (auth.uid() = user_id);
 
@@ -82,6 +88,10 @@ CREATE TABLE IF NOT EXISTS blocks (
 );
 
 ALTER TABLE blocks ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can view own blocks" ON blocks;
+DROP POLICY IF EXISTS "Users can create blocks" ON blocks;
+DROP POLICY IF EXISTS "Users can delete own blocks" ON blocks;
 
 CREATE POLICY "Users can view own blocks" ON blocks
   FOR SELECT USING (auth.uid() = blocker_id);
@@ -109,6 +119,12 @@ CREATE TABLE IF NOT EXISTS connection_requests (
 );
 
 ALTER TABLE connection_requests ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can view own requests" ON connection_requests;
+DROP POLICY IF EXISTS "Users can send requests" ON connection_requests;
+DROP POLICY IF EXISTS "Sender can cancel request" ON connection_requests;
+DROP POLICY IF EXISTS "Receiver can respond to request" ON connection_requests;
+DROP POLICY IF EXISTS "Users can delete own sent requests" ON connection_requests;
 
 CREATE POLICY "Users can view own requests" ON connection_requests
   FOR SELECT USING (auth.uid() IN (sender_id, receiver_id));
@@ -140,6 +156,9 @@ CREATE TABLE IF NOT EXISTS connections (
 );
 
 ALTER TABLE connections ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can view own connections" ON connections;
+DROP POLICY IF EXISTS "Users can remove connections" ON connections;
 
 CREATE POLICY "Users can view own connections" ON connections
   FOR SELECT USING (auth.uid() IN (user1_id, user2_id));
@@ -186,6 +205,9 @@ CREATE TABLE IF NOT EXISTS conversations (
 
 ALTER TABLE conversations ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own conversations" ON conversations;
+DROP POLICY IF EXISTS "Users can create conversations" ON conversations;
+
 -- Conversation participants
 CREATE TABLE IF NOT EXISTS conversation_participants (
   conversation_id UUID REFERENCES conversations(id) ON DELETE CASCADE,
@@ -198,6 +220,11 @@ CREATE TABLE IF NOT EXISTS conversation_participants (
 );
 
 ALTER TABLE conversation_participants ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Participants can view conversation members" ON conversation_participants;
+DROP POLICY IF EXISTS "Users can join conversations" ON conversation_participants;
+DROP POLICY IF EXISTS "Users can update own participation" ON conversation_participants;
+DROP POLICY IF EXISTS "Users can leave conversations" ON conversation_participants;
 
 -- Messages
 CREATE TABLE IF NOT EXISTS messages (
@@ -215,6 +242,11 @@ CREATE TABLE IF NOT EXISTS messages (
 );
 
 ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can view messages in their conversations" ON messages;
+DROP POLICY IF EXISTS "Users can send messages" ON messages;
+DROP POLICY IF EXISTS "Users can edit own messages" ON messages;
+DROP POLICY IF EXISTS "Users can soft-delete own messages" ON messages;
 
 -- Conversation policies
 CREATE POLICY "Users can view own conversations" ON conversations
@@ -297,6 +329,10 @@ CREATE TABLE IF NOT EXISTS user_locations (
 
 ALTER TABLE user_locations ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can manage own location" ON user_locations;
+DROP POLICY IF EXISTS "Users can see public locations" ON user_locations;
+DROP POLICY IF EXISTS "Users can see connected users locations" ON user_locations;
+
 CREATE POLICY "Users can manage own location" ON user_locations
   FOR ALL USING (auth.uid() = user_id);
 
@@ -342,6 +378,11 @@ CREATE TABLE IF NOT EXISTS game_sessions (
 
 ALTER TABLE game_sessions ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Players can view own games" ON game_sessions;
+DROP POLICY IF EXISTS "Users can see waiting games" ON game_sessions;
+DROP POLICY IF EXISTS "Users can create games" ON game_sessions;
+DROP POLICY IF EXISTS "Players can update games" ON game_sessions;
+
 -- Players can see their own games
 CREATE POLICY "Players can view own games" ON game_sessions
   FOR SELECT USING (auth.uid() IN (player1_id, player2_id));
@@ -383,6 +424,8 @@ CREATE TABLE IF NOT EXISTS game_scores (
 
 ALTER TABLE game_scores ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Anyone can view leaderboard" ON game_scores;
+
 -- Public leaderboard
 CREATE POLICY "Anyone can view leaderboard" ON game_scores
   FOR SELECT USING (true);
@@ -408,6 +451,9 @@ CREATE TABLE IF NOT EXISTS user_documents (
 );
 
 ALTER TABLE user_documents ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can manage own documents" ON user_documents;
+DROP POLICY IF EXISTS "Admins can view documents for support" ON user_documents;
 
 CREATE POLICY "Users can manage own documents" ON user_documents
   FOR ALL USING (auth.uid() = user_id);
@@ -436,6 +482,10 @@ CREATE TABLE IF NOT EXISTS reports (
 
 ALTER TABLE reports ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can create reports" ON reports;
+DROP POLICY IF EXISTS "Users can view own reports" ON reports;
+DROP POLICY IF EXISTS "Admins can manage all reports" ON reports;
+
 CREATE POLICY "Users can create reports" ON reports
   FOR INSERT WITH CHECK (auth.uid() = reporter_id);
 
@@ -463,6 +513,8 @@ CREATE TABLE IF NOT EXISTS audit_log (
 );
 
 ALTER TABLE audit_log ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Admins can view audit logs" ON audit_log;
 
 -- Only admins can view audit logs
 CREATE POLICY "Admins can view audit logs" ON audit_log
