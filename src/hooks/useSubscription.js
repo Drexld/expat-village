@@ -3,7 +3,6 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../contexts/AuthContext'
-import { supabase } from '../lib/supabase'
 import {
   getSubscription,
   checkFeatureAccess,
@@ -24,50 +23,29 @@ export function useSubscription() {
       return
     }
 
-    setLoading(true)
-    const { data, error: fetchError } = await getSubscription(user.id)
+    try {
+      setLoading(true)
+      const { data, error: fetchError } = await getSubscription(user.id)
 
-    if (fetchError) {
-      setError(fetchError)
-    } else {
-      setSubscription(data)
-      setError(null)
+      if (fetchError) {
+        console.error('Subscription fetch error:', fetchError)
+        setError(fetchError)
+      } else {
+        setSubscription(data)
+        setError(null)
+      }
+    } catch (err) {
+      console.error('Subscription hook error:', err)
+      setError(err)
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }, [user?.id])
 
   // Fetch on mount and when user changes
   useEffect(() => {
     fetchSubscription()
   }, [fetchSubscription])
-
-  // Listen for subscription updates via Supabase realtime
-  useEffect(() => {
-    if (!user?.id) return
-
-    const channel = supabase
-      .channel('subscription_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'subscriptions',
-          filter: `user_id=eq.${user.id}`,
-        },
-        () => {
-          // Clear cache and refetch
-          clearSubscriptionCache(user.id)
-          fetchSubscription()
-        }
-      )
-      .subscribe()
-
-    return () => {
-      supabase.removeChannel(channel)
-    }
-  }, [user?.id, fetchSubscription])
 
   const refresh = useCallback(() => {
     if (user?.id) {
