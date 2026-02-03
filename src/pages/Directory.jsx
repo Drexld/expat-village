@@ -2,6 +2,12 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import {
+  getDirectoryListings,
+  getListingReviews,
+  createReview,
+  DIRECTORY_CATEGORIES
+} from '../services/directory'
 
 function Directory() {
   const { user, isAuthenticated, openAuthModal, profile } = useAuth()
@@ -10,40 +16,38 @@ function Directory() {
   const [showReviewForm, setShowReviewForm] = useState(false)
   const [reviewForm, setReviewForm] = useState({ rating: 5, title: '', content: '' })
   const [submitting, setSubmitting] = useState(false)
-  const [reviews, setReviews] = useState({})
+  const [listings, setListings] = useState([])
+  const [reviews, setReviews] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [reviewsLoading, setReviewsLoading] = useState(false)
 
-  const categories = [
-    { id: 'all', label: 'All', icon: '📍' },
-    { id: 'bank', label: 'Banks', icon: '🏦' },
-    { id: 'restaurant', label: 'Restaurants', icon: '🍽️' },
-    { id: 'doctor', label: 'Healthcare', icon: '🏥' },
-    { id: 'gym', label: 'Gyms', icon: '💪' },
-  ]
-
-  const listings = [
-    { id: '1', name: 'Millennium Bank', category: 'bank', description: 'One of the most expat-friendly banks in Poland. English app and support available.', english_level: 'fluent', price_range: '$$', verified: true, expat_approved: true, rating_average: 4.5, review_count: 127, tags: ['expat-friendly', 'english-app', 'online-account'] },
-    { id: '2', name: 'mBank', category: 'bank', description: 'Modern digital bank with great mobile app. Account opening possible online.', english_level: 'fluent', price_range: '$', verified: true, expat_approved: true, rating_average: 4.3, review_count: 98, tags: ['expat-friendly', 'english-app', 'no-fees'] },
-    { id: '3', name: 'Medicover', category: 'doctor', description: 'Private healthcare network with English-speaking doctors. Multiple specialties.', english_level: 'fluent', price_range: '$$$', verified: true, expat_approved: true, rating_average: 4.2, review_count: 85, tags: ['english-speaking', 'private', 'specialists'] },
-    { id: '4', name: 'LuxMed', category: 'doctor', description: 'Large private medical network. Good for basic checkups and specialists.', english_level: 'basic', price_range: '$$$', verified: true, expat_approved: false, rating_average: 3.9, review_count: 62, tags: ['private', 'specialists', 'dental'] },
-    { id: '5', name: 'Beef & Pepper', category: 'restaurant', description: 'Great burgers and steaks. English menu available. Popular with expats.', english_level: 'fluent', price_range: '$$', verified: true, expat_approved: true, rating_average: 4.6, review_count: 43, tags: ['english-menu', 'burgers', 'steaks'] },
-    { id: '6', name: 'Charlotte Menora', category: 'restaurant', description: 'Beautiful French bakery and cafe. Perfect for brunch.', english_level: 'fluent', price_range: '$$', verified: true, expat_approved: true, rating_average: 4.7, review_count: 67, tags: ['english-menu', 'brunch', 'bakery'] },
-    { id: '7', name: 'Zdrofit', category: 'gym', description: 'Large gym chain with modern equipment. Some English-speaking staff.', english_level: 'basic', price_range: '$$', verified: true, expat_approved: false, rating_average: 4.0, review_count: 34, tags: ['24h', 'classes', 'pool'] },
-    { id: '8', name: 'Holmes Place', category: 'gym', description: 'Premium gym with excellent facilities. English-speaking staff.', english_level: 'fluent', price_range: '$$$$', verified: true, expat_approved: true, rating_average: 4.4, review_count: 28, tags: ['premium', 'spa', 'classes'] },
-  ]
-
-  // Load reviews from localStorage on mount
+  // Fetch listings on mount and category change
   useEffect(() => {
-    const savedReviews = localStorage.getItem('directory-reviews')
-    if (savedReviews) {
-      setReviews(JSON.parse(savedReviews))
-    }
-  }, [])
+    fetchListings()
+  }, [activeCategory])
 
-  const getListingReviews = (listingId) => {
-    return reviews[listingId] || []
+  // Fetch reviews when listing is selected
+  useEffect(() => {
+    if (selectedListing) {
+      fetchReviews(selectedListing.id)
+    }
+  }, [selectedListing?.id])
+
+  async function fetchListings() {
+    setLoading(true)
+    const { data } = await getDirectoryListings(activeCategory)
+    setListings(data)
+    setLoading(false)
   }
 
-  const submitReview = () => {
+  async function fetchReviews(listingId) {
+    setReviewsLoading(true)
+    const { data } = await getListingReviews(listingId)
+    setReviews(data)
+    setReviewsLoading(false)
+  }
+
+  const submitReview = async () => {
     if (!isAuthenticated) {
       openAuthModal('sign_up')
       return
@@ -54,31 +58,31 @@ function Directory() {
     setSubmitting(true)
 
     const newReview = {
-      id: `review-${Date.now()}`,
-      user_name: profile?.display_name || 'Anonymous',
+      listing_id: selectedListing.id,
+      user_id: user.id,
+      user_name: profile?.display_name || user.email?.split('@')[0] || 'Anonymous',
       rating: reviewForm.rating,
-      title: reviewForm.title,
+      title: reviewForm.title || null,
       content: reviewForm.content,
-      created_at: new Date().toISOString()
     }
 
-    // Add to reviews
-    const updatedReviews = {
-      ...reviews,
-      [selectedListing.id]: [newReview, ...(reviews[selectedListing.id] || [])]
+    const { data, error } = await createReview(newReview)
+
+    if (!error && data) {
+      // Add to local reviews list
+      setReviews([data, ...reviews])
+      // Update listing stats locally
+      setSelectedListing({
+        ...selectedListing,
+        review_count: (selectedListing.review_count || 0) + 1,
+        rating_average: ((selectedListing.rating_average * selectedListing.review_count) + reviewForm.rating) / (selectedListing.review_count + 1)
+      })
     }
-    
-    setReviews(updatedReviews)
-    localStorage.setItem('directory-reviews', JSON.stringify(updatedReviews))
 
     setShowReviewForm(false)
     setReviewForm({ rating: 5, title: '', content: '' })
     setSubmitting(false)
   }
-
-  const filteredListings = activeCategory === 'all' 
-    ? listings 
-    : listings.filter(l => l.category === activeCategory)
 
   const renderStars = (rating, interactive = false, onChange = null) => {
     return (
@@ -99,13 +103,11 @@ function Directory() {
 
   // Detail View
   if (selectedListing) {
-    const listingReviews = getListingReviews(selectedListing.id)
-    
     return (
       <div>
         <nav className="mb-6">
-          <button 
-            onClick={() => { setSelectedListing(null); setShowReviewForm(false); }}
+          <button
+            onClick={() => { setSelectedListing(null); setShowReviewForm(false); setReviews([]) }}
             className="text-slate-400 hover:text-white transition-colors"
           >
             ← Back to Directory
@@ -128,8 +130,8 @@ function Directory() {
               <p className="text-slate-400">{selectedListing.description}</p>
             </div>
             <div className="text-right ml-4">
-              <div className="text-3xl font-bold text-white">{selectedListing.rating_average}</div>
-              <div className="text-slate-500 text-sm">{selectedListing.review_count + listingReviews.length} reviews</div>
+              <div className="text-3xl font-bold text-white">{Number(selectedListing.rating_average || 0).toFixed(1)}</div>
+              <div className="text-slate-500 text-sm">{selectedListing.review_count || 0} reviews</div>
             </div>
           </div>
 
@@ -142,17 +144,46 @@ function Directory() {
             </div>
             <div className="flex items-center gap-2">
               <span className="text-slate-500">Price:</span>
-              <span className="text-white">{selectedListing.price_range}</span>
+              <span className="text-white">{selectedListing.price_range || '$$'}</span>
             </div>
+            {selectedListing.address && (
+              <div className="flex items-center gap-2">
+                <span className="text-slate-500">📍</span>
+                <span className="text-white">{selectedListing.address}</span>
+              </div>
+            )}
           </div>
 
-          {selectedListing.tags && (
+          {selectedListing.tags && selectedListing.tags.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-4">
               {selectedListing.tags.map(tag => (
                 <span key={tag} className="bg-slate-700 text-slate-300 text-xs px-2 py-1 rounded-full">
                   {tag}
                 </span>
               ))}
+            </div>
+          )}
+
+          {(selectedListing.website || selectedListing.phone) && (
+            <div className="flex flex-wrap gap-4 mt-4 pt-4 border-t border-slate-700">
+              {selectedListing.website && (
+                <a
+                  href={selectedListing.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-purple-400 hover:text-purple-300 text-sm"
+                >
+                  🌐 Website
+                </a>
+              )}
+              {selectedListing.phone && (
+                <a
+                  href={`tel:${selectedListing.phone}`}
+                  className="text-purple-400 hover:text-purple-300 text-sm"
+                >
+                  📞 {selectedListing.phone}
+                </a>
+              )}
             </div>
           )}
         </div>
@@ -180,7 +211,7 @@ function Directory() {
         {showReviewForm && (
           <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 mb-6">
             <h3 className="text-lg font-semibold text-white mb-4">Your Review</h3>
-            
+
             <div className="mb-4">
               <label className="block text-slate-400 text-sm mb-2">Rating</label>
               {renderStars(reviewForm.rating, true, (r) => setReviewForm({...reviewForm, rating: r}))}
@@ -229,16 +260,20 @@ function Directory() {
         {/* Reviews List */}
         <div>
           <h2 className="text-xl font-bold text-white mb-4">
-            Reviews ({listingReviews.length})
+            Reviews ({reviews.length})
           </h2>
-          
-          {listingReviews.length === 0 ? (
+
+          {reviewsLoading ? (
+            <div className="bg-slate-800 border border-slate-700 rounded-xl p-8 text-center">
+              <p className="text-slate-400">Loading reviews...</p>
+            </div>
+          ) : reviews.length === 0 ? (
             <div className="bg-slate-800 border border-slate-700 rounded-xl p-8 text-center">
               <p className="text-slate-400">No reviews yet. Be the first!</p>
             </div>
           ) : (
             <div className="space-y-4">
-              {listingReviews.map(review => (
+              {reviews.map(review => (
                 <div key={review.id} className="bg-slate-800 border border-slate-700 rounded-xl p-4">
                   <div className="flex items-start justify-between mb-2">
                     <div>
@@ -286,7 +321,7 @@ function Directory() {
 
       {/* Category Filters */}
       <div className="flex gap-2 overflow-x-auto pb-2 mb-6">
-        {categories.map(cat => (
+        {DIRECTORY_CATEGORIES.map(cat => (
           <button
             key={cat.id}
             onClick={() => setActiveCategory(cat.id)}
@@ -304,9 +339,16 @@ function Directory() {
 
       {/* Listings */}
       <div className="space-y-4">
-        {filteredListings.map(listing => {
-          const listingReviews = getListingReviews(listing.id)
-          return (
+        {loading ? (
+          <div className="p-8 rounded-xl bg-slate-800 border border-slate-700 text-center">
+            <p className="text-slate-400">Loading listings...</p>
+          </div>
+        ) : listings.length === 0 ? (
+          <div className="p-8 rounded-xl bg-slate-800 border border-slate-700 text-center">
+            <p className="text-slate-400">No listings found in this category yet.</p>
+          </div>
+        ) : (
+          listings.map(listing => (
             <button
               key={listing.id}
               onClick={() => setSelectedListing(listing)}
@@ -328,17 +370,17 @@ function Directory() {
                     <span className={listing.english_level === 'fluent' ? 'text-emerald-400' : 'text-amber-400'}>
                       {listing.english_level === 'fluent' ? '🗣️ Fluent English' : '🗣️ Basic English'}
                     </span>
-                    <span className="text-slate-500">{listing.price_range}</span>
+                    <span className="text-slate-500">{listing.price_range || '$$'}</span>
                   </div>
                 </div>
                 <div className="text-right ml-4">
-                  <div className="text-2xl font-bold text-white">{listing.rating_average}</div>
-                  <div className="text-slate-500 text-sm">{listing.review_count + listingReviews.length} reviews</div>
+                  <div className="text-2xl font-bold text-white">{Number(listing.rating_average || 0).toFixed(1)}</div>
+                  <div className="text-slate-500 text-sm">{listing.review_count || 0} reviews</div>
                 </div>
               </div>
             </button>
-          )
-        })}
+          ))
+        )}
       </div>
 
       {/* Add Business CTA */}
