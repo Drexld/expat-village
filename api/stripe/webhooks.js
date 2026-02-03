@@ -100,20 +100,42 @@ async function handleCheckoutComplete(supabase, session) {
   const customerId = session.customer
   const subscriptionId = session.subscription
 
+  console.log('handleCheckoutComplete called:', { userId, customerId, subscriptionId })
+
   if (!userId) {
     console.error('No user ID in checkout session metadata')
     return
   }
 
+  if (!subscriptionId) {
+    console.error('No subscription ID in session')
+    return
+  }
+
   // Fetch the subscription details from Stripe
-  const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+  let subscription
+  try {
+    subscription = await stripe.subscriptions.retrieve(subscriptionId)
+  } catch (err) {
+    console.error('Error retrieving subscription from Stripe:', err)
+    throw err
+  }
+
   const priceId = subscription.items.data[0]?.price.id
   const plan = getPlanFromPriceId(priceId)
 
-  // Upsert subscription record
+  console.log('Subscription details:', { priceId, plan, status: subscription.status })
+
+  // First try to delete any existing subscription for this user (to avoid conflicts)
+  await supabase
+    .from('subscriptions')
+    .delete()
+    .eq('user_id', userId)
+
+  // Insert new subscription record
   const { error } = await supabase
     .from('subscriptions')
-    .upsert({
+    .insert({
       user_id: userId,
       stripe_subscription_id: subscriptionId,
       stripe_customer_id: customerId,
@@ -122,13 +144,10 @@ async function handleCheckoutComplete(supabase, session) {
       current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
       current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
       cancel_at_period_end: subscription.cancel_at_period_end || false,
-      updated_at: new Date().toISOString(),
-    }, {
-      onConflict: 'user_id'
     })
 
   if (error) {
-    console.error('Error upserting subscription:', error)
+    console.error('Error inserting subscription:', error)
     throw error
   }
 
