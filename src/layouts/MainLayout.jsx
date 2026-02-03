@@ -35,10 +35,8 @@ function MainLayout() {
   }, [location.pathname])
 
   const handleSignOut = async () => {
-    localStorage.removeItem('sb-nkybxminaowwtrmoffzw-auth-token')
-    await signOut()
     setShowUserMenu(false)
-    window.location.reload()
+    await signOut()
   }
 
   const displayName = profile?.display_name 

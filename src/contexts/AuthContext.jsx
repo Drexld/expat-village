@@ -102,20 +102,29 @@ export const AuthProvider = ({ children }) => {
   const signOut = async () => {
     console.log('Sign out clicked!')
 
-    // Clear local storage directly
-    localStorage.removeItem('sb-nkybxminaowwtrmoffzw-auth-token')
+    try {
+      // Actually await the Supabase signOut
+      const { error } = await supabase.auth.signOut()
+      if (error) console.error('Supabase signOut error:', error)
+    } catch (err) {
+      console.error('SignOut error:', err)
+    }
+
+    // Clear all Supabase auth keys from localStorage
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('sb-') && key.includes('-auth-')) {
+        localStorage.removeItem(key)
+      }
+    })
 
     // Clear state
     setUser(null)
     setProfile(null)
 
-    // Try Supabase signOut in background (don't await)
-    supabase.auth.signOut().catch(err => console.log('Background signout:', err))
+    console.log('Signed out successfully')
 
-    console.log('Signed out locally')
-
-    // Reload page to ensure clean state
-    window.location.reload()
+    // Redirect to home
+    window.location.href = '/'
   }
 
   const updateProfile = async (updates) => {
