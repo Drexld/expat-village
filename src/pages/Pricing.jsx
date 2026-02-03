@@ -98,10 +98,6 @@ function Pricing() {
         <p className="text-slate-400 text-lg mt-2">
           Unlock premium features to make the most of your expat journey
         </p>
-        {/* Debug info - remove later */}
-        <p className="text-xs text-slate-600 mt-2">
-          Debug: subLoading={String(subLoading)}, currentPlan={currentPlan}, isAuth={String(isAuthenticated)}
-        </p>
       </div>
 
       {/* Canceled notice */}
