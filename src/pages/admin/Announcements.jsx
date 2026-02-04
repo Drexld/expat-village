@@ -25,6 +25,11 @@ const audiences = [
   { value: 'experienced', label: 'Experienced' },
 ]
 
+const languages = [
+  { value: 'en', label: 'English' },
+  { value: 'pl', label: 'Polish' },
+]
+
 const emptyForm = {
   title: '',
   message: '',
@@ -33,6 +38,7 @@ const emptyForm = {
   active: true,
   scope: 'village',
   target_audience: 'all',
+  language: 'en',
   link_url: '',
   link_text: '',
 }
@@ -66,6 +72,7 @@ function Announcements() {
       active: announcement.active ?? true,
       scope: announcement.scope || 'village',
       target_audience: announcement.target_audience || 'all',
+      language: announcement.language || 'en',
       link_url: announcement.link_url || '',
       link_text: announcement.link_text || '',
     })
@@ -213,6 +220,18 @@ function Announcements() {
                     ))}
                   </select>
                 </div>
+              </div>
+              <div>
+                <label className="block text-sm text-slate-400 mb-1">Language</label>
+                <select
+                  value={form.language}
+                  onChange={(e) => setForm({ ...form, language: e.target.value })}
+                  className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:border-purple-500 focus:outline-none"
+                >
+                  {languages.map((l) => (
+                    <option key={l.value} value={l.value}>{l.label}</option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="block text-sm text-slate-400 mb-1">Link URL (optional)</label>

@@ -3,7 +3,7 @@
 
 import { supabase } from '../lib/supabase'
 
-const CACHE_KEY = 'expat_village_announcements'
+const CACHE_KEY = 'expat_village_announcements_en_v4'
 const CACHE_DURATION = 15 * 60 * 1000 // 15 minutes
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
@@ -25,7 +25,7 @@ export async function getAnnouncements() {
     console.log('Fetching announcements (supabase client)...')
     // Fetch active announcements from Supabase
     const queryPromise = supabase
-      .from('announcements')
+      .from('announcements_en')
       .select('*')
       .eq('active', true)
       .order('priority', { ascending: false })
@@ -60,7 +60,7 @@ async function fetchAnnouncementsRest() {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), QUERY_TIMEOUT_MS)
 
-    const url = `${SUPABASE_URL}/rest/v1/announcements?select=*&active=eq.true&order=priority.desc,created_at.desc`
+    const url = `${SUPABASE_URL}/rest/v1/announcements_en?select=*&active=eq.true&order=priority.desc,created_at.desc`
     const response = await fetch(url, {
       method: 'GET',
       headers: {

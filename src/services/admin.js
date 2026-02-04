@@ -124,6 +124,14 @@ export async function createAnnouncement(announcement) {
       .single()
 
     if (error) throw error
+    // Trigger server-side translation (Edge Function)
+    try {
+      await supabase.functions.invoke('translate_announcement', {
+        body: { announcement_id: data.id }
+      })
+    } catch (invokeError) {
+      console.error('Translate announcement invoke error:', invokeError)
+    }
     return { data, error: null }
   } catch (error) {
     console.error('Error creating announcement:', error)
@@ -141,6 +149,14 @@ export async function updateAnnouncement(id, updates) {
       .single()
 
     if (error) throw error
+    // Trigger server-side translation (Edge Function)
+    try {
+      await supabase.functions.invoke('translate_announcement', {
+        body: { announcement_id: data.id }
+      })
+    } catch (invokeError) {
+      console.error('Translate announcement invoke error:', invokeError)
+    }
     return { data, error: null }
   } catch (error) {
     console.error('Error updating announcement:', error)
