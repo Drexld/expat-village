@@ -41,6 +41,10 @@ Context:
 - User's interests: ${interests.length > 0 ? interests.join(', ') : 'not specified'}
 ${trcDaysRemaining !== null ? `- TRC expires in: ${trcDaysRemaining} days` : ''}
 
+Language rules:
+- ALL fields must be written in English.
+- The ONLY Polish text should be the Polish part of "phraseOfTheDay".
+
 Generate a JSON response with these fields:
 1. "greeting" - A warm, personalized greeting (1 sentence, include weather context like "perfect for a hot coffee" or "bundle up!")
 2. "todayInPoland" - An interesting historical fact or cultural tidbit about Poland related to today's date (1-2 sentences). Could be a historical event, a Polish tradition, a famous Polish person's birthday, etc.

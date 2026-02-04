@@ -5,8 +5,56 @@ import { CITY_PULSE_SOURCES } from './cityPulseSources.js'
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
 const WARSAW_API_KEY = process.env.WARSAW_API_KEY
+const GROQ_API_KEY = process.env.GROQ_API_KEY
 const CRON_SECRET = process.env.CRON_SECRET
 const REQUEST_TIMEOUT_MS = 8000
+const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
+
+function isLikelyPolish(text) {
+  if (!text) return false
+  const lower = text.toLowerCase()
+  if (/[ąćęłńóśżź]/.test(lower)) return true
+  const common = [' oraz ', ' że ', ' nie ', ' się ', ' jest ', ' przez ', ' do ', ' na ', ' z ']
+  return common.some((w) => lower.includes(w))
+}
+
+async function translateToEnglish({ title, message }) {
+  if (!GROQ_API_KEY) return null
+  const systemPrompt =
+    "You translate Polish public alerts to clear English. Keep names, dates, numbers, and codes. Return ONLY valid JSON with keys: title, message."
+  const userPrompt = `Translate to English:\nTITLE: ${title}\nMESSAGE: ${message}`
+
+  const response = await withTimeout(
+    fetch(GROQ_API_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+        temperature: 0.2,
+        max_tokens: 700,
+      }),
+    }),
+    REQUEST_TIMEOUT_MS
+  )
+
+  if (!response.ok) {
+    const errorText = await response.text()
+    throw new Error(`Groq translation failed: ${response.status} - ${errorText}`)
+  }
+
+  const data = await response.json()
+  const content = data?.choices?.[0]?.message?.content || ''
+  const jsonMatch = content.match(/\{[\s\S]*\}/)
+  if (!jsonMatch) return null
+  return JSON.parse(jsonMatch[0])
+}
 
 const parser = new XMLParser({
   ignoreAttributes: false,
@@ -86,6 +134,7 @@ async function insertAnnouncements(supabase, source, items) {
       scope: source.scope || 'city',
       category: source.category || null,
       target_audience: source.target_audience || 'all',
+      language: isLikelyPolish(`${item.title} ${item.message}`) ? 'pl' : 'en',
     }))
 
   if (rows.length === 0) return { inserted: 0 }
@@ -103,10 +152,13 @@ async function insertAnnouncements(supabase, source, items) {
   const toInsert = rows.filter((r) => !r.link_url || !existingSet.has(r.link_url))
   if (toInsert.length === 0) return { inserted: 0 }
 
-  const { error } = await supabase.from('announcements').insert(toInsert)
+  const { data: insertedRows, error } = await supabase
+    .from('announcements')
+    .insert(toInsert)
+    .select('id,title,message,language')
   if (error) throw error
 
-  return { inserted: toInsert.length }
+  return { inserted: toInsert.length, rows: insertedRows || [] }
 }
 
 export default async function handler(req, res) {
@@ -129,6 +181,33 @@ export default async function handler(req, res) {
     try {
       const items = await fetchSource(source)
       const inserted = await insertAnnouncements(supabase, source, items)
+
+      // Translate newly inserted Polish items and store in announcement_translations
+      const polishRows = (inserted.rows || []).filter((r) => r.language === 'pl')
+      for (const row of polishRows) {
+        try {
+          const translated = await translateToEnglish({
+            title: row.title,
+            message: row.message,
+          })
+          if (!translated?.title || !translated?.message) continue
+          await supabase
+            .from('announcement_translations')
+            .upsert(
+              {
+                announcement_id: row.id,
+                language: 'en',
+                title: translated.title,
+                message: translated.message,
+                created_by: null,
+              },
+              { onConflict: 'announcement_id,language' }
+            )
+        } catch (translationError) {
+          results.push({ id: source.id, translation_error: translationError.message })
+        }
+      }
+
       results.push({ id: source.id, inserted: inserted.inserted })
     } catch (error) {
       results.push({ id: source.id, error: error.message })
