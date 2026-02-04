@@ -189,6 +189,49 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- Function to check if current user is a participant in a conversation
+CREATE OR REPLACE FUNCTION is_conversation_participant(p_conversation_id UUID)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+SET row_security = off
+AS $$
+BEGIN
+  RETURN EXISTS (
+    SELECT 1
+    FROM conversation_participants
+    WHERE conversation_id = p_conversation_id
+      AND user_id = auth.uid()
+  );
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION is_conversation_participant(UUID) TO authenticated, anon;
+
+-- Function to join a conversation as the current user (avoids RLS insert mismatch)
+CREATE OR REPLACE FUNCTION join_conversation_participant(p_conversation_id UUID)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+SET row_security = off
+AS $$
+BEGIN
+  IF auth.uid() IS NULL THEN
+    RAISE EXCEPTION 'Not authenticated' USING ERRCODE = '28000';
+  END IF;
+
+  INSERT INTO conversation_participants (conversation_id, user_id)
+  VALUES (p_conversation_id, auth.uid())
+  ON CONFLICT (conversation_id, user_id) DO NOTHING;
+
+  RETURN TRUE;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION join_conversation_participant(UUID) TO authenticated, anon;
+
 -- =============================================================================
 -- SECTION 4: CHAT & MESSAGING
 -- =============================================================================
@@ -222,6 +265,7 @@ CREATE TABLE IF NOT EXISTS conversation_participants (
 ALTER TABLE conversation_participants ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Participants can view conversation members" ON conversation_participants;
+DROP POLICY IF EXISTS "Participants can view members" ON conversation_participants;
 DROP POLICY IF EXISTS "Users can join conversations" ON conversation_participants;
 DROP POLICY IF EXISTS "Users can update own participation" ON conversation_participants;
 DROP POLICY IF EXISTS "Users can leave conversations" ON conversation_participants;
@@ -262,13 +306,7 @@ CREATE POLICY "Users can create conversations" ON conversations
 
 -- Participant policies
 CREATE POLICY "Participants can view conversation members" ON conversation_participants
-  FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM conversation_participants cp
-      WHERE cp.conversation_id = conversation_participants.conversation_id
-      AND cp.user_id = auth.uid()
-    )
-  );
+  FOR SELECT USING (is_conversation_participant(conversation_id));
 
 CREATE POLICY "Users can join conversations" ON conversation_participants
   FOR INSERT WITH CHECK (auth.uid() = user_id);
