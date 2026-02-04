@@ -1,7 +1,7 @@
 // Service Worker for Expat Village PWA
-// Version 1.0.0
+// Version 1.1.0
 
-const CACHE_NAME = 'expat-village-v1'
+const CACHE_NAME = 'expat-village-v2'
 const OFFLINE_URL = '/'
 
 // Files to cache immediately on install
@@ -53,31 +53,47 @@ self.addEventListener('fetch', (event) => {
   // Skip external requests
   if (!event.request.url.startsWith(self.location.origin)) return
 
+  const isNavigation = event.request.mode === 'navigate'
+  const isStaticAsset = ['script', 'style', 'worker'].includes(event.request.destination)
+
+  if (isNavigation) {
+    // Network-first for HTML to avoid stale app shell
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          const responseToCache = response.clone()
+          caches.open(CACHE_NAME).then((cache) => cache.put(OFFLINE_URL, responseToCache))
+          return response
+        })
+        .catch(() => caches.match(OFFLINE_URL))
+    )
+    return
+  }
+
+  if (isStaticAsset) {
+    // Stale-while-revalidate for JS/CSS
+    event.respondWith(
+      caches.match(event.request).then((cachedResponse) => {
+        const fetchPromise = fetch(event.request).then((networkResponse) => {
+          const responseToCache = networkResponse.clone()
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache))
+          return networkResponse
+        })
+        return cachedResponse || fetchPromise
+      })
+    )
+    return
+  }
+
+  // Default: network-first for other GETs
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        // Clone the response before caching
         const responseToCache = response.clone()
-
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseToCache)
-        })
-
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache))
         return response
       })
-      .catch(() => {
-        // If network fails, try cache
-        return caches.match(event.request).then((cachedResponse) => {
-          if (cachedResponse) {
-            return cachedResponse
-          }
-
-          // If no cache, return offline page for navigation requests
-          if (event.request.mode === 'navigate') {
-            return caches.match(OFFLINE_URL)
-          }
-        })
-      })
+      .catch(() => caches.match(event.request))
   )
 })
 
