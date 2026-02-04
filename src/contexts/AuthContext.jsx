@@ -104,7 +104,7 @@ export const AuthProvider = ({ children }) => {
     let signOutError = null
 
     try {
-      const { error } = await supabase.auth.signOut()
+      const { error } = await supabase.auth.signOut({ scope: 'local' })
       if (error) {
         signOutError = error
         console.error('Supabase signOut error:', error)
@@ -115,9 +115,16 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
+      // Stop auto-refresh to avoid token refresh after sign out
+      supabase.auth.stopAutoRefresh()
+    } catch (err) {
+      console.error('Stop auto refresh error:', err)
+    }
+
+    try {
       // Clear all Supabase auth keys from localStorage
       Object.keys(localStorage).forEach(key => {
-        if (key.startsWith('sb-') && key.includes('-auth-')) {
+        if (key.startsWith('sb-') || key.includes('supabase')) {
           localStorage.removeItem(key)
         }
       })
@@ -135,8 +142,8 @@ export const AuthProvider = ({ children }) => {
       console.warn('Sign-out completed with errors; forcing redirect.')
     }
 
-    // Redirect to home
-    window.location.href = '/'
+    // Redirect to home (hard reload)
+    window.location.replace('/')
   }
 
   const updateProfile = async (updates) => {
