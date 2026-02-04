@@ -17,6 +17,7 @@ function MorningBriefing({ weatherData, onClose }) {
   const [pulseItems, setPulseItems] = useState([])
   const startY = useRef(0)
   const containerRef = useRef(null)
+  const scrollRef = useRef(null)
 
   const displayName = profile?.display_name
     || user?.user_metadata?.display_name
@@ -109,8 +110,18 @@ function MorningBriefing({ weatherData, onClose }) {
     return items
   }, [dayMood.label, transportStatus.label, pulseItems])
 
+  const canSwipeDismiss = () => {
+    const el = scrollRef.current
+    if (!el) return true
+    const isScrollable = el.scrollHeight > el.clientHeight + 1
+    if (!isScrollable) return true
+    const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 2
+    return atBottom
+  }
+
   // Touch handlers for swipe up to dismiss
   const handleTouchStart = (e) => {
+    if (!canSwipeDismiss()) return
     startY.current = e.touches[0].clientY
     setIsDragging(true)
   }
@@ -134,6 +145,7 @@ function MorningBriefing({ weatherData, onClose }) {
 
   // Mouse handlers for desktop
   const handleMouseDown = (e) => {
+    if (!canSwipeDismiss()) return
     startY.current = e.clientY
     setIsDragging(true)
   }
@@ -220,7 +232,7 @@ function MorningBriefing({ weatherData, onClose }) {
       </div>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col px-6 py-4 overflow-y-auto">
+      <div ref={scrollRef} className="flex-1 flex flex-col px-6 py-4 overflow-y-auto">
         {/* Pulse ticker */}
         <div className="mb-5">
           <div className="rounded-full border border-purple-500/20 bg-purple-500/10 px-3 py-2 overflow-hidden">
