@@ -75,7 +75,7 @@ export async function sendMessage(conversationId, userId, content) {
     const { data, error } = await supabase
       .from('messages')
       .insert(payload)
-      .select('id, conversation_id, sender_id, content, content_type, created_at')
+      .select('id, conversation_id, sender_id, content, content_type, created_at, profiles:sender_id (id, display_name, email)')
       .single()
 
     if (error) {

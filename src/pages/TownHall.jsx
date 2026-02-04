@@ -119,8 +119,14 @@ function TownHall() {
       return
     }
 
-    const { error } = await sendMessage(activeRoom.conversation_id, user.id, messageInput)
+    const { data, error } = await sendMessage(activeRoom.conversation_id, user.id, messageInput)
     if (!error) {
+      if (data) {
+        setMessages((prev) => {
+          if (prev.find((m) => m.id === data.id)) return prev
+          return [...prev, data]
+        })
+      }
       setMessageInput('')
     } else {
       setMessageError('Message failed to send. Please try again.')
