@@ -26,21 +26,35 @@ export async function getTownHallRooms() {
 
 export async function joinRoomConversation(conversationId, userId) {
   try {
+    let resolvedUserId = userId
+    const { data: authData, error: authError } = await supabase.auth.getUser()
+    if (authError) {
+      console.error('Join room auth error:', authError)
+    }
+    if (authData?.user?.id) {
+      if (resolvedUserId && resolvedUserId !== authData.user.id) {
+        console.warn('Join room user mismatch; using auth user id.')
+      }
+      resolvedUserId = authData.user.id
+    }
+
+    if (!resolvedUserId) {
+      return { data: null, error: new Error('Not authenticated') }
+    }
+
     const { data, error } = await supabase
       .from('conversation_participants')
       .upsert(
-        { conversation_id: conversationId, user_id: userId },
+        { conversation_id: conversationId, user_id: resolvedUserId },
         { onConflict: 'conversation_id,user_id' }
       )
-      .select()
-      .single()
 
     if (error) {
       console.error('Join room error:', error)
       return { data: null, error }
     }
 
-    return { data, error: null }
+    return { data: data || null, error: null }
   } catch (error) {
     console.error('Join room error:', error)
     return { data: null, error }
