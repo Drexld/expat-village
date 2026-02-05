@@ -92,9 +92,11 @@ function Announcements() {
     return (
       <div
         key={announcement.id}
-        className="px-3 py-2.5 rounded-2xl glass-panel"
+        className="px-3 py-2.5 rounded-2xl prism-card prism-reveal"
         style={{
           borderColor: colors.border,
+          '--prism': colors.glow,
+          '--glass-glow': colors.glow,
         }}
       >
         {/* Header */}
@@ -143,7 +145,7 @@ function Announcements() {
   }
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3 prism-reveal">
       {(loading || error || topAlerts.length > 0) && (
         <div>
           <p className="text-[11px] uppercase tracking-widest text-slate-500 mb-2 px-1">City Alerts</p>

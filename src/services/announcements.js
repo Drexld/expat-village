@@ -162,34 +162,40 @@ export function getAnnouncementIcon(type) {
 export function getAnnouncementColors(type) {
   const colors = {
     info: {
-      bg: 'rgba(59, 130, 246, 0.1)',
-      border: 'rgba(59, 130, 246, 0.3)',
-      text: 'rgb(147, 197, 253)'
+      bg: 'rgba(143, 164, 255, 0.12)',
+      border: 'rgba(143, 164, 255, 0.35)',
+      text: 'rgb(191, 205, 255)',
+      glow: 'rgba(143, 164, 255, 0.25)',
     },
     warning: {
-      bg: 'rgba(245, 158, 11, 0.1)',
-      border: 'rgba(245, 158, 11, 0.3)',
-      text: 'rgb(253, 224, 71)'
+      bg: 'rgba(242, 200, 121, 0.12)',
+      border: 'rgba(242, 200, 121, 0.35)',
+      text: 'rgb(253, 230, 165)',
+      glow: 'rgba(242, 200, 121, 0.25)',
     },
     success: {
-      bg: 'rgba(34, 197, 94, 0.1)',
-      border: 'rgba(34, 197, 94, 0.3)',
-      text: 'rgb(134, 239, 172)'
+      bg: 'rgba(126, 233, 212, 0.12)',
+      border: 'rgba(126, 233, 212, 0.35)',
+      text: 'rgb(160, 246, 231)',
+      glow: 'rgba(126, 233, 212, 0.24)',
     },
     alert: {
-      bg: 'rgba(239, 68, 68, 0.1)',
-      border: 'rgba(239, 68, 68, 0.3)',
-      text: 'rgb(252, 165, 165)'
+      bg: 'rgba(255, 107, 107, 0.12)',
+      border: 'rgba(255, 107, 107, 0.35)',
+      text: 'rgb(255, 182, 182)',
+      glow: 'rgba(255, 107, 107, 0.22)',
     },
     event: {
-      bg: 'rgba(168, 85, 247, 0.1)',
-      border: 'rgba(168, 85, 247, 0.3)',
-      text: 'rgb(216, 180, 254)'
+      bg: 'rgba(191, 163, 255, 0.12)',
+      border: 'rgba(191, 163, 255, 0.35)',
+      text: 'rgb(219, 203, 255)',
+      glow: 'rgba(191, 163, 255, 0.25)',
     },
     update: {
-      bg: 'rgba(139, 92, 246, 0.1)',
-      border: 'rgba(139, 92, 246, 0.3)',
-      text: 'rgb(196, 181, 253)'
+      bg: 'rgba(154, 173, 255, 0.12)',
+      border: 'rgba(154, 173, 255, 0.35)',
+      text: 'rgb(198, 211, 255)',
+      glow: 'rgba(154, 173, 255, 0.24)',
     }
   }
   return colors[type] || colors.info

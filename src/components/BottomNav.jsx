@@ -227,7 +227,10 @@ function BottomNav() {
       )}
 
       {/* Bottom Navigation Bar */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 glass-panel border-t border-white/10 safe-area-pb">
+      <nav
+        className="fixed bottom-0 left-0 right-0 z-40 glass-panel border-t border-white/10 safe-area-pb"
+        style={{ '--glass-glow': 'rgba(143,164,255,0.18)' }}
+      >
         <div className="flex items-center justify-around px-2 py-2">
           {NAV_ITEMS.map((item) => {
             const active = item.isMenu ? menuOpen : item.isSearch ? searchOpen : isActive(item.path)
@@ -237,7 +240,7 @@ function BottomNav() {
                 key={item.label}
                 onClick={() => handleNavClick(item)}
                 className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all ${
-                  active ? 'bg-white/10' : ''
+                  active ? 'nav-active' : ''
                 }`}
               >
                 <Icon
@@ -249,6 +252,7 @@ function BottomNav() {
                 }`}>
                   {item.label}
                 </span>
+                <span className="nav-dot" />
               </button>
             )
           })}

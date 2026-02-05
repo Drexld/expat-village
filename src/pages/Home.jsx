@@ -51,17 +51,17 @@ const ACTIVITY = [
 
 // THREE PATHS (for non-authenticated users - onboarding style)
 const PATHS = [
-  { icon: "checklist", label: "Get set up", color: "#9aa3ff", glow: "rgba(154,163,255,0.18)", path: "/get-things-done" },
-  { icon: "home", label: "Find a place", color: "#c2b1d9", glow: "rgba(194,177,217,0.16)", path: "/housing" },
-  { icon: "community", label: "Meet people", color: "#88a6d9", glow: "rgba(136,166,217,0.18)", path: "/town-hall" },
+  { icon: "checklist", label: "Get set up", color: "#8fa4ff", glow: "rgba(143,164,255,0.26)", path: "/get-things-done" },
+  { icon: "home", label: "Find a place", color: "#bfa3ff", glow: "rgba(191,163,255,0.24)", path: "/housing" },
+  { icon: "community", label: "Meet people", color: "#7ee9d4", glow: "rgba(126,233,212,0.22)", path: "/town-hall" },
 ]
 
 // QUICK ACTIONS (for authenticated users - dashboard style)
 const QUICK_ACTIONS = [
-  { icon: "checklist", label: "My Checklist", path: "/my-checklist", color: "#9aa3ff" },
-  { icon: "community", label: "Town Hall", path: "/town-hall", color: "#c2b1d9" },
-  { icon: "pin", label: "Directory", path: "/directory", color: "#88a6d9" },
-  { icon: "spark", label: "Get Things Done", path: "/get-things-done", color: "#9aa3ff" },
+  { icon: "checklist", label: "My Checklist", path: "/my-checklist", color: "#8fa4ff", glow: "rgba(143,164,255,0.22)" },
+  { icon: "community", label: "Town Hall", path: "/town-hall", color: "#bfa3ff", glow: "rgba(191,163,255,0.22)" },
+  { icon: "pin", label: "Directory", path: "/directory", color: "#7ee9d4", glow: "rgba(126,233,212,0.2)" },
+  { icon: "spark", label: "Get Things Done", path: "/get-things-done", color: "#f2c879", glow: "rgba(242,200,121,0.22)" },
 ]
 
 // STARS
@@ -212,11 +212,12 @@ function ActivityStrip() {
       {[...ACTIVITY, ...ACTIVITY].map((a, i) => (
         <button
           key={`${a.id}-${i}`}
-          className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-full transition-all active:scale-95"
+          className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-full transition-all active:scale-95 glass-chip"
           style={{
             background: a.live ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.04)",
             border: a.live ? "1px solid rgba(255,255,255,0.25)" : "1px solid rgba(255,255,255,0.12)",
             backdropFilter: "blur(8px)",
+            '--glass-glow': a.live ? 'rgba(242,200,121,0.22)' : 'rgba(143,164,255,0.12)',
           }}
         >
           {a.live && (
@@ -318,7 +319,10 @@ function Home() {
                 {isAuthenticated ? (
           <div className="flex flex-col gap-6 px-4 pt-4 pb-10">
             {/* Village signal strip */}
-            <div className="relative overflow-hidden rounded-2xl px-4 py-3 glass-panel">
+            <div
+              className="relative overflow-hidden rounded-2xl px-4 py-3 prism-card prism-sweep prism-reveal"
+              style={{ '--prism': 'rgba(143,164,255,0.26)' }}
+            >
               <div className="flex items-center justify-between gap-3 mb-2">
                 <p className="text-[11px] uppercase tracking-widest text-slate-400">Village Signal</p>
                 <div className="flex items-center gap-2">
@@ -346,7 +350,8 @@ function Home() {
             {/* Daily Pulse - Tap to reopen morning briefing */}
             <button
               onClick={() => setShowMorningBriefing(true)}
-              className="relative overflow-hidden rounded-3xl p-4 text-left transition-all active:scale-[0.99] glass-3d hover-tilt"
+              className="relative overflow-hidden rounded-3xl p-4 text-left transition-all active:scale-[0.99] prism-card prism-hero prism-sweep prism-breathe hover-tilt"
+              style={{ '--prism': 'rgba(143,164,255,0.34)' }}
             >
               <div className="absolute inset-0 opacity-30" style={{
                 background: "radial-gradient(120px 120px at 85% 20%, rgba(194,177,217,0.25), transparent 70%)",
@@ -382,7 +387,8 @@ function Home() {
                   <button
                     key={i}
                     onClick={() => navigate(p.path)}
-                    className="relative overflow-hidden rounded-3xl p-4 text-left transition-all duration-200 active:scale-95 glass-3d hover-tilt"
+                    className="relative overflow-hidden rounded-3xl p-4 text-left transition-all duration-200 active:scale-95 prism-card prism-sweep hover-tilt"
+                    style={{ '--prism': p.glow }}
                   >
                     <div className="absolute -top-6 -right-6 w-16 h-16 rounded-full" style={{ background: p.color, opacity: 0.12 }} />
                     <Icon name={p.icon} className="w-6 h-6 text-slate-100 mb-2" />
@@ -403,7 +409,8 @@ function Home() {
                   <button
                     key={i}
                     onClick={() => navigate(action.path)}
-                    className="flex items-center justify-between gap-3 px-4 py-4 rounded-2xl transition-all duration-200 active:scale-95 glass-panel"
+                    className="flex items-center justify-between gap-3 px-4 py-4 rounded-2xl transition-all duration-200 active:scale-95 prism-card prism-reveal"
+                    style={{ '--prism': action.glow }}
                   >
                     <div className="flex items-center gap-3">
                       <Icon name={action.icon} className="w-5 h-5 text-slate-200" />
@@ -427,7 +434,8 @@ function Home() {
                 {ACTIVITY.slice(0, 1).map((a, i) => (
                   <button
                     key={i}
-                    className="relative overflow-hidden rounded-3xl p-4 text-left transition-all active:scale-95 glass-3d"
+                    className="relative overflow-hidden rounded-3xl p-4 text-left transition-all active:scale-95 prism-card prism-hero prism-sweep"
+                    style={{ '--prism': 'rgba(242,200,121,0.28)' }}
                   >
                     <div className="absolute -top-10 -right-10 h-24 w-24 rounded-full bg-white/10" />
                     <div className="flex items-center gap-3 mb-2">
@@ -435,7 +443,7 @@ function Home() {
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
                         <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
                       </span>
-                      <span className="text-sm">{a.icon}</span>
+                      <Icon name={a.icon} className="w-4 h-4 text-slate-200" />
                       <span className="text-sm text-white">{a.text}</span>
                     </div>
                     <p className="text-xs text-slate-300">Drop in and say hi - it is live now.</p>
@@ -447,10 +455,11 @@ function Home() {
                 {ACTIVITY.slice(1, 3).map((a, i) => (
                   <button
                     key={i}
-                    className="flex items-center justify-between gap-3 px-4 py-4 rounded-2xl transition-all active:scale-95 glass-panel"
+                    className="flex items-center justify-between gap-3 px-4 py-4 rounded-2xl transition-all active:scale-95 prism-card"
+                    style={{ '--prism': 'rgba(191,163,255,0.2)' }}
                   >
                     <div className="flex items-center gap-3">
-                      <span className="text-sm">{a.icon}</span>
+                      <Icon name={a.icon} className="w-4 h-4 text-slate-200" />
                       <span className="text-sm text-white">{a.text}</span>
                     </div>
                     <span className="text-xs text-slate-300 flex items-center gap-1">
@@ -526,8 +535,9 @@ function Home() {
                     onMouseDown={() => setTapped(i)}
                     onMouseUp={() => setTapped(null)}
                     onMouseLeave={() => setTapped(null)}
-                    className="flex-1 flex flex-col items-center gap-1.5 py-4 rounded-2xl transition-all duration-200"
+                    className="flex-1 flex flex-col items-center gap-1.5 py-4 rounded-2xl transition-all duration-200 prism-card prism-sweep"
                     style={{
+                      '--prism': p.glow,
                       background: tapped === i
                         ? `linear-gradient(145deg, ${p.glow}, rgba(20,16,38,0.75))`
                         : "rgba(20,16,38,0.55)",

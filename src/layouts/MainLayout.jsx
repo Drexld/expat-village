@@ -57,6 +57,41 @@ function MainLayout() {
 
   return (
     <div className="min-h-screen text-white flex justify-center">
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="prism-grid" />
+        <div
+          className="prism-orb"
+          style={{
+            top: '8%',
+            left: '6%',
+            width: '260px',
+            height: '260px',
+            background: 'radial-gradient(circle, rgba(143,164,255,0.55), transparent 70%)',
+          }}
+        />
+        <div
+          className="prism-orb"
+          style={{
+            top: '20%',
+            right: '8%',
+            width: '220px',
+            height: '220px',
+            background: 'radial-gradient(circle, rgba(191,163,255,0.5), transparent 70%)',
+            animationDelay: '2s',
+          }}
+        />
+        <div
+          className="prism-orb"
+          style={{
+            bottom: '10%',
+            left: '18%',
+            width: '240px',
+            height: '240px',
+            background: 'radial-gradient(circle, rgba(126,233,212,0.4), transparent 70%)',
+            animationDelay: '4s',
+          }}
+        />
+      </div>
       {/* Mobile container - constrain width on desktop to simulate mobile */}
       <div className="w-full max-w-md relative">
       <AuthModal />
@@ -68,6 +103,7 @@ function MainLayout() {
             ? 'glass-panel border-b border-white/10' 
             : 'bg-transparent'
         }`}
+        style={scrolled ? { '--glass-glow': 'rgba(143,164,255,0.18)' } : undefined}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16 md:h-20">
