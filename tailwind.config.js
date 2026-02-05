@@ -17,10 +17,10 @@ export default {
           700: '#151b2f',
         },
         accent: {
-          1: '#8fa4ff',
-          2: '#bfa3ff',
-          3: '#7ee9d4',
-          4: '#f2c879',
+          1: '#f2a65a',
+          2: '#f6c38f',
+          3: '#f28f7b',
+          4: '#f7d9b5',
         },
       },
       boxShadow: {

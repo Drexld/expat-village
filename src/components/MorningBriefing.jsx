@@ -195,13 +195,13 @@ function MorningBriefing({ weatherData, onClose }) {
           <svg viewBox="0 0 390 120" className="w-full h-full">
             <defs>
               <linearGradient id="swooshGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="rgba(154,163,255,0.28)" />
-                <stop offset="55%" stopColor="rgba(136,166,217,0.3)" />
-                <stop offset="100%" stopColor="rgba(194,177,217,0.2)" />
+                <stop offset="0%" stopColor="rgba(242,166,90,0.28)" />
+                <stop offset="55%" stopColor="rgba(246,195,143,0.3)" />
+                <stop offset="100%" stopColor="rgba(242,143,123,0.2)" />
               </linearGradient>
               <linearGradient id="swooshGlow" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="rgba(154,163,255,0.45)" />
-                <stop offset="100%" stopColor="rgba(194,177,217,0.4)" />
+                <stop offset="0%" stopColor="rgba(242,166,90,0.45)" />
+                <stop offset="100%" stopColor="rgba(242,143,123,0.4)" />
               </linearGradient>
             </defs>
             <path

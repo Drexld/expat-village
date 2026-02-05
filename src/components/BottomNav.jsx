@@ -229,7 +229,7 @@ function BottomNav() {
       {/* Bottom Navigation Bar */}
       <nav
         className="fixed bottom-0 left-0 right-0 z-40 glass-panel border-t border-white/10 safe-area-pb"
-        style={{ '--glass-glow': 'rgba(143,164,255,0.18)' }}
+        style={{ '--glass-glow': 'rgba(242,166,90,0.18)' }}
       >
         <div className="flex items-center justify-around px-2 py-2">
           {NAV_ITEMS.map((item) => {

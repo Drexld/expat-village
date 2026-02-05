@@ -36,11 +36,11 @@ function About() {
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div
           className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full blur-[120px]"
-          style={{ background: 'rgba(154,163,255,0.16)' }}
+          style={{ background: 'rgba(242,166,90,0.16)' }}
         />
         <div
           className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full blur-[100px]"
-          style={{ background: 'rgba(194,177,217,0.14)' }}
+          style={{ background: 'rgba(242,143,123,0.14)' }}
         />
       </div>
 
@@ -54,7 +54,7 @@ function About() {
             </span>
             <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6">
               We Built What We<br />
-              <span className="bg-gradient-to-r from-[#9aa3ff] via-[#b9b0d6] to-[#c2b1d9] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#f2a65a] via-[#f6c38f] to-[#f28f7b] bg-clip-text text-transparent">
                 Wished Existed
               </span>
             </h1>
@@ -73,7 +73,7 @@ function About() {
             {/* Visual Card */}
             <div className={`transition-all duration-1000 delay-200 ${isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}>
               <div className="relative">
-                <div className="absolute -inset-2 rounded-3xl blur-2xl opacity-40" style={{ background: 'linear-gradient(135deg, rgba(154,163,255,0.4), rgba(194,177,217,0.25))' }} />
+                <div className="absolute -inset-2 rounded-3xl blur-2xl opacity-40" style={{ background: 'linear-gradient(135deg, rgba(242,166,90,0.4), rgba(242,143,123,0.25))' }} />
                 <div className="relative glass-strong rounded-3xl p-8 md:p-10">
                   <Icon name="globe" className="w-12 h-12 text-slate-200 mb-6" />
                   <div className="space-y-4 text-slate-400">
@@ -270,8 +270,8 @@ function About() {
         <section className="py-16">
           <div className="relative overflow-hidden rounded-3xl">
             <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(11,12,18,0.7), rgba(17,20,34,0.9))' }} />
-            <div className="absolute top-0 right-0 w-80 h-80 rounded-full blur-3xl opacity-30" style={{ background: 'rgba(154,163,255,0.25)' }} />
-            <div className="absolute bottom-0 left-0 w-80 h-80 rounded-full blur-3xl opacity-25" style={{ background: 'rgba(194,177,217,0.22)' }} />
+            <div className="absolute top-0 right-0 w-80 h-80 rounded-full blur-3xl opacity-30" style={{ background: 'rgba(242,166,90,0.25)' }} />
+            <div className="absolute bottom-0 left-0 w-80 h-80 rounded-full blur-3xl opacity-25" style={{ background: 'rgba(242,143,123,0.22)' }} />
             
             <div className="relative glass-strong rounded-3xl p-10 md:p-14 text-center">
               <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-5">

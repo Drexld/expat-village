@@ -50,8 +50,8 @@ function PremiumGate({
         className="absolute -top-16 -right-10 h-40 w-40 rounded-full opacity-25"
         style={{
           background: isPremium
-            ? 'radial-gradient(circle, rgba(194,177,217,0.7), transparent 70%)'
-            : 'radial-gradient(circle, rgba(154,163,255,0.6), transparent 70%)',
+            ? 'radial-gradient(circle, rgba(242,143,123,0.7), transparent 70%)'
+            : 'radial-gradient(circle, rgba(242,166,90,0.6), transparent 70%)',
         }}
       />
 

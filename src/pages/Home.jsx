@@ -15,25 +15,25 @@ const WEATHER = {
   cold: {
     label: "-3C", condition: "Heavy snow", icon: "snow",
     skyTop: "#0b0d17", skyMid: "#141828", skyBot: "#1a2034",
-    fogOpacity: 0.16, skylineOpacity: 0.32, ambientColor: "#9aa3ff",
+    fogOpacity: 0.16, skylineOpacity: 0.32, ambientColor: "#c0a08c",
     stars: false, windowGlow: true,
   },
   cloudy: {
     label: "-1C", condition: "Partly cloudy", icon: "cloud",
     skyTop: "#0b0f19", skyMid: "#13182a", skyBot: "#1b2136",
-    fogOpacity: 0.08, skylineOpacity: 0.42, ambientColor: "#88a6d9",
+    fogOpacity: 0.08, skylineOpacity: 0.42, ambientColor: "#c5a892",
     stars: false, windowGlow: false,
   },
   sunny: {
     label: "12C", condition: "Sunny, warm", icon: "sun",
     skyTop: "#0d0f1a", skyMid: "#1a1e30", skyBot: "#262b42",
-    fogOpacity: 0.02, skylineOpacity: 0.5, ambientColor: "#c2b1d9",
+    fogOpacity: 0.02, skylineOpacity: 0.5, ambientColor: "#d1b39a",
     stars: false, windowGlow: false,
   },
   night: {
     label: "-5C", condition: "Clear night", icon: "moon",
     skyTop: "#070912", skyMid: "#0d1020", skyBot: "#14172a",
-    fogOpacity: 0.05, skylineOpacity: 0.44, ambientColor: "#8d93a5",
+    fogOpacity: 0.05, skylineOpacity: 0.44, ambientColor: "#b79884",
     stars: true, windowGlow: true,
   },
 }
@@ -51,17 +51,17 @@ const ACTIVITY = [
 
 // THREE PATHS (for non-authenticated users - onboarding style)
 const PATHS = [
-  { icon: "checklist", label: "Get set up", color: "#8fa4ff", glow: "rgba(143,164,255,0.26)", path: "/get-things-done" },
-  { icon: "home", label: "Find a place", color: "#bfa3ff", glow: "rgba(191,163,255,0.24)", path: "/housing" },
-  { icon: "community", label: "Meet people", color: "#7ee9d4", glow: "rgba(126,233,212,0.22)", path: "/town-hall" },
+  { icon: "checklist", label: "Get set up", color: "#f2a65a", glow: "rgba(242,166,90,0.26)", path: "/get-things-done" },
+  { icon: "home", label: "Find a place", color: "#f6c38f", glow: "rgba(246,195,143,0.24)", path: "/housing" },
+  { icon: "community", label: "Meet people", color: "#f28f7b", glow: "rgba(242,143,123,0.24)", path: "/town-hall" },
 ]
 
 // QUICK ACTIONS (for authenticated users - dashboard style)
 const QUICK_ACTIONS = [
-  { icon: "checklist", label: "My Checklist", path: "/my-checklist", color: "#8fa4ff", glow: "rgba(143,164,255,0.22)" },
-  { icon: "community", label: "Town Hall", path: "/town-hall", color: "#bfa3ff", glow: "rgba(191,163,255,0.22)" },
-  { icon: "pin", label: "Directory", path: "/directory", color: "#7ee9d4", glow: "rgba(126,233,212,0.2)" },
-  { icon: "spark", label: "Get Things Done", path: "/get-things-done", color: "#f2c879", glow: "rgba(242,200,121,0.22)" },
+  { icon: "checklist", label: "My Checklist", path: "/my-checklist", color: "#f2a65a", glow: "rgba(242,166,90,0.22)" },
+  { icon: "community", label: "Town Hall", path: "/town-hall", color: "#f28f7b", glow: "rgba(242,143,123,0.22)" },
+  { icon: "pin", label: "Directory", path: "/directory", color: "#f6c38f", glow: "rgba(246,195,143,0.2)" },
+  { icon: "spark", label: "Get Things Done", path: "/get-things-done", color: "#f7d9b5", glow: "rgba(247,217,181,0.22)" },
 ]
 
 // STARS
@@ -93,12 +93,12 @@ function Fog({ opacity }) {
   return (
     <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{ height: "42%", opacity }}>
       <div className="absolute bottom-0 left-0 right-0 h-full" style={{
-        background: "linear-gradient(to top, rgba(139,92,246,0.13) 0%, transparent 65%)",
+        background: "linear-gradient(to top, rgba(242,166,90,0.12) 0%, transparent 65%)",
         animation: "fogDrift 9s ease-in-out infinite alternate",
       }} />
       <div className="absolute bottom-0 left-0 right-0" style={{
         height: "50%",
-        background: "linear-gradient(to top, rgba(22,16,42,0.75) 0%, transparent 100%)",
+        background: "linear-gradient(to top, rgba(28,18,22,0.8) 0%, transparent 100%)",
         animation: "fogDrift 13s ease-in-out 2s infinite alternate-reverse",
       }} />
     </div>
@@ -166,7 +166,7 @@ function Skyline({ weather }) {
               [294,92],[298,112],[328,82],[332,104],
               [354,98],[358,118],
             ].map(([x, y], i) => (
-              <rect key={i} x={x} y={y} width="3" height="4" rx="0.5" fill="#fbbf24"
+              <rect key={i} x={x} y={y} width="3" height="4" rx="0.5" fill="#f2a65a"
                 style={{ animation: `windowPulse ${1.5 + (i % 3) * 0.7}s ease-in-out ${(i * 0.2) % 2}s infinite alternate` }}
               />
             ))}
@@ -217,7 +217,7 @@ function ActivityStrip() {
             background: a.live ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.04)",
             border: a.live ? "1px solid rgba(255,255,255,0.25)" : "1px solid rgba(255,255,255,0.12)",
             backdropFilter: "blur(8px)",
-            '--glass-glow': a.live ? 'rgba(242,200,121,0.22)' : 'rgba(143,164,255,0.12)',
+            '--glass-glow': a.live ? 'rgba(242,166,90,0.22)' : 'rgba(246,195,143,0.12)',
           }}
         >
           {a.live && (
@@ -321,7 +321,7 @@ function Home() {
             {/* Village signal strip */}
             <div
               className="relative overflow-hidden rounded-2xl px-4 py-3 prism-card prism-sweep prism-reveal"
-              style={{ '--prism': 'rgba(143,164,255,0.26)' }}
+              style={{ '--prism': 'rgba(242,166,90,0.26)' }}
             >
               <div className="flex items-center justify-between gap-3 mb-2">
                 <p className="text-[11px] uppercase tracking-widest text-slate-400">Village Signal</p>
@@ -351,10 +351,10 @@ function Home() {
             <button
               onClick={() => setShowMorningBriefing(true)}
               className="relative overflow-hidden rounded-3xl p-4 text-left transition-all active:scale-[0.99] prism-card prism-hero prism-sweep prism-breathe hover-tilt"
-              style={{ '--prism': 'rgba(143,164,255,0.34)' }}
+              style={{ '--prism': 'rgba(242,143,123,0.34)' }}
             >
               <div className="absolute inset-0 opacity-30" style={{
-                background: "radial-gradient(120px 120px at 85% 20%, rgba(194,177,217,0.25), transparent 70%)",
+                background: "radial-gradient(120px 120px at 85% 20%, rgba(242,143,123,0.3), transparent 70%)",
               }} />
               <div className="relative flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
@@ -435,7 +435,7 @@ function Home() {
                   <button
                     key={i}
                     className="relative overflow-hidden rounded-3xl p-4 text-left transition-all active:scale-95 prism-card prism-hero prism-sweep"
-                    style={{ '--prism': 'rgba(242,200,121,0.28)' }}
+                    style={{ '--prism': 'rgba(242,166,90,0.28)' }}
                   >
                     <div className="absolute -top-10 -right-10 h-24 w-24 rounded-full bg-white/10" />
                     <div className="flex items-center gap-3 mb-2">
@@ -456,7 +456,7 @@ function Home() {
                   <button
                     key={i}
                     className="flex items-center justify-between gap-3 px-4 py-4 rounded-2xl transition-all active:scale-95 prism-card"
-                    style={{ '--prism': 'rgba(191,163,255,0.2)' }}
+                    style={{ '--prism': 'rgba(246,195,143,0.2)' }}
                   >
                     <div className="flex items-center gap-3">
                       <Icon name={a.icon} className="w-4 h-4 text-slate-200" />
@@ -488,7 +488,7 @@ function Home() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
                 </span>
-                <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: "#a78bfa" }}>
+                <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: "#f2a65a" }}>
                   Warsaw - Live
                 </span>
               </div>
@@ -501,7 +501,7 @@ function Home() {
               }}>
                 Your village<br />is already{' '}
                 <span style={{
-                  background: "linear-gradient(90deg, #a78bfa 0%, #c4b5fd 35%, #fbbf24 100%)",
+                  background: "linear-gradient(90deg, #f2a65a 0%, #f6c38f 40%, #f28f7b 100%)",
                   WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
                 }}>here.</span>
               </h1>
@@ -576,7 +576,7 @@ function Home() {
               className="px-2.5 py-1 rounded-full text-xs font-semibold transition-all"
               style={{
                 background: weatherData.state === k ? "rgba(139,92,246,0.4)" : "rgba(255,255,255,0.1)",
-                color: weatherData.state === k ? "#c4b5fd" : "#64748b",
+                color: weatherData.state === k ? "#f6c38f" : "#64748b",
                 border: `1px solid ${weatherData.state === k ? "rgba(139,92,246,0.5)" : "rgba(255,255,255,0.1)"}`,
               }}
             >

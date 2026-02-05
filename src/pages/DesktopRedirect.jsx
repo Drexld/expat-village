@@ -21,7 +21,7 @@ function DesktopRedirect() {
         <div className="glass-strong surface-glow rounded-3xl border border-white/10 p-10 text-center">
           <div className="flex justify-center mb-8">
             <div className="relative">
-              <div className="absolute inset-0 rounded-2xl blur-xl opacity-30" style={{ background: 'radial-gradient(circle, rgba(154,163,255,0.6), transparent 70%)' }} />
+              <div className="absolute inset-0 rounded-2xl blur-xl opacity-30" style={{ background: 'radial-gradient(circle, rgba(242,166,90,0.6), transparent 70%)' }} />
               <div className="relative w-20 h-20 rounded-2xl shadow-lg overflow-hidden border border-white/10">
                 <img src="/icon.svg" alt="Expat Village" className="w-full h-full object-cover" />
               </div>

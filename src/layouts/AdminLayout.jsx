@@ -71,7 +71,7 @@ function AdminLayout() {
             <div className="relative">
               <div
                 className="absolute inset-0 rounded-lg blur opacity-40 group-hover:opacity-70 transition-opacity"
-                style={{ background: 'linear-gradient(135deg, rgba(154,163,255,0.45), rgba(194,177,217,0.35))' }}
+                style={{ background: 'linear-gradient(135deg, rgba(242,166,90,0.45), rgba(242,143,123,0.35))' }}
               />
               <div className="relative w-10 h-10 rounded-lg overflow-hidden glass-3d">
                 <img src="/icon.svg" alt="Expat Village" className="w-full h-full object-cover" />
@@ -126,7 +126,7 @@ function AdminLayout() {
           <div className="flex items-center gap-3">
             <div
               className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm"
-              style={{ background: 'linear-gradient(135deg, rgba(154,163,255,0.6), rgba(194,177,217,0.6))' }}
+              style={{ background: 'linear-gradient(135deg, rgba(242,166,90,0.6), rgba(242,143,123,0.6))' }}
             >
               {displayName.charAt(0).toUpperCase()}
             </div>

@@ -12,15 +12,15 @@ function SubscriptionBadge({ size = 'sm' }) {
   const badges = {
     basic: {
       label: 'Basic',
-      bg: 'linear-gradient(135deg, rgba(154,163,255,0.22), rgba(136,166,217,0.12))',
-      border: 'rgba(154,163,255,0.4)',
+      bg: 'linear-gradient(135deg, rgba(242,166,90,0.25), rgba(246,195,143,0.15))',
+      border: 'rgba(242,166,90,0.45)',
       text: 'text-slate-100',
       icon: 'star',
     },
     premium: {
       label: 'Premium',
-      bg: 'linear-gradient(135deg, rgba(194,177,217,0.28), rgba(154,163,255,0.18))',
-      border: 'rgba(194,177,217,0.5)',
+      bg: 'linear-gradient(135deg, rgba(242,143,123,0.3), rgba(242,166,90,0.18))',
+      border: 'rgba(242,143,123,0.5)',
       text: 'text-slate-100',
       icon: 'crown',
     },

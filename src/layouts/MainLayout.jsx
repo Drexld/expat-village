@@ -66,7 +66,7 @@ function MainLayout() {
             left: '6%',
             width: '260px',
             height: '260px',
-            background: 'radial-gradient(circle, rgba(143,164,255,0.55), transparent 70%)',
+            background: 'radial-gradient(circle, rgba(242,166,90,0.5), transparent 70%)',
           }}
         />
         <div
@@ -76,7 +76,7 @@ function MainLayout() {
             right: '8%',
             width: '220px',
             height: '220px',
-            background: 'radial-gradient(circle, rgba(191,163,255,0.5), transparent 70%)',
+            background: 'radial-gradient(circle, rgba(242,143,123,0.45), transparent 70%)',
             animationDelay: '2s',
           }}
         />
@@ -87,7 +87,7 @@ function MainLayout() {
             left: '18%',
             width: '240px',
             height: '240px',
-            background: 'radial-gradient(circle, rgba(126,233,212,0.4), transparent 70%)',
+            background: 'radial-gradient(circle, rgba(246,195,143,0.4), transparent 70%)',
             animationDelay: '4s',
           }}
         />
@@ -103,7 +103,7 @@ function MainLayout() {
             ? 'glass-panel border-b border-white/10' 
             : 'bg-transparent'
         }`}
-        style={scrolled ? { '--glass-glow': 'rgba(143,164,255,0.18)' } : undefined}
+        style={scrolled ? { '--glass-glow': 'rgba(242,166,90,0.18)' } : undefined}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16 md:h-20">
@@ -113,7 +113,7 @@ function MainLayout() {
               <div className="relative">
                 <div
                   className="absolute inset-0 rounded-xl blur-lg opacity-40 transition-opacity"
-                  style={{ background: 'linear-gradient(135deg, rgba(154,163,255,0.35), rgba(194,177,217,0.25))' }}
+                  style={{ background: 'linear-gradient(135deg, rgba(242,166,90,0.35), rgba(242,143,123,0.25))' }}
                 />
                 <div className="relative w-10 h-10 md:w-12 md:h-12 rounded-xl overflow-hidden glass-3d">
                   <img src="/icon.svg" alt="Expat Village" className="w-full h-full object-cover" />
@@ -139,7 +139,7 @@ function MainLayout() {
                   >
                     <div
                       className="w-8 h-8 rounded-full flex items-center justify-center text-white font-semibold text-sm"
-                      style={{ background: 'linear-gradient(135deg, rgba(154,163,255,0.6), rgba(194,177,217,0.6))' }}
+                      style={{ background: 'linear-gradient(135deg, rgba(242,166,90,0.6), rgba(242,143,123,0.6))' }}
                     >
                       {avatarLetter}
                     </div>

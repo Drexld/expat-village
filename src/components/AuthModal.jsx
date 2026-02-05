@@ -110,7 +110,7 @@ function AuthModal() {
           {/* Soft Glow Border */}
           <div
             className="absolute -inset-1 rounded-3xl blur-xl opacity-40"
-            style={{ background: 'linear-gradient(135deg, rgba(154,163,255,0.45), rgba(194,177,217,0.35))' }}
+            style={{ background: 'linear-gradient(135deg, rgba(242,166,90,0.45), rgba(242,143,123,0.35))' }}
           />
           
           {/* Modal Content */}
@@ -121,8 +121,8 @@ function AuthModal() {
             <div className="absolute inset-0" style={{
               background: 'linear-gradient(180deg, rgba(11,12,18,0.65) 0%, rgba(17,20,34,0.9) 55%, rgba(11,12,18,0.75) 100%)'
             }} />
-            <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full blur-3xl opacity-40" style={{ background: 'rgba(154,163,255,0.25)' }} />
-            <div className="absolute -bottom-28 -left-24 w-80 h-80 rounded-full blur-3xl opacity-30" style={{ background: 'rgba(194,177,217,0.2)' }} />
+            <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full blur-3xl opacity-40" style={{ background: 'rgba(242,166,90,0.25)' }} />
+            <div className="absolute -bottom-28 -left-24 w-80 h-80 rounded-full blur-3xl opacity-30" style={{ background: 'rgba(242,143,123,0.2)' }} />
           </div>
 
             {/* ===== MODAL HEADER ===== */}
