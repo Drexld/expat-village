@@ -156,14 +156,14 @@ function MyChecklist() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="text-slate-400">Loading your checklist...</div>
+        <div className="text-terra-ink-soft">Loading your checklist...</div>
       </div>
     )
   }
 
   return (
     <div className="min-h-screen space-y-8">
-      <Link to="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
+      <Link to="/" className="inline-flex items-center gap-2 text-terra-ink-soft hover:text-terra-ink transition-colors">
         <Icon name="arrowLeft" size={16} />
         Back to Home
       </Link>
@@ -171,30 +171,30 @@ function MyChecklist() {
       <header className="glass-panel rounded-3xl p-6">
         <div className="flex items-center gap-3 mb-3">
           <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
-            <Icon name="checklist" size={22} className="text-slate-100" />
+            <Icon name="checklist" size={22} className="text-terra-ink" />
           </div>
-          <h1 className="text-3xl font-semibold text-white">My Checklist</h1>
-          {saving && <span className="text-emerald-200 text-sm animate-pulse">Saving...</span>}
+          <h1 className="text-3xl font-semibold text-terra-ink">My Checklist</h1>
+          {saving && <span className="text-terra-sage text-sm animate-pulse">Saving...</span>}
         </div>
-        <p className="text-slate-400 text-lg">
+        <p className="text-terra-ink-soft text-lg">
           Track your expat journey. Check off tasks as you complete them.
         </p>
       </header>
 
       {!isAuthenticated && (
-        <div className="glass-panel rounded-2xl p-4 border border-amber-500/30">
+        <div className="glass-panel rounded-2xl p-4 border border-amber-300/60">
           <div className="flex items-start gap-3">
             <div className="glass-panel flex h-10 w-10 items-center justify-center rounded-xl">
-              <Icon name="warning" size={18} className="text-amber-200" />
+              <Icon name="warning" size={18} className="text-amber-600" />
             </div>
             <div>
-              <p className="text-amber-200 font-medium">Sign in to save your progress</p>
-              <p className="text-slate-400 text-sm mt-1">
+              <p className="text-amber-700 font-medium">Sign in to save your progress</p>
+              <p className="text-terra-ink-soft text-sm mt-1">
                 Your checklist is saved locally, but signing in syncs it across devices.
               </p>
               <button
                 onClick={() => openAuthModal('sign_up')}
-                className="mt-3 rounded-full border border-amber-400/40 bg-amber-500/20 px-4 py-1.5 text-sm text-amber-100 hover:bg-amber-500/30"
+                className="mt-3 rounded-full bg-terra-primary px-4 py-1.5 text-sm text-white shadow-glass hover:opacity-95"
               >
                 Sign Up Free
               </button>
@@ -205,16 +205,16 @@ function MyChecklist() {
 
       <div className="glass-3d rounded-3xl p-6 hover-tilt">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-semibold text-white">Your Progress</h3>
-          <span className="text-2xl font-semibold text-emerald-200">{progressPercent}%</span>
+          <h3 className="text-lg font-semibold text-terra-ink">Your Progress</h3>
+          <span className="text-2xl font-semibold text-terra-primary">{progressPercent}%</span>
         </div>
-        <div className="h-4 bg-slate-900 rounded-full overflow-hidden">
+        <div className="h-4 bg-terra-cream rounded-full overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 transition-all duration-500"
+            className="h-full bg-terra-primary transition-all duration-500"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
-        <p className="text-slate-400 text-sm mt-2">
+        <p className="text-terra-ink-soft text-sm mt-2">
           {completedTasks} of {totalTasks} tasks completed
         </p>
       </div>
@@ -225,28 +225,28 @@ function MyChecklist() {
           const categoryTotal = category.tasks.length
 
           return (
-            <div key={category.id} className="glass-panel rounded-2xl overflow-hidden border border-white/10">
-              <div className="p-4 border-b border-white/10 flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-white">{category.title}</h2>
-                <span className="text-sm text-slate-400">
+            <div key={category.id} className="glass-panel rounded-2xl overflow-hidden border border-terra-taupe/40">
+              <div className="p-4 border-b border-terra-taupe/30 flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-terra-ink">{category.title}</h2>
+                <span className="text-sm text-terra-ink-soft">
                   {categoryCompleted}/{categoryTotal}
                 </span>
               </div>
 
-              <div className="divide-y divide-white/5">
+              <div className="divide-y divide-terra-taupe/30">
                 {category.tasks.map((task) => (
                   <div
                     key={task.id}
                     className={`p-4 flex items-center gap-4 transition-colors ${
-                      checkedItems[task.id] ? 'bg-emerald-900/10' : 'hover:bg-white/5'
+                      checkedItems[task.id] ? 'bg-terra-sage/10' : 'hover:bg-terra-cream/60'
                     }`}
                   >
                     <button
                       onClick={() => toggleTask(task.id)}
                       className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all ${
                         checkedItems[task.id]
-                          ? 'bg-emerald-500 border-emerald-500 text-white'
-                          : 'border-slate-600 hover:border-emerald-500'
+                          ? 'bg-terra-sage border-terra-sage text-white'
+                          : 'border-terra-taupe/60 hover:border-terra-sage'
                       }`}
                     >
                       {checkedItems[task.id] && (
@@ -257,7 +257,7 @@ function MyChecklist() {
                     </button>
 
                     <span className={`flex-1 ${
-                      checkedItems[task.id] ? 'text-slate-400 line-through' : 'text-white'
+                      checkedItems[task.id] ? 'text-terra-ink-soft line-through' : 'text-terra-ink'
                     }`}>
                       {task.label}
                     </span>
@@ -265,7 +265,7 @@ function MyChecklist() {
                     {task.guide && (
                       <Link
                         to={task.guide}
-                        className="text-emerald-200 hover:text-emerald-100 text-sm transition-colors inline-flex items-center gap-1"
+                        className="text-terra-sage hover:text-terra-ink text-sm transition-colors inline-flex items-center gap-1"
                       >
                         Guide <Icon name="arrowRight" size={12} />
                       </Link>
@@ -278,7 +278,7 @@ function MyChecklist() {
         })}
       </div>
 
-      <div className="text-center text-slate-500 text-sm">
+      <div className="text-center text-terra-taupe text-sm">
         Every checked box is a step toward feeling at home.
       </div>
     </div>
@@ -286,3 +286,4 @@ function MyChecklist() {
 }
 
 export default MyChecklist
+

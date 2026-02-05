@@ -117,12 +117,12 @@ function Announcements() {
 
   const getTypeColor = (type) => {
     const colors = {
-      info: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-      warning: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
-      success: 'bg-green-500/20 text-green-400 border-green-500/30',
-      alert: 'bg-red-500/20 text-red-400 border-red-500/30',
-      event: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
-      update: 'bg-indigo-500/20 text-indigo-400 border-indigo-500/30',
+      info: 'bg-terra-sage/15 text-terra-ink border-terra-sage/30',
+      warning: 'bg-terra-primary/15 text-terra-primary border-terra-primary/30',
+      success: 'bg-terra-sage/20 text-terra-sage border-terra-sage/40',
+      alert: 'bg-red-500/20 text-red-600 border-red-500/30',
+      event: 'bg-amber-400/20 text-amber-700 border-amber-400/30',
+      update: 'bg-terra-taupe/20 text-terra-ink-soft border-terra-taupe/40',
     }
     return colors[type] || colors.info
   }
@@ -132,12 +132,13 @@ function Announcements() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-white mb-1">Announcements</h1>
-          <p className="text-slate-400">Manage community announcements</p>
+          <h1 className="text-2xl font-bold text-terra-ink mb-1">Announcements</h1>
+          <p className="text-terra-taupe">Manage community announcements</p>
         </div>
         <button
           onClick={handleNew}
-          className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium rounded-xl transition-colors"
+          className="px-4 py-2 text-terra-bg text-sm font-medium rounded-xl transition-colors hover-tilt"
+          style={{ background: 'linear-gradient(135deg, #C76B55, #D07C63)' }}
         >
           + New Announcement
         </button>
@@ -145,39 +146,39 @@ function Announcements() {
 
       {/* Form Modal */}
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="w-full max-w-lg bg-slate-900 border border-slate-700 rounded-2xl p-6 max-h-[90vh] overflow-y-auto">
-            <h2 className="text-lg font-bold text-white mb-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30">
+          <div className="w-full max-w-lg glass-strong texture-layer texture-paper border border-black/10 rounded-2xl p-6 max-h-[90vh] overflow-y-auto">
+            <h2 className="text-lg font-bold text-terra-ink mb-4">
               {editingId ? 'Edit Announcement' : 'New Announcement'}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm text-slate-400 mb-1">Title</label>
+                <label className="block text-sm text-terra-taupe mb-1">Title</label>
                 <input
                   type="text"
                   value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:border-purple-500 focus:outline-none"
+                  className="w-full px-3 py-2 bg-terra-cream border border-black/10 rounded-xl text-terra-ink text-sm focus:border-terra-primary focus:outline-none"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm text-slate-400 mb-1">Message</label>
+                <label className="block text-sm text-terra-taupe mb-1">Message</label>
                 <textarea
                   value={form.message}
                   onChange={(e) => setForm({ ...form, message: e.target.value })}
                   rows={3}
-                  className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:border-purple-500 focus:outline-none resize-none"
+                  className="w-full px-3 py-2 bg-terra-cream border border-black/10 rounded-xl text-terra-ink text-sm focus:border-terra-primary focus:outline-none resize-none"
                   required
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm text-slate-400 mb-1">Type</label>
+                  <label className="block text-sm text-terra-taupe mb-1">Type</label>
                   <select
                     value={form.type}
                     onChange={(e) => setForm({ ...form, type: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:border-purple-500 focus:outline-none"
+                    className="w-full px-3 py-2 bg-terra-cream border border-black/10 rounded-xl text-terra-ink text-sm focus:border-terra-primary focus:outline-none"
                   >
                     {announcementTypes.map((t) => (
                       <option key={t.value} value={t.value}>{t.label}</option>
@@ -185,24 +186,24 @@ function Announcements() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm text-slate-400 mb-1">Priority (1-5)</label>
+                  <label className="block text-sm text-terra-taupe mb-1">Priority (1-5)</label>
                   <input
                     type="number"
                     min="1"
                     max="5"
                     value={form.priority}
                     onChange={(e) => setForm({ ...form, priority: parseInt(e.target.value) || 1 })}
-                    className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:border-purple-500 focus:outline-none"
+                    className="w-full px-3 py-2 bg-terra-cream border border-black/10 rounded-xl text-terra-ink text-sm focus:border-terra-primary focus:outline-none"
                   />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm text-slate-400 mb-1">Scope</label>
+                  <label className="block text-sm text-terra-taupe mb-1">Scope</label>
                   <select
                     value={form.scope}
                     onChange={(e) => setForm({ ...form, scope: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:border-purple-500 focus:outline-none"
+                    className="w-full px-3 py-2 bg-terra-cream border border-black/10 rounded-xl text-terra-ink text-sm focus:border-terra-primary focus:outline-none"
                   >
                     {scopes.map((s) => (
                       <option key={s.value} value={s.value}>{s.label}</option>
@@ -210,11 +211,11 @@ function Announcements() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm text-slate-400 mb-1">Audience</label>
+                  <label className="block text-sm text-terra-taupe mb-1">Audience</label>
                   <select
                     value={form.target_audience}
                     onChange={(e) => setForm({ ...form, target_audience: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:border-purple-500 focus:outline-none"
+                    className="w-full px-3 py-2 bg-terra-cream border border-black/10 rounded-xl text-terra-ink text-sm focus:border-terra-primary focus:outline-none"
                   >
                     {audiences.map((a) => (
                       <option key={a.value} value={a.value}>{a.label}</option>
@@ -223,11 +224,11 @@ function Announcements() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-slate-400 mb-1">Language</label>
+                <label className="block text-sm text-terra-taupe mb-1">Language</label>
                 <select
                   value={form.language}
                   onChange={(e) => setForm({ ...form, language: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:border-purple-500 focus:outline-none"
+                  className="w-full px-3 py-2 bg-terra-cream border border-black/10 rounded-xl text-terra-ink text-sm focus:border-terra-primary focus:outline-none"
                 >
                   {languages.map((l) => (
                     <option key={l.value} value={l.value}>{l.label}</option>
@@ -235,22 +236,22 @@ function Announcements() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm text-slate-400 mb-1">Link URL (optional)</label>
+                <label className="block text-sm text-terra-taupe mb-1">Link URL (optional)</label>
                 <input
                   type="url"
                   value={form.link_url}
                   onChange={(e) => setForm({ ...form, link_url: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:border-purple-500 focus:outline-none"
+                  className="w-full px-3 py-2 bg-terra-cream border border-black/10 rounded-xl text-terra-ink text-sm focus:border-terra-primary focus:outline-none"
                   placeholder="https://..."
                 />
               </div>
               <div>
-                <label className="block text-sm text-slate-400 mb-1">Link Text (optional)</label>
+                <label className="block text-sm text-terra-taupe mb-1">Link Text (optional)</label>
                 <input
                   type="text"
                   value={form.link_text}
                   onChange={(e) => setForm({ ...form, link_text: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:border-purple-500 focus:outline-none"
+                  className="w-full px-3 py-2 bg-terra-cream border border-black/10 rounded-xl text-terra-ink text-sm focus:border-terra-primary focus:outline-none"
                   placeholder="Learn more"
                 />
               </div>
@@ -258,24 +259,25 @@ function Announcements() {
                 <button
                   type="button"
                   onClick={() => setForm({ ...form, active: !form.active })}
-                  className={`w-12 h-7 rounded-full transition-colors ${form.active ? 'bg-purple-600' : 'bg-slate-700'}`}
+                  className={`w-12 h-7 rounded-full transition-colors ${form.active ? 'bg-terra-primary/60' : 'bg-terra-cream'}`}
                 >
-                  <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${form.active ? 'translate-x-6' : 'translate-x-1'}`} />
+                  <div className={`w-5 h-5 bg-terra-bg rounded-full shadow transition-transform ${form.active ? 'translate-x-6' : 'translate-x-1'}`} />
                 </button>
-                <span className="text-sm text-slate-400">Active</span>
+                <span className="text-sm text-terra-taupe">Active</span>
               </div>
               <div className="flex gap-3 pt-4">
                 <button
                   type="button"
                   onClick={() => { setShowForm(false); setEditingId(null); setForm(emptyForm) }}
-                  className="flex-1 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium rounded-xl transition-colors"
+                  className="flex-1 px-4 py-2 bg-terra-cream hover:bg-terra-bg text-terra-ink text-sm font-medium rounded-xl transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-500 disabled:bg-purple-800 text-white text-sm font-medium rounded-xl transition-colors"
+                  className="flex-1 px-4 py-2 text-terra-bg text-sm font-medium rounded-xl transition-colors disabled:opacity-60"
+                  style={{ background: 'linear-gradient(135deg, #C76B55, #D07C63)' }}
                 >
                   {saving ? 'Saving...' : editingId ? 'Update' : 'Create'}
                 </button>
@@ -287,14 +289,14 @@ function Announcements() {
 
       {/* Delete Confirmation Modal */}
       {deleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="w-full max-w-sm bg-slate-900 border border-slate-700 rounded-2xl p-6">
-            <h2 className="text-lg font-bold text-white mb-2">Delete Announcement?</h2>
-            <p className="text-sm text-slate-400 mb-4">This action cannot be undone.</p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30">
+          <div className="w-full max-w-sm glass-strong texture-layer texture-paper border border-black/10 rounded-2xl p-6">
+            <h2 className="text-lg font-bold text-terra-ink mb-2">Delete Announcement?</h2>
+            <p className="text-sm text-terra-taupe mb-4">This action cannot be undone.</p>
             <div className="flex gap-3">
               <button
                 onClick={() => setDeleteConfirm(null)}
-                className="flex-1 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium rounded-xl transition-colors"
+                className="flex-1 px-4 py-2 bg-terra-cream hover:bg-terra-bg text-terra-ink text-sm font-medium rounded-xl transition-colors"
               >
                 Cancel
               </button>
@@ -312,18 +314,18 @@ function Announcements() {
       {/* Announcements List */}
       <div className="space-y-3">
         {loading ? (
-          <div className="p-8 rounded-2xl bg-slate-800/50 border border-slate-700/50 text-center text-slate-400">
+          <div className="p-8 rounded-2xl action-card texture-layer texture-paper text-center text-terra-taupe">
             Loading announcements...
           </div>
         ) : announcements.length === 0 ? (
-          <div className="p-8 rounded-2xl bg-slate-800/50 border border-slate-700/50 text-center text-slate-400">
+          <div className="p-8 rounded-2xl action-card texture-layer texture-paper text-center text-terra-taupe">
             No announcements yet. Create your first one!
           </div>
         ) : (
           announcements.map((announcement) => (
             <div
               key={announcement.id}
-              className="p-4 rounded-2xl bg-slate-800/50 border border-slate-700/50"
+              className="p-4 rounded-2xl action-card texture-layer texture-paper"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
@@ -333,18 +335,18 @@ function Announcements() {
                     </span>
                     <span className={`text-xs px-2 py-0.5 rounded-full ${
                       announcement.active
-                        ? 'bg-green-500/20 text-green-400'
-                        : 'bg-slate-700 text-slate-400'
+                        ? 'bg-terra-sage/20 text-terra-sage'
+                        : 'bg-terra-cream text-terra-taupe'
                     }`}>
                       {announcement.active ? 'Active' : 'Inactive'}
                     </span>
-                    <span className="text-xs text-slate-500">
+                    <span className="text-xs text-terra-taupe">
                       Priority: {announcement.priority}
                     </span>
                   </div>
-                  <h3 className="text-white font-medium mb-1">{announcement.title}</h3>
-                  <p className="text-sm text-slate-400 line-clamp-2">{announcement.message}</p>
-                  <div className="flex items-center gap-3 mt-2 text-xs text-slate-500">
+                  <h3 className="text-terra-ink font-medium mb-1">{announcement.title}</h3>
+                  <p className="text-sm text-terra-ink-soft line-clamp-2">{announcement.message}</p>
+                  <div className="flex items-center gap-3 mt-2 text-xs text-terra-taupe">
                     <span>{announcement.scope}</span>
                     <span>-</span>
                     <span>{announcement.target_audience}</span>
@@ -357,8 +359,8 @@ function Announcements() {
                     onClick={() => handleToggleActive(announcement)}
                     className={`p-2 rounded-lg transition-colors ${
                       announcement.active
-                        ? 'text-green-400 hover:bg-green-500/20'
-                        : 'text-slate-400 hover:bg-slate-700'
+                        ? 'text-terra-sage hover:bg-terra-sage/20'
+                        : 'text-terra-taupe hover:bg-terra-cream'
                     }`}
                     title={announcement.active ? 'Deactivate' : 'Activate'}
                   >
@@ -372,7 +374,7 @@ function Announcements() {
                   </button>
                   <button
                     onClick={() => handleEdit(announcement)}
-                    className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
+                    className="p-2 rounded-lg text-terra-taupe hover:text-terra-ink hover:bg-terra-cream transition-colors"
                     title="Edit"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -381,7 +383,7 @@ function Announcements() {
                   </button>
                   <button
                     onClick={() => setDeleteConfirm(announcement.id)}
-                    className="p-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/20 transition-colors"
+                    className="p-2 rounded-lg text-terra-taupe hover:text-red-500 hover:bg-red-500/20 transition-colors"
                     title="Delete"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

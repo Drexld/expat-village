@@ -295,7 +295,7 @@ function JobsCareers() {
       {activeCategory ? (
         <button
           onClick={() => setActiveCategory(null)}
-          className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
+          className="inline-flex items-center gap-2 text-terra-ink-soft hover:text-terra-ink transition-colors"
         >
           <Icon name="arrowLeft" size={16} />
           Back to Jobs and Careers
@@ -303,7 +303,7 @@ function JobsCareers() {
       ) : (
         <Link
           to="/"
-          className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
+          className="inline-flex items-center gap-2 text-terra-ink-soft hover:text-terra-ink transition-colors"
         >
           <Icon name="arrowLeft" size={16} />
           Back to Home
@@ -315,23 +315,23 @@ function JobsCareers() {
           <header className="glass-panel rounded-3xl p-6">
             <div className="flex items-center gap-3 mb-3">
               <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
-                <Icon name="briefcase" size={22} className="text-slate-100" />
+                <Icon name="briefcase" size={22} className="text-terra-ink" />
               </div>
-              <h1 className="text-3xl font-semibold text-white">Jobs and Careers</h1>
+              <h1 className="text-3xl font-semibold text-terra-ink">Jobs and Careers</h1>
             </div>
-            <p className="text-slate-400 text-lg">
+            <p className="text-terra-ink-soft text-lg">
               Find work, understand contracts, and build your career in Poland.
             </p>
           </header>
 
-          <div className="glass-panel rounded-2xl p-5 border border-amber-500/30">
+          <div className="glass-panel rounded-2xl p-5 border border-amber-300/60">
             <div className="flex items-start gap-4">
               <div className="glass-panel flex h-10 w-10 items-center justify-center rounded-xl">
-                <Icon name="warning" size={18} className="text-amber-200" />
+                <Icon name="warning" size={18} className="text-amber-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-amber-200">Work Authorization Required</h3>
-                <p className="text-slate-300 text-sm">
+                <h3 className="text-lg font-semibold text-amber-700">Work Authorization Required</h3>
+                <p className="text-terra-ink-soft text-sm">
                   Non-EU citizens need a work permit before starting employment. Working illegally risks deportation and bans. Check your requirements first.
                 </p>
               </div>
@@ -341,14 +341,14 @@ function JobsCareers() {
           <div className="glass-3d rounded-3xl p-6 hover-tilt">
             <div className="flex items-start gap-4">
               <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
-                <Icon name="bolt" size={20} className="text-slate-100" />
+                <Icon name="bolt" size={20} className="text-terra-ink" />
               </div>
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <h3 className="text-lg font-semibold text-white">Poland Tech Boom</h3>
-                  <span className="glass-chip text-xs px-2 py-0.5 rounded-full text-slate-100">Hot Market</span>
+                  <h3 className="text-lg font-semibold text-terra-ink">Poland Tech Boom</h3>
+                  <span className="glass-chip text-xs px-2 py-0.5 rounded-full text-terra-primary">Hot Market</span>
                 </div>
-                <p className="text-slate-300 text-sm mb-3">
+                <p className="text-terra-ink-soft text-sm mb-3">
                   400,000+ IT professionals. Top European tech hub. English-speaking roles. Remote-friendly culture. Senior devs earning 5,000-10,000 per month.
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -369,31 +369,31 @@ function JobsCareers() {
                 onClick={() => setActiveCategory(category.id)}
                 className={`w-full text-left glass-panel hover-tilt rounded-2xl p-5 transition-all ${
                   category.isImportant
-                    ? 'border border-amber-500/30'
+                    ? 'border border-amber-300/60'
                     : category.featured
-                    ? 'border border-emerald-400/30'
-                    : 'border border-white/10'
+                    ? 'border border-terra-sage/40'
+                    : 'border border-terra-taupe/40'
                 }`}
               >
                 <div className="flex items-center gap-4">
                   <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
-                    <Icon name={category.icon} size={20} className="text-slate-100" />
+                    <Icon name={category.icon} size={20} className="text-terra-ink" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="text-lg font-semibold text-white">{category.title}</h3>
+                      <h3 className="text-lg font-semibold text-terra-ink">{category.title}</h3>
                       {category.isImportant && (
-                        <span className="glass-chip text-xs px-2 py-0.5 rounded-full text-amber-100">Important</span>
+                        <span className="glass-chip text-xs px-2 py-0.5 rounded-full text-amber-700">Important</span>
                       )}
                       {category.featured && (
-                        <span className="glass-chip text-xs px-2 py-0.5 rounded-full text-emerald-100">Hot</span>
+                        <span className="glass-chip text-xs px-2 py-0.5 rounded-full text-terra-sage">Hot</span>
                       )}
                     </div>
-                    <p className="text-slate-400 text-sm">{category.shortDesc}</p>
+                    <p className="text-terra-ink-soft text-sm">{category.shortDesc}</p>
                   </div>
                   <div className="text-right">
-                    <Icon name="arrowRight" size={16} className="text-slate-400" />
-                    <p className="text-xs text-slate-500 mt-1">Updated {category.lastUpdated}</p>
+                    <Icon name="arrowRight" size={16} className="text-terra-taupe" />
+                    <p className="text-xs text-terra-taupe mt-1">Updated {category.lastUpdated}</p>
                   </div>
                 </div>
               </button>
@@ -403,14 +403,14 @@ function JobsCareers() {
           <div className="glass-panel rounded-2xl p-6">
             <div className="flex items-start gap-4">
               <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
-                <Icon name="chart" size={20} className="text-slate-100" />
+                <Icon name="chart" size={20} className="text-terra-ink" />
               </div>
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <h3 className="text-lg font-semibold text-white">Salary Calculator</h3>
-                  <span className="glass-chip text-xs px-2 py-0.5 rounded-full text-slate-100">Coming Soon</span>
+                  <h3 className="text-lg font-semibold text-terra-ink">Salary Calculator</h3>
+                  <span className="glass-chip text-xs px-2 py-0.5 rounded-full text-terra-taupe">Coming Soon</span>
                 </div>
-                <p className="text-slate-400 text-sm">
+                <p className="text-terra-ink-soft text-sm">
                   B2B vs Employment comparison. See your real take-home pay after taxes and ZUS. Compare offers properly.
                 </p>
               </div>
@@ -422,42 +422,42 @@ function JobsCareers() {
           <header className="glass-panel rounded-3xl p-6">
             <div className="flex items-center gap-3">
               <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
-                <Icon name={activeContent.icon} size={22} className="text-slate-100" />
+                <Icon name={activeContent.icon} size={22} className="text-terra-ink" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h1 className="text-3xl font-semibold text-white">{activeContent.title}</h1>
+                  <h1 className="text-3xl font-semibold text-terra-ink">{activeContent.title}</h1>
                   {activeContent.isImportant && (
-                    <span className="glass-chip text-xs px-2 py-0.5 rounded-full text-amber-100">Important</span>
+                    <span className="glass-chip text-xs px-2 py-0.5 rounded-full text-amber-700">Important</span>
                   )}
                 </div>
-                <p className="text-slate-400 text-sm">Last updated: {activeContent.lastUpdated}</p>
+                <p className="text-terra-ink-soft text-sm">Last updated: {activeContent.lastUpdated}</p>
               </div>
             </div>
           </header>
 
           <section className="glass-panel rounded-2xl p-5">
-            <h2 className={`text-xl font-semibold mb-3 ${activeContent.isImportant ? 'text-amber-200' : 'text-slate-100'}`}>What is it?</h2>
-            <p className="text-slate-300 leading-relaxed">{activeContent.content.whatIsIt}</p>
+            <h2 className={`text-xl font-semibold mb-3 ${activeContent.isImportant ? 'text-amber-700' : 'text-terra-ink'}`}>What is it?</h2>
+            <p className="text-terra-ink leading-relaxed">{activeContent.content.whatIsIt}</p>
           </section>
 
           <section className="glass-panel rounded-2xl p-5">
-            <h2 className={`text-xl font-semibold mb-3 ${activeContent.isImportant ? 'text-amber-200' : 'text-slate-100'}`}>Why it matters</h2>
-            <p className="text-slate-300 leading-relaxed">{activeContent.content.whyItMatters}</p>
+            <h2 className={`text-xl font-semibold mb-3 ${activeContent.isImportant ? 'text-amber-700' : 'text-terra-ink'}`}>Why it matters</h2>
+            <p className="text-terra-ink leading-relaxed">{activeContent.content.whyItMatters}</p>
           </section>
 
           <section className="glass-panel rounded-2xl p-5">
-            <h2 className={`text-xl font-semibold mb-3 ${activeContent.isImportant ? 'text-amber-200' : 'text-slate-100'}`}>How to do it</h2>
+            <h2 className={`text-xl font-semibold mb-3 ${activeContent.isImportant ? 'text-amber-700' : 'text-terra-ink'}`}>How to do it</h2>
             <div className="space-y-4">
               {activeContent.content.steps.map((step) => (
                 <div key={step.step} className="glass-chip rounded-2xl p-4">
                   <div className="flex gap-4">
-                    <span className={`w-8 h-8 ${activeContent.isImportant ? 'bg-amber-500/70' : 'bg-slate-600/60'} text-white rounded-full flex items-center justify-center font-bold text-sm`}>
+                    <span className={`w-8 h-8 ${activeContent.isImportant ? 'bg-amber-500/80' : 'bg-terra-primary/80'} text-white rounded-full flex items-center justify-center font-bold text-sm`}>
                       {step.step}
                     </span>
                     <div>
-                      <h3 className="font-semibold text-white mb-1">{step.title}</h3>
-                      <p className="text-slate-400 text-sm leading-relaxed">{step.details}</p>
+                      <h3 className="font-semibold text-terra-ink mb-1">{step.title}</h3>
+                      <p className="text-terra-ink-soft text-sm leading-relaxed">{step.details}</p>
                     </div>
                   </div>
                 </div>
@@ -466,16 +466,16 @@ function JobsCareers() {
           </section>
 
           <section className="glass-panel rounded-2xl p-5">
-            <h2 className={`text-xl font-semibold mb-3 ${activeContent.isImportant ? 'text-amber-200' : 'text-slate-100'}`}>What to do next</h2>
-            <p className="text-slate-300 leading-relaxed">{activeContent.content.whatNext}</p>
+            <h2 className={`text-xl font-semibold mb-3 ${activeContent.isImportant ? 'text-amber-700' : 'text-terra-ink'}`}>What to do next</h2>
+            <p className="text-terra-ink leading-relaxed">{activeContent.content.whatNext}</p>
           </section>
 
           <section className="glass-panel rounded-2xl p-5">
-            <h2 className={`text-xl font-semibold mb-3 ${activeContent.isImportant ? 'text-amber-200' : 'text-slate-100'}`}>Pro Tips</h2>
+            <h2 className={`text-xl font-semibold mb-3 ${activeContent.isImportant ? 'text-amber-700' : 'text-terra-ink'}`}>Pro Tips</h2>
             <ul className="space-y-2">
               {activeContent.content.proTips.map((tip, index) => (
-                <li key={index} className="flex gap-2 text-slate-300">
-                  <Icon name={activeContent.isImportant ? 'warning' : 'spark'} size={14} className="text-slate-400" />
+                <li key={index} className="flex gap-2 text-terra-ink">
+                  <Icon name={activeContent.isImportant ? 'warning' : 'spark'} size={14} className="text-terra-taupe" />
                   <span>{tip}</span>
                 </li>
               ))}
@@ -483,7 +483,7 @@ function JobsCareers() {
           </section>
 
           <section className="glass-panel rounded-2xl p-5">
-            <h2 className="text-sm font-semibold text-slate-400 mb-3">Sources and official links</h2>
+            <h2 className="text-sm font-semibold text-terra-ink-soft mb-3">Sources and official links</h2>
             <div className="flex flex-wrap gap-3">
               {activeContent.content.sources.map((source, index) => (
                 <a
@@ -491,7 +491,7 @@ function JobsCareers() {
                   href={source.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-slate-200 hover:text-white underline"
+                  className="text-sm text-terra-ink hover:text-terra-primary underline"
                 >
                   {source.name}
                 </a>
@@ -505,3 +505,4 @@ function JobsCareers() {
 }
 
 export default JobsCareers
+

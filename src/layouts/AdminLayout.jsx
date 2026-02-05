@@ -29,20 +29,20 @@ function AdminLayout() {
   const displayName = profile?.display_name || user?.email?.split('@')[0] || 'Admin'
 
   return (
-    <div className="min-h-screen text-white">
+    <div className="min-h-screen text-terra-ink bg-terra-bg">
       {/* Mobile header */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 glass-panel border-b border-white/10">
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 glass-strong border-b border-black/10">
         <div className="flex items-center justify-between px-4 h-14">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 text-slate-400 hover:text-white"
+            className="p-2 text-terra-ink-soft hover:text-terra-ink"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
-          <span className="text-sm font-semibold text-slate-200">Admin Dashboard</span>
-          <Link to="/" className="p-2 text-slate-400 hover:text-white">
+          <span className="text-sm font-semibold text-terra-ink">Admin Dashboard</span>
+          <Link to="/" className="p-2 text-terra-ink-soft hover:text-terra-ink">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -53,33 +53,33 @@ function AdminLayout() {
       {/* Sidebar overlay for mobile */}
       {sidebarOpen && (
         <div
-          className="lg:hidden fixed inset-0 z-40 bg-black/50"
+          className="lg:hidden fixed inset-0 z-40 bg-black/20"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <aside className={`
-        fixed top-0 left-0 z-50 h-full w-64 glass-strong border-r border-white/10
+        fixed top-0 left-0 z-50 h-full w-64 glass-strong border-r border-black/10
         transform transition-transform duration-300 ease-in-out
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         lg:translate-x-0
       `}>
         {/* Sidebar header */}
-        <div className="p-4 border-b border-white/10">
+        <div className="p-4 border-b border-black/10">
           <Link to="/" className="flex items-center gap-3 group">
             <div className="relative">
               <div
                 className="absolute inset-0 rounded-lg blur opacity-40 group-hover:opacity-70 transition-opacity"
-                style={{ background: 'linear-gradient(135deg, rgba(242,166,90,0.45), rgba(242,143,123,0.35))' }}
+                style={{ background: 'linear-gradient(135deg, rgba(199,107,85,0.45), rgba(117,153,124,0.35))' }}
               />
               <div className="relative w-10 h-10 rounded-lg overflow-hidden glass-3d">
                 <img src="/icon.svg" alt="Expat Village" className="w-full h-full object-cover" />
               </div>
             </div>
             <div>
-              <h1 className="text-sm font-bold text-white">Expat Village</h1>
-              <p className="text-xs text-slate-400">Admin Panel</p>
+              <h1 className="text-sm font-bold text-terra-ink">Expat Village</h1>
+              <p className="text-xs text-terra-taupe">Admin Panel</p>
             </div>
           </Link>
         </div>
@@ -94,8 +94,8 @@ function AdminLayout() {
               className={`
                 flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all
                 ${isActive(item)
-                  ? 'glass-panel text-white border border-white/10'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  ? 'glass-panel text-terra-ink border border-black/10'
+                  : 'text-terra-ink-soft hover:text-terra-ink hover:bg-black/5'
                 }
               `}
             >
@@ -107,14 +107,14 @@ function AdminLayout() {
 
         {/* Divider */}
         <div className="px-4 my-4">
-          <div className="border-t border-white/10" />
+          <div className="border-t border-black/10" />
         </div>
 
         {/* Back to app link */}
         <div className="px-4">
           <Link
             to="/"
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-terra-ink-soft hover:text-terra-ink hover:bg-black/5 transition-all"
           >
             <Icon name="home" className="w-5 h-5" />
             Back to App
@@ -122,21 +122,21 @@ function AdminLayout() {
         </div>
 
         {/* User info at bottom */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10 glass-strong">
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-black/10 glass-strong">
           <div className="flex items-center gap-3">
             <div
-              className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm"
-              style={{ background: 'linear-gradient(135deg, rgba(242,166,90,0.6), rgba(242,143,123,0.6))' }}
+              className="w-9 h-9 rounded-full flex items-center justify-center text-terra-bg font-bold text-sm"
+              style={{ background: 'linear-gradient(135deg, rgba(199,107,85,0.85), rgba(210,160,115,0.85))' }}
             >
               {displayName.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">{displayName}</p>
-              <p className="text-xs text-slate-500 truncate">{user?.email}</p>
+              <p className="text-sm font-medium text-terra-ink truncate">{displayName}</p>
+              <p className="text-xs text-terra-taupe truncate">{user?.email}</p>
             </div>
             <button
               onClick={signOut}
-              className="p-2 text-slate-400 hover:text-red-400 transition-colors"
+              className="p-2 text-terra-ink-soft hover:text-red-600 transition-colors"
               title="Sign out"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

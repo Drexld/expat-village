@@ -119,41 +119,42 @@ function Rewards() {
 
   const getRarityColor = (rarity) => {
     switch (rarity) {
-      case 'common': return 'from-slate-700 to-slate-800 border-slate-600'
-      case 'uncommon': return 'from-emerald-800 to-emerald-900 border-emerald-500'
-      case 'rare': return 'from-sky-800 to-indigo-900 border-sky-500'
-      case 'legendary': return 'from-amber-700 to-orange-900 border-amber-500'
-      default: return 'from-slate-700 to-slate-800 border-slate-600'
+      case 'common': return 'from-[#F6F1EA] to-[#FDFBF8] border-black/10'
+      case 'uncommon': return 'from-[#E5EFE7] to-[#F6F1EA] border-[#75997C]/30'
+      case 'rare': return 'from-[#F1E3D5] to-[#FDFBF8] border-[#C76B55]/30'
+      case 'legendary': return 'from-[#E9D3B8] to-[#FDFBF8] border-[#C76B55]/40'
+      default: return 'from-[#F6F1EA] to-[#FDFBF8] border-black/10'
     }
   }
 
   const getRarityLabel = (rarity) => {
     switch (rarity) {
-      case 'common': return { text: 'Common', color: 'text-slate-300' }
-      case 'uncommon': return { text: 'Uncommon', color: 'text-emerald-200' }
-      case 'rare': return { text: 'Rare', color: 'text-sky-200' }
-      case 'legendary': return { text: 'Legendary', color: 'text-amber-200' }
-      default: return { text: 'Common', color: 'text-slate-300' }
+      case 'common': return { text: 'Common', color: 'text-terra-taupe' }
+      case 'uncommon': return { text: 'Uncommon', color: 'text-terra-sage' }
+      case 'rare': return { text: 'Rare', color: 'text-terra-primary' }
+      case 'legendary': return { text: 'Legendary', color: 'text-terra-ink' }
+      default: return { text: 'Common', color: 'text-terra-taupe' }
     }
   }
 
   if (!isAuthenticated) {
     return (
       <div className="space-y-8">
-        <Link to="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
+        <Link to="/" className="inline-flex items-center gap-2 text-terra-ink-soft hover:text-terra-ink transition-colors">
           <Icon name="arrowLeft" size={16} />
           Back to Home
         </Link>
 
-        <div className="glass-panel rounded-3xl p-10 text-center">
+        <div className="hero-card texture-layer texture-paper text-center">
           <div className="glass-panel inline-flex h-14 w-14 items-center justify-center rounded-2xl mb-4">
-            <Icon name="trophy" size={22} className="text-slate-100" />
+            <Icon name="trophy" size={22} className="text-terra-ink" />
           </div>
-          <h1 className="text-3xl font-semibold text-white mb-3">My Rewards</h1>
-          <p className="text-slate-400 mb-6">Sign in to track your points and earn badges.</p>
+          <h1 className="text-3xl font-semibold text-terra-ink mb-3">My Rewards</h1>
+          <p className="text-terra-ink-soft mb-6">Sign in to track your points and earn badges.</p>
           <button
             onClick={() => openAuthModal('sign_up')}
-            className="rounded-full border border-white/20 bg-white/10 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/20"
+            className="rounded-full px-6 py-3 text-sm font-semibold text-terra-bg transition-colors hover-tilt"
+            style={{ background: 'linear-gradient(135deg, #C76B55, #D07C63)' }}
           >
             Sign Up to Start Earning
           </button>
@@ -164,60 +165,63 @@ function Rewards() {
 
   return (
     <div className="space-y-8">
-      <Link to="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
+      <Link to="/" className="inline-flex items-center gap-2 text-terra-ink-soft hover:text-terra-ink transition-colors">
         <Icon name="arrowLeft" size={16} />
         Back to Home
       </Link>
 
-      <header className="glass-panel rounded-3xl p-6">
+      <header className="hero-card texture-layer texture-paper texture-amber">
         <div className="flex items-center gap-3 mb-2">
-          <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
-            <Icon name="trophy" size={22} className="text-slate-100" />
+          <div className="glass-3d flex h-12 w-12 items-center justify-center rounded-2xl">
+            <Icon name="trophy" size={22} className="text-terra-ink" />
           </div>
-          <h1 className="text-3xl font-semibold text-white">My Rewards</h1>
+          <h1 className="text-3xl font-semibold text-terra-ink">My Rewards</h1>
         </div>
-        <p className="text-slate-400 text-lg">
+        <p className="text-terra-ink-soft text-lg">
           Earn points by helping the community. Unlock badges and climb the ranks.
         </p>
       </header>
 
-      <div className="glass-3d rounded-3xl p-6 hover-tilt">
+      <div className="hero-card texture-layer texture-paper texture-photo hover-tilt">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
           <div>
-            <p className="text-slate-400 text-sm uppercase tracking-wide">Your Level</p>
+            <p className="text-terra-taupe text-sm uppercase tracking-wide">Your Level</p>
             <div className="flex items-center gap-2 mt-1">
               <div className="glass-panel flex h-10 w-10 items-center justify-center rounded-xl">
-                <Icon name={currentLevel.icon} size={18} className="text-slate-100" />
+                <Icon name={currentLevel.icon} size={18} className="text-terra-ink" />
               </div>
-              <span className="text-2xl font-semibold text-white">{currentLevel.name}</span>
+              <span className="text-2xl font-semibold text-terra-ink">{currentLevel.name}</span>
             </div>
           </div>
           <div className="text-right">
-            <p className="text-slate-400 text-sm uppercase tracking-wide">Total Points</p>
-            <p className="text-4xl font-semibold text-white">{points}</p>
+            <p className="text-terra-taupe text-sm uppercase tracking-wide">Total Points</p>
+            <p className="text-4xl font-semibold text-terra-ink">{points}</p>
           </div>
         </div>
 
         {nextLevel ? (
           <div>
             <div className="flex justify-between text-sm mb-2">
-              <span className="text-slate-400">Progress to {nextLevel.name}</span>
-              <span className="text-emerald-200">{nextLevel.minPoints - points} points to go</span>
+              <span className="text-terra-taupe">Progress to {nextLevel.name}</span>
+              <span className="text-terra-primary">{nextLevel.minPoints - points} points to go</span>
             </div>
-            <div className="h-3 bg-slate-800 rounded-full overflow-hidden">
+            <div className="h-3 bg-terra-cream rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 transition-all duration-500"
-                style={{ width: `${Math.min(progressToNext, 100)}%` }}
+                className="h-full transition-all duration-500"
+                style={{
+                  background: 'linear-gradient(90deg, #C76B55, #D07C63)',
+                  width: `${Math.min(progressToNext, 100)}%`
+                }}
               />
             </div>
           </div>
         ) : (
-          <div className="text-center text-emerald-200 mt-2">You have reached the highest level.</div>
+          <div className="text-center text-terra-sage mt-2">You have reached the highest level.</div>
         )}
       </div>
 
-      <div className="glass-panel rounded-2xl p-6">
-        <h2 className="text-lg font-semibold text-white mb-4">How to Earn Points</h2>
+      <div className="action-card texture-layer texture-paper">
+        <h2 className="text-lg font-semibold text-terra-ink mb-4">How to Earn Points</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { label: 'Complete Checklist', value: 'Up to 300 pts', icon: 'checklist' },
@@ -227,23 +231,23 @@ function Rewards() {
           ].map((item) => (
             <div key={item.label} className="glass-chip rounded-2xl p-4 text-center">
               <div className="glass-panel inline-flex h-10 w-10 items-center justify-center rounded-xl mb-2">
-                <Icon name={item.icon} size={18} className="text-slate-100" />
+                <Icon name={item.icon} size={18} className="text-terra-ink" />
               </div>
-              <p className="text-white font-medium text-sm">{item.label}</p>
-              <p className="text-emerald-200 text-xs">{item.value}</p>
+              <p className="text-terra-ink font-medium text-sm">{item.label}</p>
+              <p className="text-terra-primary text-xs">{item.value}</p>
             </div>
           ))}
         </div>
       </div>
 
       <div className="space-y-6">
-        <h2 className="text-xl font-semibold text-white">
+        <h2 className="text-xl font-semibold text-terra-ink">
           Badges ({earnedBadges.length}/{BADGES.length})
         </h2>
 
         {earnedBadges.length > 0 && (
           <div className="space-y-3">
-            <h3 className="text-sm text-emerald-200 uppercase tracking-wide">Earned</h3>
+            <h3 className="text-sm text-terra-sage uppercase tracking-wide">Earned</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {BADGES.filter(b => earnedBadges.includes(b.id)).map(badge => {
                 const rarityLabel = getRarityLabel(badge.rarity)
@@ -253,11 +257,11 @@ function Rewards() {
                     className={`bg-gradient-to-br ${getRarityColor(badge.rarity)} border rounded-2xl p-4 text-center`}
                   >
                     <div className="glass-panel inline-flex h-10 w-10 items-center justify-center rounded-xl mb-2">
-                      <Icon name={badge.icon} size={18} className="text-white" />
+                      <Icon name={badge.icon} size={18} className="text-terra-ink" />
                     </div>
-                    <h4 className="text-white font-medium text-sm">{badge.name}</h4>
+                    <h4 className="text-terra-ink font-medium text-sm">{badge.name}</h4>
                     <p className={`text-xs ${rarityLabel.color}`}>{rarityLabel.text}</p>
-                    <p className="text-emerald-200 text-xs mt-1">+{badge.points} pts</p>
+                    <p className="text-terra-primary text-xs mt-1">+{badge.points} pts</p>
                   </div>
                 )
               })}
@@ -266,21 +270,21 @@ function Rewards() {
         )}
 
         <div className="space-y-3">
-          <h3 className="text-sm text-slate-400 uppercase tracking-wide">Locked</h3>
+          <h3 className="text-sm text-terra-taupe uppercase tracking-wide">Locked</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {BADGES.filter(b => !earnedBadges.includes(b.id)).map(badge => {
               const rarityLabel = getRarityLabel(badge.rarity)
               return (
                 <div
                   key={badge.id}
-                  className="glass-panel rounded-2xl p-4 text-center opacity-70 border border-white/5"
+                  className="action-card texture-layer texture-paper rounded-2xl p-4 text-center opacity-80 border border-black/5"
                 >
                   <div className="glass-panel inline-flex h-10 w-10 items-center justify-center rounded-xl mb-2">
-                    <Icon name={badge.icon} size={18} className="text-slate-200" />
+                    <Icon name={badge.icon} size={18} className="text-terra-ink-soft" />
                   </div>
-                  <h4 className="text-slate-300 font-medium text-sm">{badge.name}</h4>
+                  <h4 className="text-terra-ink-soft font-medium text-sm">{badge.name}</h4>
                   <p className={`text-xs ${rarityLabel.color} opacity-60`}>{rarityLabel.text}</p>
-                  <p className="text-slate-500 text-xs mt-1">{badge.description}</p>
+                  <p className="text-terra-taupe text-xs mt-1">{badge.description}</p>
                 </div>
               )
             })}
@@ -289,31 +293,31 @@ function Rewards() {
       </div>
 
       <div className="space-y-3">
-        <h2 className="text-xl font-semibold text-white">Points History</h2>
+        <h2 className="text-xl font-semibold text-terra-ink">Points History</h2>
         {pointsHistory.length === 0 ? (
-          <div className="glass-panel rounded-2xl p-8 text-center text-slate-400">
+          <div className="action-card texture-layer texture-paper rounded-2xl p-8 text-center text-terra-taupe">
             No points earned yet. Start exploring.
           </div>
         ) : (
-          <div className="glass-panel rounded-2xl overflow-hidden">
+          <div className="action-card texture-layer texture-paper rounded-2xl overflow-hidden">
             {pointsHistory.slice(0, 10).map(entry => (
-              <div key={entry.id} className="flex items-center justify-between p-4 border-b border-white/5 last:border-0">
+              <div key={entry.id} className="flex items-center justify-between p-4 border-b border-black/5 last:border-0">
                 <div>
-                  <p className="text-white">{entry.description}</p>
-                  <p className="text-slate-500 text-sm">
+                  <p className="text-terra-ink">{entry.description}</p>
+                  <p className="text-terra-taupe text-sm">
                     {new Date(entry.timestamp).toLocaleDateString()}
                   </p>
                 </div>
-                <span className="text-emerald-200 font-semibold">+{entry.points}</span>
+                <span className="text-terra-primary font-semibold">+{entry.points}</span>
               </div>
             ))}
           </div>
         )}
       </div>
 
-      <div className="glass-panel rounded-2xl p-6 text-center">
-        <h3 className="text-lg font-semibold text-white mb-2">Leaderboard Coming Soon</h3>
-        <p className="text-slate-400 text-sm">Compete with other expats and see who is the ultimate Village Elder.</p>
+      <div className="hero-card texture-layer texture-paper text-center">
+        <h3 className="text-lg font-semibold text-terra-ink mb-2">Leaderboard Coming Soon</h3>
+        <p className="text-terra-ink-soft text-sm">Compete with other expats and see who is the ultimate Village Elder.</p>
       </div>
     </div>
   )

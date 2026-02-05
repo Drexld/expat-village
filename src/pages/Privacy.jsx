@@ -1,4 +1,4 @@
-﻿// src/pages/Privacy.jsx
+// src/pages/Privacy.jsx
 // EXPAT VILLAGE - Privacy Policy (GDPR Compliant)
 
 import { Link } from 'react-router-dom'
@@ -10,35 +10,35 @@ function Privacy() {
   return (
     <div className="min-h-screen">
       <section className="py-12 text-center">
-        <span className="inline-block glass-chip rounded-full px-5 py-2 text-sm font-semibold text-slate-200 mb-4">
+        <span className="inline-block glass-chip rounded-full px-5 py-2 text-sm font-semibold text-terra-ink mb-4">
           Legal
         </span>
-        <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4">Privacy Policy</h1>
-        <p className="text-slate-400">Last updated: {lastUpdated}</p>
+        <h1 className="text-4xl md:text-5xl font-extrabold text-terra-ink mb-4">Privacy Policy</h1>
+        <p className="text-terra-ink-soft">Last updated: {lastUpdated}</p>
       </section>
 
       <section className="pb-16">
         <div className="max-w-3xl mx-auto">
           <div className="glass-strong rounded-3xl p-8 md:p-12">
             <div className="glass-panel rounded-2xl p-6 mb-10">
-              <h2 className="text-lg font-bold text-slate-200 mb-3 flex items-center gap-2">
-                <Icon name="info" size={16} className="text-slate-200" /> The Short Version
+              <h2 className="text-lg font-bold text-terra-ink mb-3 flex items-center gap-2">
+                <Icon name="info" size={16} className="text-terra-ink" /> The Short Version
               </h2>
-              <ul className="space-y-2 text-slate-300 text-sm">
+              <ul className="space-y-2 text-terra-ink text-sm">
                 <li className="flex items-start gap-2">
-                  <Icon name="success" size={14} className="text-emerald-200 mt-0.5" />
+                  <Icon name="success" size={14} className="text-terra-sage mt-0.5" />
                   <span>We only collect what we need to make the app work</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Icon name="success" size={14} className="text-emerald-200 mt-0.5" />
+                  <Icon name="success" size={14} className="text-terra-sage mt-0.5" />
                   <span>We never sell your personal data to anyone</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Icon name="success" size={14} className="text-emerald-200 mt-0.5" />
+                  <Icon name="success" size={14} className="text-terra-sage mt-0.5" />
                   <span>You can delete your account and data anytime</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Icon name="success" size={14} className="text-emerald-200 mt-0.5" />
+                  <Icon name="success" size={14} className="text-terra-sage mt-0.5" />
                   <span>We comply with GDPR and EU data protection laws</span>
                 </li>
               </ul>
@@ -46,11 +46,11 @@ function Privacy() {
 
             <div className="space-y-10">
               <section>
-                <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
+                <h2 className="text-xl font-bold text-terra-ink mb-4 flex items-center gap-3">
                   <span className="w-8 h-8 glass-panel rounded-lg flex items-center justify-center text-sm">1</span>
                   Introduction
                 </h2>
-                <div className="text-slate-400 space-y-3 leading-relaxed">
+                <div className="text-terra-ink-soft space-y-3 leading-relaxed">
                   <p>
                     Expat Village ("we", "our", or "us") is committed to protecting your privacy.
                     This Privacy Policy explains how we collect, use, disclose, and safeguard your
@@ -65,12 +65,12 @@ function Privacy() {
               </section>
 
               <section>
-                <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
+                <h2 className="text-xl font-bold text-terra-ink mb-4 flex items-center gap-3">
                   <span className="w-8 h-8 glass-panel rounded-lg flex items-center justify-center text-sm">2</span>
                   Data We Collect
                 </h2>
-                <div className="text-slate-400 space-y-4 leading-relaxed">
-                  <p className="font-medium text-white">Personal Data You Provide:</p>
+                <div className="text-terra-ink-soft space-y-4 leading-relaxed">
+                  <p className="font-medium text-terra-ink">Personal Data You Provide:</p>
                   <ul className="list-disc list-inside space-y-1 ml-4">
                     <li>Email address (when you create an account)</li>
                     <li>Display name (optional, chosen by you)</li>
@@ -78,7 +78,7 @@ function Privacy() {
                     <li>Content you create (reviews, comments, checklist progress)</li>
                   </ul>
 
-                  <p className="font-medium text-white mt-4">Data Collected Automatically:</p>
+                  <p className="font-medium text-terra-ink mt-4">Data Collected Automatically:</p>
                   <ul className="list-disc list-inside space-y-1 ml-4">
                     <li>Device information (browser type, operating system)</li>
                     <li>Usage data (pages visited, features used)</li>
@@ -86,7 +86,7 @@ function Privacy() {
                     <li>Cookies and similar technologies</li>
                   </ul>
 
-                  <p className="font-medium text-white mt-4">Data We Do NOT Collect:</p>
+                  <p className="font-medium text-terra-ink mt-4">Data We Do NOT Collect:</p>
                   <ul className="list-disc list-inside space-y-1 ml-4">
                     <li>Payment information (handled securely by Stripe)</li>
                     <li>Government ID numbers</li>
@@ -96,11 +96,11 @@ function Privacy() {
               </section>
 
               <section>
-                <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
+                <h2 className="text-xl font-bold text-terra-ink mb-4 flex items-center gap-3">
                   <span className="w-8 h-8 glass-panel rounded-lg flex items-center justify-center text-sm">3</span>
                   How We Use Your Data
                 </h2>
-                <div className="text-slate-400 space-y-3 leading-relaxed">
+                <div className="text-terra-ink-soft space-y-3 leading-relaxed">
                   <p>We use your personal data to:</p>
                   <ul className="list-disc list-inside space-y-1 ml-4">
                     <li>Provide and maintain our Service</li>
@@ -112,39 +112,39 @@ function Privacy() {
                     <li>Improve our Service based on usage patterns</li>
                     <li>Prevent fraud and ensure security</li>
                   </ul>
-                  <p className="text-slate-200 font-medium mt-4">
+                  <p className="text-terra-ink font-medium mt-4">
                     We never sell your personal data to third parties.
                   </p>
                 </div>
               </section>
 
               <section>
-                <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
+                <h2 className="text-xl font-bold text-terra-ink mb-4 flex items-center gap-3">
                   <span className="w-8 h-8 glass-panel rounded-lg flex items-center justify-center text-sm">4</span>
                   Legal Basis for Processing (GDPR)
                 </h2>
-                <div className="text-slate-400 space-y-3 leading-relaxed">
+                <div className="text-terra-ink-soft space-y-3 leading-relaxed">
                   <p>Under GDPR, we process your data based on:</p>
                   <ul className="list-disc list-inside space-y-1 ml-4">
-                    <li><span className="text-white">Contract:</span> Processing necessary to provide our Service</li>
-                    <li><span className="text-white">Consent:</span> Where you have given explicit permission</li>
-                    <li><span className="text-white">Legitimate Interest:</span> For improving our Service</li>
-                    <li><span className="text-white">Legal Obligation:</span> When required by law</li>
+                    <li><span className="text-terra-ink">Contract:</span> Processing necessary to provide our Service</li>
+                    <li><span className="text-terra-ink">Consent:</span> Where you have given explicit permission</li>
+                    <li><span className="text-terra-ink">Legitimate Interest:</span> For improving our Service</li>
+                    <li><span className="text-terra-ink">Legal Obligation:</span> When required by law</li>
                   </ul>
                 </div>
               </section>
 
               <section>
-                <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
+                <h2 className="text-xl font-bold text-terra-ink mb-4 flex items-center gap-3">
                   <span className="w-8 h-8 glass-panel rounded-lg flex items-center justify-center text-sm">5</span>
                   Data Sharing
                 </h2>
-                <div className="text-slate-400 space-y-3 leading-relaxed">
+                <div className="text-terra-ink-soft space-y-3 leading-relaxed">
                   <p>We may share your data with:</p>
                   <ul className="list-disc list-inside space-y-1 ml-4">
-                    <li><span className="text-white">Service Providers:</span> Companies that help us run our Service (hosting, analytics)</li>
-                    <li><span className="text-white">Payment Processors:</span> Stripe for handling payments</li>
-                    <li><span className="text-white">Legal Requirements:</span> If required by law</li>
+                    <li><span className="text-terra-ink">Service Providers:</span> Companies that help us run our Service (hosting, analytics)</li>
+                    <li><span className="text-terra-ink">Payment Processors:</span> Stripe for handling payments</li>
+                    <li><span className="text-terra-ink">Legal Requirements:</span> If required by law</li>
                   </ul>
                   <p className="mt-4">Our key service providers:</p>
                   <ul className="list-disc list-inside space-y-1 ml-4">
@@ -156,11 +156,11 @@ function Privacy() {
               </section>
 
               <section>
-                <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
+                <h2 className="text-xl font-bold text-terra-ink mb-4 flex items-center gap-3">
                   <span className="w-8 h-8 glass-panel rounded-lg flex items-center justify-center text-sm">6</span>
                   Data Retention
                 </h2>
-                <div className="text-slate-400 space-y-3 leading-relaxed">
+                <div className="text-terra-ink-soft space-y-3 leading-relaxed">
                   <p>We retain your data for as long as:</p>
                   <ul className="list-disc list-inside space-y-1 ml-4">
                     <li>Your account is active</li>
@@ -175,24 +175,24 @@ function Privacy() {
               </section>
 
               <section>
-                <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
+                <h2 className="text-xl font-bold text-terra-ink mb-4 flex items-center gap-3">
                   <span className="w-8 h-8 glass-panel rounded-lg flex items-center justify-center text-sm">7</span>
                   Your Rights (GDPR)
                 </h2>
-                <div className="text-slate-400 space-y-3 leading-relaxed">
+                <div className="text-terra-ink-soft space-y-3 leading-relaxed">
                   <p>Under GDPR, you have the right to:</p>
                   <ul className="list-disc list-inside space-y-1 ml-4">
-                    <li><span className="text-white">Access:</span> Request a copy of your personal data</li>
-                    <li><span className="text-white">Rectification:</span> Correct inaccurate data</li>
-                    <li><span className="text-white">Erasure:</span> Request deletion ("right to be forgotten")</li>
-                    <li><span className="text-white">Portability:</span> Receive your data in a portable format</li>
-                    <li><span className="text-white">Restrict Processing:</span> Limit how we use your data</li>
-                    <li><span className="text-white">Object:</span> Object to certain processing activities</li>
-                    <li><span className="text-white">Withdraw Consent:</span> Revoke consent at any time</li>
+                    <li><span className="text-terra-ink">Access:</span> Request a copy of your personal data</li>
+                    <li><span className="text-terra-ink">Rectification:</span> Correct inaccurate data</li>
+                    <li><span className="text-terra-ink">Erasure:</span> Request deletion ("right to be forgotten")</li>
+                    <li><span className="text-terra-ink">Portability:</span> Receive your data in a portable format</li>
+                    <li><span className="text-terra-ink">Restrict Processing:</span> Limit how we use your data</li>
+                    <li><span className="text-terra-ink">Object:</span> Object to certain processing activities</li>
+                    <li><span className="text-terra-ink">Withdraw Consent:</span> Revoke consent at any time</li>
                   </ul>
                   <p className="mt-3">
                     To exercise these rights, email us at{' '}
-                    <a href="mailto:privacy@expatvillage.com" className="text-slate-200 hover:text-white">
+                    <a href="mailto:privacy@expatvillage.com" className="text-terra-ink hover:text-terra-primary">
                       privacy@expatvillage.com
                     </a>
                   </p>
@@ -200,15 +200,15 @@ function Privacy() {
               </section>
 
               <section>
-                <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
+                <h2 className="text-xl font-bold text-terra-ink mb-4 flex items-center gap-3">
                   <span className="w-8 h-8 glass-panel rounded-lg flex items-center justify-center text-sm">8</span>
                   Cookies
                 </h2>
-                <div className="text-slate-400 space-y-3 leading-relaxed">
+                <div className="text-terra-ink-soft space-y-3 leading-relaxed">
                   <p>We use cookies for:</p>
                   <ul className="list-disc list-inside space-y-1 ml-4">
-                    <li><span className="text-white">Essential:</span> Required for the Service to function</li>
-                    <li><span className="text-white">Analytics:</span> Understanding how users interact with our Service</li>
+                    <li><span className="text-terra-ink">Essential:</span> Required for the Service to function</li>
+                    <li><span className="text-terra-ink">Analytics:</span> Understanding how users interact with our Service</li>
                   </ul>
                   <p className="mt-3">
                     You can control cookies through your browser settings.
@@ -217,11 +217,11 @@ function Privacy() {
               </section>
 
               <section>
-                <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
+                <h2 className="text-xl font-bold text-terra-ink mb-4 flex items-center gap-3">
                   <span className="w-8 h-8 glass-panel rounded-lg flex items-center justify-center text-sm">9</span>
                   Data Security
                 </h2>
-                <div className="text-slate-400 space-y-3 leading-relaxed">
+                <div className="text-terra-ink-soft space-y-3 leading-relaxed">
                   <p>We protect your data with:</p>
                   <ul className="list-disc list-inside space-y-1 ml-4">
                     <li>Encryption in transit (HTTPS/TLS)</li>
@@ -234,11 +234,11 @@ function Privacy() {
               </section>
 
               <section>
-                <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
+                <h2 className="text-xl font-bold text-terra-ink mb-4 flex items-center gap-3">
                   <span className="w-8 h-8 glass-panel rounded-lg flex items-center justify-center text-sm">10</span>
                   Children's Privacy
                 </h2>
-                <div className="text-slate-400 leading-relaxed">
+                <div className="text-terra-ink-soft leading-relaxed">
                   <p>
                     Our Service is not intended for children under 16. We do not knowingly
                     collect personal data from children under 16. If you believe we have
@@ -248,11 +248,11 @@ function Privacy() {
               </section>
 
               <section>
-                <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
+                <h2 className="text-xl font-bold text-terra-ink mb-4 flex items-center gap-3">
                   <span className="w-8 h-8 glass-panel rounded-lg flex items-center justify-center text-sm">11</span>
                   Changes to This Policy
                 </h2>
-                <div className="text-slate-400 space-y-3 leading-relaxed">
+                <div className="text-terra-ink-soft space-y-3 leading-relaxed">
                   <p>
                     We may update this Privacy Policy from time to time. We will notify you by:
                   </p>
@@ -265,15 +265,15 @@ function Privacy() {
               </section>
 
               <section>
-                <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
+                <h2 className="text-xl font-bold text-terra-ink mb-4 flex items-center gap-3">
                   <span className="w-8 h-8 glass-panel rounded-lg flex items-center justify-center text-sm">12</span>
                   Contact Us
                 </h2>
-                <div className="text-slate-400 space-y-3 leading-relaxed">
+                <div className="text-terra-ink-soft space-y-3 leading-relaxed">
                   <p>For privacy-related questions or to exercise your rights:</p>
                   <div className="glass-panel rounded-xl p-6 mt-4">
-                    <p className="text-white font-bold mb-2">Expat Village</p>
-                    <p>Email: <a href="mailto:privacy@expatvillage.com" className="text-slate-200 hover:text-white">privacy@expatvillage.com</a></p>
+                    <p className="text-terra-ink font-bold mb-2">Expat Village</p>
+                    <p>Email: <a href="mailto:privacy@expatvillage.com" className="text-terra-ink hover:text-terra-primary">privacy@expatvillage.com</a></p>
                     <p>Location: Warsaw, Poland</p>
                   </div>
                   <p className="text-sm mt-4">
@@ -289,7 +289,7 @@ function Privacy() {
           <div className="text-center mt-8">
             <Link
               to="/"
-              className="text-slate-300 hover:text-white transition-colors inline-flex items-center gap-2"
+              className="text-terra-ink hover:text-terra-primary transition-colors inline-flex items-center gap-2"
             >
               <Icon name="arrowLeft" size={14} /> Back to Home
             </Link>
@@ -301,3 +301,6 @@ function Privacy() {
 }
 
 export default Privacy
+
+
+

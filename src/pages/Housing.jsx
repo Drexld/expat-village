@@ -294,7 +294,7 @@ function Housing() {
       {activeCategory ? (
         <button
           onClick={() => setActiveCategory(null)}
-          className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
+          className="inline-flex items-center gap-2 text-terra-ink-soft hover:text-terra-ink transition-colors"
         >
           <Icon name="arrowLeft" size={16} />
           Back to Housing
@@ -302,7 +302,7 @@ function Housing() {
       ) : (
         <Link
           to="/"
-          className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
+          className="inline-flex items-center gap-2 text-terra-ink-soft hover:text-terra-ink transition-colors"
         >
           <Icon name="arrowLeft" size={16} />
           Back to Home
@@ -314,11 +314,11 @@ function Housing() {
           <header className="glass-panel rounded-3xl p-6">
             <div className="flex items-center gap-3 mb-3">
               <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
-                <Icon name="home" size={22} className="text-slate-100" />
+                <Icon name="home" size={22} className="text-terra-ink" />
               </div>
-              <h1 className="text-3xl font-semibold text-white">Housing</h1>
+              <h1 className="text-3xl font-semibold text-terra-ink">Housing</h1>
             </div>
-            <p className="text-slate-400 text-lg">
+            <p className="text-terra-ink-soft text-lg">
               Finding an apartment, avoiding scams, and understanding contracts.
             </p>
           </header>
@@ -326,14 +326,14 @@ function Housing() {
           <div className="glass-3d rounded-3xl p-6 hover-tilt">
             <div className="flex flex-col md:flex-row md:items-center gap-5">
               <div className="glass-panel flex h-14 w-14 items-center justify-center rounded-2xl">
-                <Icon name="home" size={24} className="text-slate-100" />
+                <Icon name="home" size={24} className="text-terra-ink" />
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
-                  <h3 className="font-semibold text-white text-lg">NestQuest</h3>
-                  <span className="glass-chip text-xs px-2 py-0.5 rounded-full text-slate-100">Free Tool</span>
+                  <h3 className="font-semibold text-terra-ink text-lg">NestQuest</h3>
+                  <span className="glass-chip text-xs px-2 py-0.5 rounded-full text-terra-primary">Free Tool</span>
                 </div>
-                <p className="text-slate-300 text-sm mb-4">
+                <p className="text-terra-ink-soft text-sm mb-4">
                   One click on any Otodom listing and get instant English analysis with true cost breakdown, scam detection, and commute times.
                 </p>
                 <div className="flex flex-wrap gap-2 mb-4">
@@ -347,7 +347,7 @@ function Housing() {
                   href="https://chromewebstore.google.com/detail/polish-apartment-summariz/lmbkkgedjmcoackmbdkmdgmgenhlaako"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/20"
+                  className="inline-flex items-center gap-2 rounded-full bg-terra-primary px-4 py-2 text-sm font-medium text-white shadow-glass transition-colors hover:opacity-95"
                 >
                   <Icon name="download" size={16} />
                   Add to Chrome - It is free
@@ -356,14 +356,14 @@ function Housing() {
             </div>
           </div>
 
-          <div className="glass-panel rounded-2xl p-5 border border-red-500/30">
+          <div className="glass-panel rounded-2xl p-5 border border-rose-300/60">
             <div className="flex items-start gap-4">
               <div className="glass-panel flex h-10 w-10 items-center justify-center rounded-xl">
-                <Icon name="warning" size={18} className="text-red-200" />
+                <Icon name="warning" size={18} className="text-rose-600" />
               </div>
               <div>
-                <h3 className="font-semibold text-red-200">Scam Alert</h3>
-                <p className="text-slate-300 text-sm">
+                <h3 className="font-semibold text-rose-700">Scam Alert</h3>
+                <p className="text-terra-ink-soft text-sm">
                   Rental scams targeting expats are common. NestQuest flags red flags automatically, but always read our scam warnings before sending any money.
                 </p>
               </div>
@@ -377,28 +377,28 @@ function Housing() {
                 onClick={() => setActiveCategory(category.id)}
                 className={`w-full text-left glass-panel hover-tilt rounded-2xl p-5 transition-all ${
                   category.isAlert
-                    ? 'border border-red-500/30'
-                    : 'border border-white/10'
+                    ? 'border border-rose-300/60'
+                    : 'border border-terra-taupe/40'
                 }`}
               >
                 <div className="flex items-center gap-4">
                   <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
-                    <Icon name={category.icon} size={20} className="text-slate-100" />
+                    <Icon name={category.icon} size={20} className="text-terra-ink" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="text-lg font-semibold text-white">
+                      <h3 className="text-lg font-semibold text-terra-ink">
                         {category.title}
                       </h3>
                       {category.isAlert && (
-                        <span className="glass-chip text-xs px-2 py-0.5 rounded-full text-red-100">Important</span>
+                        <span className="glass-chip text-xs px-2 py-0.5 rounded-full text-rose-700">Important</span>
                       )}
                     </div>
-                    <p className="text-slate-400 text-sm">{category.shortDesc}</p>
+                    <p className="text-terra-ink-soft text-sm">{category.shortDesc}</p>
                   </div>
                   <div className="text-right">
-                    <Icon name="arrowRight" size={16} className="text-slate-400" />
-                    <p className="text-xs text-slate-500 mt-1">Updated {category.lastUpdated}</p>
+                    <Icon name="arrowRight" size={16} className="text-terra-taupe" />
+                    <p className="text-xs text-terra-taupe mt-1">Updated {category.lastUpdated}</p>
                   </div>
                 </div>
               </button>
@@ -411,14 +411,14 @@ function Housing() {
           >
             <div className="flex items-start gap-4">
               <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
-                <Icon name="document" size={20} className="text-slate-100" />
+                <Icon name="document" size={20} className="text-terra-ink" />
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
-                  <h3 className="font-semibold text-white text-lg">Contract Analyzer</h3>
-                  <span className="glass-chip text-xs px-2 py-0.5 rounded-full text-emerald-100">New</span>
+                  <h3 className="font-semibold text-terra-ink text-lg">Contract Analyzer</h3>
+                  <span className="glass-chip text-xs px-2 py-0.5 rounded-full text-terra-sage">New</span>
                 </div>
-                <p className="text-slate-300 text-sm mb-3">
+                <p className="text-terra-ink-soft text-sm mb-3">
                   Upload your rental contract and our AI will scan for red flags, unusual clauses, and potential issues in seconds.
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -426,7 +426,7 @@ function Housing() {
                   <span className="glass-chip text-xs px-2 py-1 rounded">Free Scan</span>
                   <span className="glass-chip text-xs px-2 py-1 rounded">Lawyer Review Option</span>
                 </div>
-                <span className="text-emerald-200 text-sm mt-3 inline-flex items-center gap-2">
+                <span className="text-terra-sage text-sm mt-3 inline-flex items-center gap-2">
                   Analyze your contract <Icon name="arrowRight" size={14} />
                 </span>
               </div>
@@ -434,14 +434,14 @@ function Housing() {
           </Link>
 
           <div className="glass-panel rounded-2xl p-6">
-            <h3 className="text-lg font-semibold text-white mb-4">What NestQuest Analyzes</h3>
+            <h3 className="text-lg font-semibold text-terra-ink mb-4">What NestQuest Analyzes</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {nestQuestFeatures.map((feature, index) => (
                 <div key={index} className="glass-chip rounded-2xl p-4 flex items-start gap-3">
-                  <Icon name={feature.icon} size={18} className="text-slate-100" />
+                  <Icon name={feature.icon} size={18} className="text-terra-ink" />
                   <div>
-                    <h4 className="font-medium text-white">{feature.title}</h4>
-                    <p className="text-slate-400 text-sm">{feature.desc}</p>
+                    <h4 className="font-medium text-terra-ink">{feature.title}</h4>
+                    <p className="text-terra-ink-soft text-sm">{feature.desc}</p>
                   </div>
                 </div>
               ))}
@@ -453,37 +453,37 @@ function Housing() {
           <header className="glass-panel rounded-3xl p-6">
             <div className="flex items-center gap-3">
               <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
-                <Icon name={activeContent.icon} size={22} className="text-slate-100" />
+                <Icon name={activeContent.icon} size={22} className="text-terra-ink" />
               </div>
               <div>
-                <h1 className="text-3xl font-semibold text-white">{activeContent.title}</h1>
-                <p className="text-slate-400 text-sm">Last updated: {activeContent.lastUpdated}</p>
+                <h1 className="text-3xl font-semibold text-terra-ink">{activeContent.title}</h1>
+                <p className="text-terra-ink-soft text-sm">Last updated: {activeContent.lastUpdated}</p>
               </div>
             </div>
           </header>
 
           <section className="glass-panel rounded-2xl p-5">
-            <h2 className={`text-xl font-semibold mb-3 ${activeContent.isAlert ? 'text-red-200' : 'text-slate-100'}`}>What is it?</h2>
-            <p className="text-slate-300 leading-relaxed">{activeContent.content.whatIsIt}</p>
+            <h2 className={`text-xl font-semibold mb-3 ${activeContent.isAlert ? 'text-rose-700' : 'text-terra-ink'}`}>What is it?</h2>
+            <p className="text-terra-ink leading-relaxed">{activeContent.content.whatIsIt}</p>
           </section>
 
           <section className="glass-panel rounded-2xl p-5">
-            <h2 className={`text-xl font-semibold mb-3 ${activeContent.isAlert ? 'text-red-200' : 'text-slate-100'}`}>Why it matters</h2>
-            <p className="text-slate-300 leading-relaxed">{activeContent.content.whyItMatters}</p>
+            <h2 className={`text-xl font-semibold mb-3 ${activeContent.isAlert ? 'text-rose-700' : 'text-terra-ink'}`}>Why it matters</h2>
+            <p className="text-terra-ink leading-relaxed">{activeContent.content.whyItMatters}</p>
           </section>
 
           <section className="glass-panel rounded-2xl p-5">
-            <h2 className={`text-xl font-semibold mb-3 ${activeContent.isAlert ? 'text-red-200' : 'text-slate-100'}`}>How to do it</h2>
+            <h2 className={`text-xl font-semibold mb-3 ${activeContent.isAlert ? 'text-rose-700' : 'text-terra-ink'}`}>How to do it</h2>
             <div className="space-y-4">
               {activeContent.content.howToDoIt.map((step) => (
                 <div key={step.step} className="glass-chip rounded-2xl p-4">
                   <div className="flex gap-4">
-                    <span className={`w-8 h-8 ${activeContent.isAlert ? 'bg-red-500/70' : 'bg-slate-600/60'} text-white rounded-full flex items-center justify-center font-bold text-sm`}>
+                    <span className={`w-8 h-8 ${activeContent.isAlert ? 'bg-rose-500/80' : 'bg-terra-primary/80'} text-white rounded-full flex items-center justify-center font-bold text-sm`}>
                       {step.step}
                     </span>
                     <div>
-                      <h3 className="font-medium text-white mb-1">{step.title}</h3>
-                      <p className="text-slate-400 text-sm">{step.details}</p>
+                      <h3 className="font-medium text-terra-ink mb-1">{step.title}</h3>
+                      <p className="text-terra-ink-soft text-sm">{step.details}</p>
                     </div>
                   </div>
                 </div>
@@ -492,16 +492,16 @@ function Housing() {
           </section>
 
           <section className="glass-panel rounded-2xl p-5">
-            <h2 className={`text-xl font-semibold mb-3 ${activeContent.isAlert ? 'text-red-200' : 'text-slate-100'}`}>What to do next</h2>
-            <p className="text-slate-300">{activeContent.content.whatNext}</p>
+            <h2 className={`text-xl font-semibold mb-3 ${activeContent.isAlert ? 'text-rose-700' : 'text-terra-ink'}`}>What to do next</h2>
+            <p className="text-terra-ink">{activeContent.content.whatNext}</p>
           </section>
 
           <section className="glass-panel rounded-2xl p-5">
-            <h2 className={`text-xl font-semibold mb-3 ${activeContent.isAlert ? 'text-red-200' : 'text-slate-100'}`}>Pro Tips</h2>
+            <h2 className={`text-xl font-semibold mb-3 ${activeContent.isAlert ? 'text-rose-700' : 'text-terra-ink'}`}>Pro Tips</h2>
             <ul className="space-y-2">
               {activeContent.content.proTips.map((tip, index) => (
-                <li key={index} className="flex gap-2 text-slate-300">
-                  <Icon name={activeContent.isAlert ? 'warning' : 'spark'} size={14} className="text-slate-400" />
+                <li key={index} className="flex gap-2 text-terra-ink">
+                  <Icon name={activeContent.isAlert ? 'warning' : 'spark'} size={14} className="text-terra-taupe" />
                   <span>{tip}</span>
                 </li>
               ))}
@@ -509,7 +509,7 @@ function Housing() {
           </section>
 
           <section className="glass-panel rounded-2xl p-5">
-            <h2 className="text-sm font-semibold text-slate-400 mb-3">Sources and official links</h2>
+            <h2 className="text-sm font-semibold text-terra-ink-soft mb-3">Sources and official links</h2>
             <div className="flex flex-wrap gap-3">
               {activeContent.content.sources.map((source, index) => (
                 <a
@@ -517,7 +517,7 @@ function Housing() {
                   href={source.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-slate-200 hover:text-white underline"
+                  className="text-sm text-terra-ink hover:text-terra-primary underline"
                 >
                   {source.name}
                 </a>
@@ -531,3 +531,4 @@ function Housing() {
 }
 
 export default Housing
+

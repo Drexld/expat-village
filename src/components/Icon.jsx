@@ -255,6 +255,22 @@ const ICONS = {
     viewBox: '0 0 24 24',
     path: 'M12 2 8 4v6c0 5 4 8 4 8s4-3 4-8V4l-4-2zm-4 18-2 2m10-2 2 2',
   },
+  handshake: {
+    viewBox: '0 0 24 24',
+    path: 'm7 12 3 3a2.5 2.5 0 0 0 3.5 0l3-3m-9-4-3 3a2.5 2.5 0 0 0 0 3.5l1.5 1.5m9-8 3 3a2.5 2.5 0 0 1 0 3.5l-1.5 1.5M8 9l2.2-2.2a2.5 2.5 0 0 1 3.5 0L16 9',
+  },
+  mapRoute: {
+    viewBox: '0 0 24 24',
+    path: 'M6 5a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm12 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM6 9c0 4 6 2 6 6s6 2 6 6',
+  },
+  mailbox: {
+    viewBox: '0 0 24 24',
+    path: 'M4 12h16v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6zm0 0 3-6h10l3 6M8 14h4',
+  },
+  bellPin: {
+    viewBox: '0 0 24 24',
+    path: 'M12 3a4 4 0 0 0-4 4v3l-1.5 2.5h11L16 10V7a4 4 0 0 0-4-4zm-2 14a2 2 0 0 0 4 0M12 21s4-4.2 4-7a4 4 0 1 0-8 0c0 2.8 4 7 4 7z',
+  },
 }
 
 function Icon({ name, className = '', size = 20 }) {
@@ -269,7 +285,7 @@ function Icon({ name, className = '', size = 20 }) {
       className={className}
       fill={filled ? 'currentColor' : 'none'}
       stroke={filled ? 'none' : 'currentColor'}
-      strokeWidth="1.7"
+      strokeWidth="1.8"
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"

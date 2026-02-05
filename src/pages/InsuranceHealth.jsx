@@ -286,13 +286,13 @@ function InsuranceHealth() {
       {activeCategory ? (
         <button
           onClick={() => setActiveCategory(null)}
-          className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
+          className="inline-flex items-center gap-2 text-terra-ink-soft hover:text-terra-ink transition-colors"
         >
           <Icon name="arrowLeft" size={16} />
           Back to Insurance and Health
         </button>
       ) : (
-        <Link to="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
+        <Link to="/" className="inline-flex items-center gap-2 text-terra-ink-soft hover:text-terra-ink transition-colors">
           <Icon name="arrowLeft" size={16} />
           Back to Home
         </Link>
@@ -303,11 +303,11 @@ function InsuranceHealth() {
           <header className="glass-panel rounded-3xl p-6">
             <div className="flex items-center gap-3 mb-3">
               <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
-                <Icon name="health" size={22} className="text-slate-100" />
+                <Icon name="health" size={22} className="text-terra-ink" />
               </div>
-              <h1 className="text-3xl font-semibold text-white">Insurance and Health</h1>
+              <h1 className="text-3xl font-semibold text-terra-ink">Insurance and Health</h1>
             </div>
-            <p className="text-slate-400 text-lg">
+            <p className="text-terra-ink-soft text-lg">
               Understanding healthcare in Poland does not have to be confusing. Here is everything you need to stay covered.
             </p>
           </header>
@@ -315,14 +315,14 @@ function InsuranceHealth() {
           <div className="glass-3d rounded-3xl p-6 hover-tilt">
             <div className="flex items-start gap-4">
               <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
-                <Icon name="shield" size={20} className="text-slate-100" />
+                <Icon name="shield" size={20} className="text-terra-ink" />
               </div>
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <h3 className="text-lg font-semibold text-white">Coverage Stack</h3>
-                  <span className="glass-chip text-xs px-2 py-0.5 rounded-full text-slate-100">Recommended</span>
+                  <h3 className="text-lg font-semibold text-terra-ink">Coverage Stack</h3>
+                  <span className="glass-chip text-xs px-2 py-0.5 rounded-full text-terra-primary">Recommended</span>
                 </div>
-                <p className="text-slate-300 text-sm mb-3">
+                <p className="text-terra-ink-soft text-sm mb-3">
                   Most expats use NFZ for major care and private insurance for speed and English-speaking doctors.
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -341,19 +341,19 @@ function InsuranceHealth() {
               <button
                 key={category.id}
                 onClick={() => setActiveCategory(category.id)}
-                className="w-full text-left glass-panel hover-tilt rounded-2xl p-5 transition-all border border-white/10"
+                className="w-full text-left glass-panel hover-tilt rounded-2xl p-5 transition-all border border-terra-taupe/40"
               >
                 <div className="flex items-center gap-4">
                   <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
-                    <Icon name={category.icon} size={20} className="text-slate-100" />
+                    <Icon name={category.icon} size={20} className="text-terra-ink" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-white">{category.title}</h3>
-                    <p className="text-slate-400 text-sm">{category.shortDesc}</p>
+                    <h3 className="text-lg font-semibold text-terra-ink">{category.title}</h3>
+                    <p className="text-terra-ink-soft text-sm">{category.shortDesc}</p>
                   </div>
                   <div className="text-right">
-                    <Icon name="arrowRight" size={16} className="text-slate-400" />
-                    <p className="text-xs text-slate-500 mt-1">Updated {category.lastUpdated}</p>
+                    <Icon name="arrowRight" size={16} className="text-terra-taupe" />
+                    <p className="text-xs text-terra-taupe mt-1">Updated {category.lastUpdated}</p>
                   </div>
                 </div>
               </button>
@@ -361,8 +361,8 @@ function InsuranceHealth() {
           </div>
 
           <div className="glass-panel rounded-2xl p-5">
-            <p className="text-slate-400 text-sm">
-              <strong className="text-slate-200">Tip:</strong> Most expats use a combination of NFZ (for major procedures) and private insurance (for convenience). You do not have to choose just one.
+            <p className="text-terra-ink-soft text-sm">
+              <strong className="text-terra-ink">Tip:</strong> Most expats use a combination of NFZ (for major procedures) and private insurance (for convenience). You do not have to choose just one.
             </p>
           </div>
         </>
@@ -371,37 +371,37 @@ function InsuranceHealth() {
           <header className="glass-panel rounded-3xl p-6">
             <div className="flex items-center gap-3">
               <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
-                <Icon name={activeContent.icon} size={22} className="text-slate-100" />
+                <Icon name={activeContent.icon} size={22} className="text-terra-ink" />
               </div>
               <div>
-                <h1 className="text-3xl font-semibold text-white">{activeContent.title}</h1>
-                <p className="text-slate-400 text-sm">Last updated: {activeContent.lastUpdated}</p>
+                <h1 className="text-3xl font-semibold text-terra-ink">{activeContent.title}</h1>
+                <p className="text-terra-ink-soft text-sm">Last updated: {activeContent.lastUpdated}</p>
               </div>
             </div>
           </header>
 
           <section className="glass-panel rounded-2xl p-5">
-            <h2 className="text-xl font-semibold text-slate-100 mb-3">What is it?</h2>
-            <p className="text-slate-300 leading-relaxed">{activeContent.content.whatIsIt}</p>
+            <h2 className="text-xl font-semibold text-terra-ink mb-3">What is it?</h2>
+            <p className="text-terra-ink leading-relaxed">{activeContent.content.whatIsIt}</p>
           </section>
 
           <section className="glass-panel rounded-2xl p-5">
-            <h2 className="text-xl font-semibold text-slate-100 mb-3">Why it matters</h2>
-            <p className="text-slate-300 leading-relaxed">{activeContent.content.whyItMatters}</p>
+            <h2 className="text-xl font-semibold text-terra-ink mb-3">Why it matters</h2>
+            <p className="text-terra-ink leading-relaxed">{activeContent.content.whyItMatters}</p>
           </section>
 
           <section className="glass-panel rounded-2xl p-5">
-            <h2 className="text-xl font-semibold text-slate-100 mb-3">How to do it</h2>
+            <h2 className="text-xl font-semibold text-terra-ink mb-3">How to do it</h2>
             <div className="space-y-4">
               {activeContent.content.howToDoIt.map((step) => (
                 <div key={step.step} className="glass-chip rounded-2xl p-4">
                   <div className="flex gap-4">
-                    <span className="w-8 h-8 bg-slate-600/60 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                    <span className="w-8 h-8 bg-terra-primary/80 text-white rounded-full flex items-center justify-center font-bold text-sm">
                       {step.step}
                     </span>
                     <div>
-                      <h3 className="font-semibold text-white mb-1">{step.title}</h3>
-                      <p className="text-slate-400 text-sm leading-relaxed">{step.details}</p>
+                      <h3 className="font-semibold text-terra-ink mb-1">{step.title}</h3>
+                      <p className="text-terra-ink-soft text-sm leading-relaxed">{step.details}</p>
                     </div>
                   </div>
                 </div>
@@ -410,16 +410,16 @@ function InsuranceHealth() {
           </section>
 
           <section className="glass-panel rounded-2xl p-5">
-            <h2 className="text-xl font-semibold text-slate-100 mb-3">What to do next</h2>
-            <p className="text-slate-300 leading-relaxed">{activeContent.content.whatNext}</p>
+            <h2 className="text-xl font-semibold text-terra-ink mb-3">What to do next</h2>
+            <p className="text-terra-ink leading-relaxed">{activeContent.content.whatNext}</p>
           </section>
 
           <section className="glass-panel rounded-2xl p-5">
-            <h2 className="text-xl font-semibold text-slate-100 mb-3">Pro Tips</h2>
+            <h2 className="text-xl font-semibold text-terra-ink mb-3">Pro Tips</h2>
             <ul className="space-y-2">
               {activeContent.content.proTips.map((tip, index) => (
-                <li key={index} className="flex gap-2 text-slate-300">
-                  <Icon name="spark" size={14} className="text-slate-400" />
+                <li key={index} className="flex gap-2 text-terra-ink">
+                  <Icon name="spark" size={14} className="text-terra-taupe" />
                   <span>{tip}</span>
                 </li>
               ))}
@@ -427,7 +427,7 @@ function InsuranceHealth() {
           </section>
 
           <section className="glass-panel rounded-2xl p-5">
-            <h2 className="text-sm font-semibold text-slate-400 mb-3">Sources and official links</h2>
+            <h2 className="text-sm font-semibold text-terra-ink-soft mb-3">Sources and official links</h2>
             <div className="flex flex-wrap gap-3">
               {activeContent.content.sources.map((source, index) => (
                 <a
@@ -435,7 +435,7 @@ function InsuranceHealth() {
                   href={source.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-slate-200 hover:text-white underline"
+                  className="text-sm text-terra-ink hover:text-terra-primary underline"
                 >
                   {source.name}
                 </a>
@@ -449,3 +449,4 @@ function InsuranceHealth() {
 }
 
 export default InsuranceHealth
+

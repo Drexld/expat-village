@@ -26,7 +26,7 @@ function PremiumGate({
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="w-6 h-6 border-2 border-slate-500/40 border-t-slate-200 rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-terra-taupe/60 border-t-terra-primary rounded-full animate-spin" />
       </div>
     )
   }
@@ -50,43 +50,45 @@ function PremiumGate({
         className="absolute -top-16 -right-10 h-40 w-40 rounded-full opacity-25"
         style={{
           background: isPremium
-            ? 'radial-gradient(circle, rgba(242,143,123,0.7), transparent 70%)'
-            : 'radial-gradient(circle, rgba(242,166,90,0.6), transparent 70%)',
+            ? 'radial-gradient(circle, rgba(199,107,85,0.7), transparent 70%)'
+            : 'radial-gradient(circle, rgba(210,160,115,0.6), transparent 70%)',
         }}
       />
 
       <div className="relative flex flex-col items-center gap-3">
         <div className="glass-panel flex h-14 w-14 items-center justify-center rounded-2xl">
-          <Icon name={isPremium ? 'crown' : 'star'} size={26} className="text-slate-100" />
+          <Icon name={isPremium ? 'crown' : 'star'} size={26} className="text-terra-primary" />
         </div>
 
-        <h3 className="text-xl font-semibold text-white">
+        <h3 className="text-xl font-semibold text-terra-ink">
           {isPremium ? 'Premium Feature' : 'Basic Feature'}
         </h3>
 
-        <p className="text-sm text-slate-300">
+        <p className="text-sm text-terra-ink-soft">
           {feature} requires a {isPremium ? 'Premium' : 'Basic'} subscription.
         </p>
 
         {isAuthenticated ? (
           <Link
             to="/pricing"
-            className="glass-chip inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white transition hover:text-white"
+            className="inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-terra-bg transition hover-tilt"
+            style={{ background: 'linear-gradient(135deg, #C76B55, #D07C63)' }}
           >
             Upgrade to {isPremium ? 'Premium' : 'Basic'}
-            <Icon name="arrowRight" size={16} className="text-slate-200" />
+            <Icon name="arrowRight" size={16} className="text-terra-bg" />
           </Link>
         ) : (
           <button
             onClick={() => openAuthModal('sign_up')}
-            className="glass-chip inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white transition hover:text-white"
+            className="inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-terra-bg transition hover-tilt"
+            style={{ background: 'linear-gradient(135deg, #C76B55, #D07C63)' }}
           >
             Sign up to unlock
-            <Icon name="arrowRight" size={16} className="text-slate-200" />
+            <Icon name="arrowRight" size={16} className="text-terra-bg" />
           </button>
         )}
 
-        <p className="text-xs text-slate-400">
+        <p className="text-xs text-terra-taupe">
           Starting at EUR 9/month. Cancel anytime.
         </p>
       </div>

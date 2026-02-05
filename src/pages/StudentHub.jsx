@@ -113,20 +113,20 @@ function StudentHub() {
 
   const getColorClass = (color) => {
     const colors = {
-      blue: 'bg-sky-500/80',
-      green: 'bg-emerald-500/80',
+      blue: 'bg-terra-sage',
+      green: 'bg-terra-primary',
       red: 'bg-rose-500/80',
       orange: 'bg-amber-500/80',
-      purple: 'bg-violet-500/80',
+      purple: 'bg-terra-taupe/70',
     }
-    return colors[color] || 'bg-slate-600'
+    return colors[color] || 'bg-terra-cream/60'
   }
 
   return (
     <div className="min-h-screen space-y-8">
       <Link
         to="/town-hall"
-        className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
+        className="inline-flex items-center gap-2 text-terra-ink-soft hover:text-terra-ink transition-colors"
       >
         <Icon name="arrowLeft" size={16} />
         Back to Town Hall
@@ -135,11 +135,11 @@ function StudentHub() {
       <header className="glass-panel rounded-3xl p-6">
         <div className="flex items-center gap-3 mb-3">
           <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
-            <Icon name="graduation" size={22} className="text-slate-100" />
+            <Icon name="graduation" size={22} className="text-terra-ink" />
           </div>
           <div>
-            <h1 className="text-3xl font-semibold text-white">Student Hub</h1>
-            <p className="text-slate-400">Connect with students across Polish universities</p>
+            <h1 className="text-3xl font-semibold text-terra-ink">Student Hub</h1>
+            <p className="text-terra-ink-soft">Connect with students across Polish universities</p>
           </div>
         </div>
       </header>
@@ -147,20 +147,20 @@ function StudentHub() {
       <div className="glass-3d rounded-3xl p-6 hover-tilt">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
           <div>
-            <p className="text-2xl font-semibold text-white">4,839</p>
-            <p className="text-slate-400 text-sm">Students</p>
+            <p className="text-2xl font-semibold text-terra-ink">4,839</p>
+            <p className="text-terra-ink-soft text-sm">Students</p>
           </div>
           <div>
-            <p className="text-2xl font-semibold text-white">12</p>
-            <p className="text-slate-400 text-sm">Universities</p>
+            <p className="text-2xl font-semibold text-terra-ink">12</p>
+            <p className="text-terra-ink-soft text-sm">Universities</p>
           </div>
           <div>
-            <p className="text-2xl font-semibold text-white">47</p>
-            <p className="text-slate-400 text-sm">Countries</p>
+            <p className="text-2xl font-semibold text-terra-ink">47</p>
+            <p className="text-terra-ink-soft text-sm">Countries</p>
           </div>
           <div>
-            <p className="text-2xl font-semibold text-white">156</p>
-            <p className="text-slate-400 text-sm">Looking for Rooms</p>
+            <p className="text-2xl font-semibold text-terra-ink">156</p>
+            <p className="text-terra-ink-soft text-sm">Looking for Rooms</p>
           </div>
         </div>
       </div>
@@ -177,8 +177,8 @@ function StudentHub() {
             onClick={() => setActiveTab(tab.id)}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
               activeTab === tab.id
-                ? 'bg-white/15 text-white border border-white/20'
-                : 'bg-slate-900/40 text-slate-400 border border-white/10 hover:text-white'
+                ? 'bg-terra-primary/15 text-terra-ink border border-terra-primary/30'
+                : 'bg-terra-cream/70 text-terra-ink-soft border border-terra-taupe/40 hover:text-terra-ink'
             }`}
           >
             {tab.label}
@@ -189,44 +189,44 @@ function StudentHub() {
       {activeTab === 'universities' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-white">Find Your University</h2>
-            <span className="text-slate-400 text-sm">Click to join your uni community</span>
+            <h2 className="text-xl font-semibold text-terra-ink">Find Your University</h2>
+            <span className="text-terra-ink-soft text-sm">Click to join your uni community</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {universities.map((uni) => (
               <button
                 key={uni.id}
-                className="glass-panel hover-tilt rounded-2xl p-5 text-left transition-all border border-white/10"
+                className="glass-panel hover-tilt rounded-2xl p-5 text-left transition-all border border-terra-taupe/40"
               >
                 <div className="flex items-start gap-4">
                   <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
-                    <Icon name={uni.icon} size={20} className="text-slate-100" />
+                    <Icon name={uni.icon} size={20} className="text-terra-ink" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold text-white">{uni.shortName}</h3>
+                      <h3 className="font-semibold text-terra-ink">{uni.shortName}</h3>
                       <span className={`text-xs px-2 py-0.5 rounded-full ${getColorClass(uni.color)} text-white`}>
                         {uni.city}
                       </span>
                     </div>
-                    <p className="text-slate-400 text-sm mb-2">{uni.name}</p>
+                    <p className="text-terra-ink-soft text-sm mb-2">{uni.name}</p>
                     <div className="flex items-center gap-2">
-                      <span className="text-emerald-200 text-sm font-medium">{uni.students}</span>
-                      <span className="text-slate-500 text-sm">students in Village</span>
+                      <span className="text-terra-sage text-sm font-medium">{uni.students}</span>
+                      <span className="text-terra-taupe text-sm">students in Village</span>
                     </div>
                   </div>
-                  <Icon name="arrowRight" size={16} className="text-slate-400" />
+                  <Icon name="arrowRight" size={16} className="text-terra-taupe" />
                 </div>
               </button>
             ))}
           </div>
 
-          <div className="glass-panel rounded-2xl p-6 text-center border border-dashed border-white/10">
+          <div className="glass-panel rounded-2xl p-6 text-center border border-dashed border-terra-taupe/40">
             <div className="glass-panel inline-flex h-12 w-12 items-center justify-center rounded-2xl mb-2">
-              <Icon name="spark" size={18} className="text-slate-100" />
+              <Icon name="spark" size={18} className="text-terra-ink" />
             </div>
-            <p className="text-slate-400 mb-3">Do not see your university?</p>
-            <button className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/20">
+            <p className="text-terra-ink-soft mb-3">Do not see your university?</p>
+            <button className="rounded-full bg-terra-primary px-4 py-2 text-sm font-medium text-white shadow-glass transition-colors hover:opacity-95">
               Add Your University
             </button>
           </div>
@@ -236,34 +236,34 @@ function StudentHub() {
       {activeTab === 'roommates' && (
         <div className="space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-white">Find Roommates and Housing</h2>
-            <button className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/20">
+            <h2 className="text-xl font-semibold text-terra-ink">Find Roommates and Housing</h2>
+            <button className="rounded-full bg-terra-primary px-4 py-2 text-sm font-medium text-white shadow-glass transition-colors hover:opacity-95">
               Post Listing
             </button>
           </div>
-          <p className="text-slate-400 text-sm">
+          <p className="text-terra-ink-soft text-sm">
             Verified students looking for rooms, flatmates, or apartments. Safer than random Facebook posts.
           </p>
 
           <div className="space-y-4">
             {roommateListings.map((listing) => (
-              <div key={listing.id} className="glass-panel rounded-2xl p-5 border border-white/10">
+              <div key={listing.id} className="glass-panel rounded-2xl p-5 border border-terra-taupe/40">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-full">
-                      <Icon name="user" size={18} className="text-slate-100" />
+                      <Icon name="user" size={18} className="text-terra-ink" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-white">{listing.name}, {listing.age}</h3>
+                        <h3 className="font-semibold text-terra-ink">{listing.name}, {listing.age}</h3>
                         {listing.verified && (
-                          <span className="glass-chip text-xs px-2 py-0.5 rounded-full text-emerald-100">Verified</span>
+                          <span className="glass-chip text-xs px-2 py-0.5 rounded-full text-terra-sage">Verified</span>
                         )}
                       </div>
-                      <p className="text-slate-400 text-sm">{listing.university} - {listing.program}</p>
+                      <p className="text-terra-ink-soft text-sm">{listing.university} - {listing.program}</p>
                     </div>
                   </div>
-                  <span className="text-slate-500 text-xs">{listing.posted}</span>
+                  <span className="text-terra-taupe text-xs">{listing.posted}</span>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
@@ -274,13 +274,13 @@ function StudentHub() {
                     { label: 'Move in', value: listing.moveIn }
                   ].map((item) => (
                     <div key={item.label} className="glass-chip rounded-lg p-2">
-                      <p className="text-slate-500 text-xs">{item.label}</p>
-                      <p className="text-white text-sm font-medium capitalize">{item.value}</p>
+                      <p className="text-terra-taupe text-xs">{item.label}</p>
+                      <p className="text-terra-ink text-sm font-medium capitalize">{item.value}</p>
                     </div>
                   ))}
                 </div>
 
-                <p className="text-slate-300 text-sm mb-3">{listing.about}</p>
+                <p className="text-terra-ink text-sm mb-3">{listing.about}</p>
 
                 <div className="flex items-center justify-between">
                   <div className="flex gap-2">
@@ -290,7 +290,7 @@ function StudentHub() {
                       </span>
                     ))}
                   </div>
-                  <button className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/20">
+                  <button className="rounded-full bg-terra-primary px-4 py-2 text-sm font-medium text-white shadow-glass transition-colors hover:opacity-95">
                     Contact
                   </button>
                 </div>
@@ -298,16 +298,16 @@ function StudentHub() {
             ))}
           </div>
 
-          <div className="glass-panel rounded-2xl p-4 border border-amber-500/30">
+          <div className="glass-panel rounded-2xl p-4 border border-amber-300/60">
             <div className="flex items-start gap-3">
               <div className="glass-panel flex h-10 w-10 items-center justify-center rounded-xl">
-                <Icon name="warning" size={18} className="text-amber-200" />
+                <Icon name="warning" size={18} className="text-amber-600" />
               </div>
               <div>
-                <h4 className="font-medium text-amber-200 mb-1">Safety First</h4>
-                <p className="text-slate-400 text-sm">
+                <h4 className="font-medium text-amber-700 mb-1">Safety First</h4>
+                <p className="text-terra-ink-soft text-sm">
                   Always meet in public first. Verify student status. Do not send money before seeing the place.
-                  Use our <Link to="/contract-analyzer" className="text-emerald-200 hover:underline">Contract Analyzer</Link> before signing.
+                  Use our <Link to="/contract-analyzer" className="text-terra-sage hover:underline">Contract Analyzer</Link> before signing.
                 </p>
               </div>
             </div>
@@ -318,8 +318,8 @@ function StudentHub() {
       {activeTab === 'discounts' && (
         <div className="space-y-6">
           <div>
-            <h2 className="text-xl font-semibold text-white">Student Discounts in Poland</h2>
-            <p className="text-slate-400 text-sm">
+            <h2 className="text-xl font-semibold text-terra-ink">Student Discounts in Poland</h2>
+            <p className="text-terra-ink-soft text-sm">
               Save money with your student status. Most require valid student ID or ISIC card.
             </p>
           </div>
@@ -330,23 +330,23 @@ function StudentHub() {
 
             return (
               <div key={category} className="space-y-3">
-                <h3 className="text-lg font-semibold text-white">{category}</h3>
+                <h3 className="text-lg font-semibold text-terra-ink">{category}</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {categoryDiscounts.map((discount) => (
-                    <div key={discount.id} className="glass-panel rounded-2xl p-4 border border-white/10">
+                    <div key={discount.id} className="glass-panel rounded-2xl p-4 border border-terra-taupe/40">
                       <div className="flex items-start gap-3">
                         <div className="glass-panel flex h-10 w-10 items-center justify-center rounded-xl">
-                          <Icon name={discount.icon} size={18} className="text-slate-100" />
+                          <Icon name={discount.icon} size={18} className="text-terra-ink" />
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
-                            <h4 className="font-medium text-white">{discount.name}</h4>
-                            <span className="glass-chip text-xs px-2 py-0.5 rounded-full text-emerald-100">
+                            <h4 className="font-medium text-terra-ink">{discount.name}</h4>
+                            <span className="glass-chip text-xs px-2 py-0.5 rounded-full text-terra-sage">
                               {discount.discount}
                             </span>
                           </div>
-                          <p className="text-slate-400 text-sm mb-2">{discount.description}</p>
-                          <p className="text-slate-500 text-xs">{discount.requirements}</p>
+                          <p className="text-terra-ink-soft text-sm mb-2">{discount.description}</p>
+                          <p className="text-terra-taupe text-xs">{discount.requirements}</p>
                         </div>
                       </div>
                     </div>
@@ -359,14 +359,14 @@ function StudentHub() {
           <div className="glass-3d rounded-3xl p-6 hover-tilt">
             <div className="flex items-start gap-4">
               <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
-                <Icon name="badge" size={20} className="text-slate-100" />
+                <Icon name="badge" size={20} className="text-terra-ink" />
               </div>
               <div>
-                <h3 className="font-semibold text-white mb-1">Get Your ISIC Card</h3>
-                <p className="text-slate-300 text-sm mb-3">
+                <h3 className="font-semibold text-terra-ink mb-1">Get Your ISIC Card</h3>
+                <p className="text-terra-ink-soft text-sm mb-3">
                   International Student Identity Card - recognized worldwide. Get discounts on travel, software, entertainment and more in 130+ countries.
                 </p>
-                <button className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/20">
+                <button className="rounded-full bg-terra-primary px-4 py-2 text-sm font-medium text-white shadow-glass transition-colors hover:opacity-95">
                   Apply for ISIC
                 </button>
               </div>
@@ -378,33 +378,33 @@ function StudentHub() {
       {activeTab === 'groups' && (
         <div className="space-y-4">
           <div>
-            <h2 className="text-xl font-semibold text-white">Student Communities</h2>
-            <p className="text-slate-400 text-sm">
+            <h2 className="text-xl font-semibold text-terra-ink">Student Communities</h2>
+            <p className="text-terra-ink-soft text-sm">
               Find your people. Join groups based on your background, field, or interests.
             </p>
           </div>
 
           <div className="space-y-3">
             {studentGroups.map((group) => (
-              <div key={group.id} className="glass-panel rounded-2xl p-5 border border-white/10">
+              <div key={group.id} className="glass-panel rounded-2xl p-5 border border-terra-taupe/40">
                 <div className="flex items-center gap-4">
                   <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
-                    <Icon name={group.icon} size={20} className="text-slate-100" />
+                    <Icon name={group.icon} size={20} className="text-terra-ink" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold text-white">{group.name}</h3>
+                      <h3 className="font-semibold text-terra-ink">{group.name}</h3>
                       {group.active && (
-                        <span className="w-2 h-2 bg-emerald-400 rounded-full" />
+                        <span className="w-2 h-2 bg-terra-sage rounded-full" />
                       )}
                     </div>
-                    <p className="text-slate-400 text-sm">{group.description}</p>
+                    <p className="text-terra-ink-soft text-sm">{group.description}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-emerald-200 font-semibold">{group.members.toLocaleString()}</p>
-                    <p className="text-slate-500 text-xs">members</p>
+                    <p className="text-terra-sage font-semibold">{group.members.toLocaleString()}</p>
+                    <p className="text-terra-taupe text-xs">members</p>
                   </div>
-                  <button className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/20">
+                  <button className="rounded-full bg-terra-primary px-4 py-2 text-sm font-medium text-white shadow-glass transition-colors hover:opacity-95">
                     Join
                   </button>
                 </div>
@@ -412,12 +412,12 @@ function StudentHub() {
             ))}
           </div>
 
-          <div className="glass-panel rounded-2xl p-6 text-center border border-dashed border-white/10">
+          <div className="glass-panel rounded-2xl p-6 text-center border border-dashed border-terra-taupe/40">
             <div className="glass-panel inline-flex h-12 w-12 items-center justify-center rounded-2xl mb-2">
-              <Icon name="spark" size={18} className="text-slate-100" />
+              <Icon name="spark" size={18} className="text-terra-ink" />
             </div>
-            <p className="text-slate-400 mb-3">Start a community for your country, program, or interest.</p>
-            <button className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/20">
+            <p className="text-terra-ink-soft mb-3">Start a community for your country, program, or interest.</p>
+            <button className="rounded-full bg-terra-primary px-4 py-2 text-sm font-medium text-white shadow-glass transition-colors hover:opacity-95">
               Create Group
             </button>
           </div>
@@ -427,26 +427,26 @@ function StudentHub() {
       <div className="glass-panel rounded-2xl p-6">
         <div className="flex items-start gap-4">
           <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
-            <Icon name="calendar" size={20} className="text-slate-100" />
+            <Icon name="calendar" size={20} className="text-terra-ink" />
           </div>
           <div className="flex-1">
-            <h3 className="font-semibold text-white mb-2">Upcoming Student Events</h3>
+            <h3 className="font-semibold text-terra-ink mb-2">Upcoming Student Events</h3>
             <div className="space-y-2 text-sm">
               <div className="flex items-center justify-between">
-                <span className="text-slate-300">Erasmus Welcome Party at SGH</span>
-                <span className="text-slate-500">Feb 15</span>
+                <span className="text-terra-ink">Erasmus Welcome Party at SGH</span>
+                <span className="text-terra-taupe">Feb 15</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-slate-300">African Students Meetup</span>
-                <span className="text-slate-500">Feb 22</span>
+                <span className="text-terra-ink">African Students Meetup</span>
+                <span className="text-terra-taupe">Feb 22</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-slate-300">Career Fair at University of Warsaw</span>
-                <span className="text-slate-500">Mar 5</span>
+                <span className="text-terra-ink">Career Fair at University of Warsaw</span>
+                <span className="text-terra-taupe">Mar 5</span>
               </div>
             </div>
           </div>
-          <button className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/20">
+          <button className="rounded-full bg-terra-primary px-4 py-2 text-sm font-medium text-white shadow-glass transition-colors hover:opacity-95">
             See All Events
           </button>
         </div>
@@ -456,3 +456,4 @@ function StudentHub() {
 }
 
 export default StudentHub
+

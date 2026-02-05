@@ -138,27 +138,27 @@ function Alerts() {
     switch (type) {
       case 'urgent':
         return {
-          border: 'border-red-500/30',
-          badge: 'bg-red-500/80',
-          accent: 'text-red-200',
+          border: 'border-red-400/40',
+          badge: 'bg-red-500/80 text-terra-bg',
+          accent: 'text-red-700',
           icon: 'alert',
-          panel: 'glass-3d'
+          panel: 'action-card texture-layer texture-paper'
         }
       case 'important':
         return {
-          border: 'border-amber-400/30',
-          badge: 'bg-amber-400/80',
-          accent: 'text-amber-200',
+          border: 'border-amber-400/40',
+          badge: 'bg-amber-400/80 text-terra-bg',
+          accent: 'text-amber-700',
           icon: 'warning',
-          panel: 'glass-panel'
+          panel: 'action-card texture-layer texture-paper'
         }
       default:
         return {
-          border: 'border-white/10',
-          badge: 'bg-slate-500/70',
-          accent: 'text-slate-200',
+          border: 'border-black/10',
+          badge: 'bg-terra-taupe/80 text-terra-bg',
+          accent: 'text-terra-ink',
           icon: 'info',
-          panel: 'glass-panel'
+          panel: 'action-card texture-layer texture-paper'
         }
     }
   }
@@ -171,32 +171,32 @@ function Alerts() {
     <div className="min-h-screen space-y-8">
       <Link
         to="/"
-        className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
+        className="inline-flex items-center gap-2 text-terra-ink-soft hover:text-terra-ink transition-colors"
       >
         <Icon name="arrowLeft" size={16} />
         Back to Home
       </Link>
 
-      <header className="glass-panel rounded-3xl p-6">
+      <header className="hero-card texture-layer texture-paper texture-amber">
         <div className="flex items-center gap-4">
-          <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
-            <Icon name="bell" size={22} className="text-slate-100" />
+          <div className="glass-3d flex h-12 w-12 items-center justify-center rounded-2xl">
+            <Icon name="bell" size={22} className="text-terra-ink" />
           </div>
           <div>
-            <h1 className="text-3xl font-semibold text-white">Alerts</h1>
-            <p className="text-slate-400">Policy updates, deadlines, and important news for expats</p>
+            <h1 className="text-3xl font-semibold text-terra-ink">Alerts</h1>
+            <p className="text-terra-ink-soft">Policy updates, deadlines, and important news for expats</p>
           </div>
         </div>
       </header>
 
-      <section className="glass-strong rounded-3xl p-6">
+      <section className="hero-card texture-layer texture-paper texture-photo">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
           <div>
-            <h2 className="text-lg font-semibold text-white">Get Alerts That Matter</h2>
-            <p className="text-slate-400 text-sm">Subscribe to topics and never miss important updates</p>
+            <h2 className="text-lg font-semibold text-terra-ink">Get Alerts That Matter</h2>
+            <p className="text-terra-ink-soft text-sm">Subscribe to topics and never miss important updates</p>
           </div>
           <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
-            <Icon name="update" size={20} className="text-slate-200" />
+            <Icon name="update" size={20} className="text-terra-ink" />
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -206,34 +206,34 @@ function Alerts() {
               onClick={() => toggleSubscription(filter.id)}
               className={`glass-chip flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
                 subscribedTopics.includes(filter.id)
-                  ? 'text-white ring-1 ring-white/20'
-                  : 'text-slate-300 hover:text-white'
+                  ? 'text-terra-ink ring-1 ring-terra-primary/30'
+                  : 'text-terra-ink-soft hover:text-terra-ink'
               }`}
             >
-              <Icon name={filter.icon} size={14} className="text-slate-200" />
+              <Icon name={filter.icon} size={14} className="text-terra-ink" />
               <span>{filter.name}</span>
-              {subscribedTopics.includes(filter.id) && <Icon name="success" size={12} className="text-emerald-300" />}
+              {subscribedTopics.includes(filter.id) && <Icon name="success" size={12} className="text-terra-sage" />}
             </button>
           ))}
         </div>
-        <p className="text-slate-500 text-xs mt-3">
+        <p className="text-terra-taupe text-xs mt-3">
           Subscribed topics will be sent to your email.
-          <button className="text-slate-300 hover:underline ml-1">Manage notification settings</button>
+          <button className="text-terra-ink hover:underline ml-1">Manage notification settings</button>
         </p>
       </section>
 
       <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="glass-panel rounded-2xl p-4 text-center">
-          <p className="text-2xl font-semibold text-red-200">{alerts.filter(a => a.type === 'urgent').length}</p>
-          <p className="text-slate-400 text-sm">Urgent Alerts</p>
+        <div className="action-card texture-layer texture-paper text-center">
+          <p className="text-2xl font-semibold text-red-700">{alerts.filter(a => a.type === 'urgent').length}</p>
+          <p className="text-terra-taupe text-sm">Urgent Alerts</p>
         </div>
-        <div className="glass-panel rounded-2xl p-4 text-center">
-          <p className="text-2xl font-semibold text-white">{alerts.length}</p>
-          <p className="text-slate-400 text-sm">This Month</p>
+        <div className="action-card texture-layer texture-paper text-center">
+          <p className="text-2xl font-semibold text-terra-ink">{alerts.length}</p>
+          <p className="text-terra-taupe text-sm">This Month</p>
         </div>
-        <div className="glass-panel rounded-2xl p-4 text-center">
-          <p className="text-2xl font-semibold text-emerald-200">{subscribedTopics.length}</p>
-          <p className="text-slate-400 text-sm">Subscribed Topics</p>
+        <div className="action-card texture-layer texture-paper text-center">
+          <p className="text-2xl font-semibold text-terra-sage">{subscribedTopics.length}</p>
+          <p className="text-terra-taupe text-sm">Subscribed Topics</p>
         </div>
       </section>
 
@@ -244,14 +244,14 @@ function Alerts() {
             onClick={() => setActiveFilter(filter.id)}
             className={`glass-chip flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
               activeFilter === filter.id
-                ? 'text-white ring-1 ring-white/20'
-                : 'text-slate-400 hover:text-white'
+                ? 'text-terra-ink ring-1 ring-terra-primary/30'
+                : 'text-terra-ink-soft hover:text-terra-ink'
             }`}
           >
-            <Icon name={filter.icon} size={14} className="text-slate-200" />
+            <Icon name={filter.icon} size={14} className="text-terra-ink" />
             <span className="text-sm">{filter.name}</span>
             {filter.id !== 'all' && (
-              <span className="text-xs bg-white/10 px-1.5 py-0.5 rounded">
+              <span className="text-xs bg-terra-cream px-1.5 py-0.5 rounded">
                 {alerts.filter(a => a.category === filter.id).length}
               </span>
             )}
@@ -270,22 +270,22 @@ function Alerts() {
               <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
                 <div className="flex items-start gap-3">
                   <div className="glass-panel flex h-10 w-10 items-center justify-center rounded-xl">
-                    <Icon name={styles.icon} size={18} className="text-slate-200" />
+                    <Icon name={styles.icon} size={18} className="text-terra-ink" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="font-semibold text-white">{alert.title}</h3>
-                      <span className={`text-xs ${styles.badge} text-white px-2 py-0.5 rounded-full capitalize`}>
+                      <h3 className="font-semibold text-terra-ink">{alert.title}</h3>
+                      <span className={`text-xs ${styles.badge} px-2 py-0.5 rounded-full capitalize`}>
                         {alert.type}
                       </span>
                       {alert.actionRequired && (
-                        <span className="text-xs bg-red-600/80 text-white px-2 py-0.5 rounded-full">
+                        <span className="text-xs bg-red-600/80 text-terra-bg px-2 py-0.5 rounded-full">
                           Action Required
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-2 mt-1 text-xs text-slate-500">
-                      <Icon name={getCategoryIcon(alert.category)} size={12} className="text-slate-400" />
+                    <div className="flex items-center gap-2 mt-1 text-xs text-terra-taupe">
+                      <Icon name={getCategoryIcon(alert.category)} size={12} className="text-terra-taupe" />
                       <span>{filters.find(f => f.id === alert.category)?.name}</span>
                       <span>|</span>
                       <span>{alert.date}</span>
@@ -293,29 +293,29 @@ function Alerts() {
                   </div>
                 </div>
                 {alert.verified && (
-                  <span className="text-xs bg-emerald-500/80 text-white px-2 py-1 rounded-full flex items-center gap-1">
-                    <Icon name="success" size={12} className="text-white" />
+                  <span className="text-xs bg-terra-sage/80 text-terra-bg px-2 py-1 rounded-full flex items-center gap-1">
+                    <Icon name="success" size={12} className="text-terra-bg" />
                     Verified
                   </span>
                 )}
               </div>
 
-              <p className="text-slate-300 mb-4">{alert.summary}</p>
+              <p className="text-terra-ink-soft mb-4">{alert.summary}</p>
 
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500">
+                <div className="flex flex-wrap items-center gap-4 text-xs text-terra-taupe">
                   <span className="flex items-center gap-1">
-                    <Icon name="document" size={12} className="text-slate-500" />
+                    <Icon name="document" size={12} className="text-terra-taupe" />
                     Source: {alert.source}
                   </span>
                   <span className="flex items-center gap-1">
-                    <Icon name="community" size={12} className="text-slate-500" />
+                    <Icon name="community" size={12} className="text-terra-taupe" />
                     {alert.affectedUsers}
                   </span>
                 </div>
-                <button className="text-slate-200 hover:text-white text-sm font-medium inline-flex items-center gap-2">
+                <button className="text-terra-ink hover:text-terra-primary text-sm font-medium inline-flex items-center gap-2">
                   Read more
-                  <Icon name="arrowRight" size={14} className="text-slate-300" />
+                  <Icon name="arrowRight" size={14} className="text-terra-primary" />
                 </button>
               </div>
             </div>
@@ -324,40 +324,40 @@ function Alerts() {
       </section>
 
       {filteredAlerts.length === 0 && (
-        <div className="glass-panel rounded-2xl p-8 text-center">
-          <Icon name="info" size={28} className="text-slate-300 mx-auto mb-3" />
-          <p className="text-slate-400">No alerts in this category right now.</p>
+        <div className="action-card texture-layer texture-paper rounded-2xl p-8 text-center">
+          <Icon name="info" size={28} className="text-terra-ink mx-auto mb-3" />
+          <p className="text-terra-ink-soft">No alerts in this category right now.</p>
         </div>
       )}
 
-      <section className="glass-panel rounded-2xl p-6 text-center">
+      <section className="action-card texture-layer texture-paper rounded-2xl p-6 text-center">
         <div className="glass-panel mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl">
-          <Icon name="spark" size={20} className="text-slate-100" />
+          <Icon name="spark" size={20} className="text-terra-ink" />
         </div>
-        <h3 className="text-white font-semibold mb-2">Know about an important update?</h3>
-        <p className="text-slate-400 text-sm mb-4">
+        <h3 className="text-terra-ink font-semibold mb-2">Know about an important update?</h3>
+        <p className="text-terra-ink-soft text-sm mb-4">
           Help the community by submitting alerts. Our team verifies all submissions.
         </p>
-        <button className="glass-chip text-white px-6 py-2 rounded-lg transition-colors">
+        <button className="text-terra-bg px-6 py-2 rounded-lg transition-colors hover-tilt" style={{ background: 'linear-gradient(135deg, #C76B55, #D07C63)' }}>
           Submit an Alert
         </button>
       </section>
 
-      <section className="glass-strong rounded-2xl p-6">
+      <section className="hero-card texture-layer texture-paper texture-amber">
         <div className="flex items-start gap-4">
           <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
-            <Icon name="bolt" size={20} className="text-slate-100" />
+            <Icon name="bolt" size={20} className="text-terra-ink" />
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
-              <h3 className="text-white font-semibold">Premium Alerts</h3>
-              <span className="text-xs bg-white/10 text-slate-100 px-2 py-0.5 rounded-full">Coming Soon</span>
+              <h3 className="text-terra-ink font-semibold">Premium Alerts</h3>
+              <span className="text-xs bg-terra-cream text-terra-ink px-2 py-0.5 rounded-full">Coming Soon</span>
             </div>
-            <p className="text-slate-300 text-sm mb-3">
+            <p className="text-terra-ink-soft text-sm mb-3">
               Get instant SMS alerts for urgent immigration updates, personalized deadline reminders,
               and early warnings about policy changes that affect you.
             </p>
-            <button className="glass-chip text-white px-4 py-2 rounded-lg transition-colors text-sm">
+            <button className="text-terra-bg px-4 py-2 rounded-lg transition-colors text-sm hover-tilt" style={{ background: 'linear-gradient(135deg, #C76B55, #D07C63)' }}>
               Join Waitlist
             </button>
           </div>
@@ -365,8 +365,8 @@ function Alerts() {
       </section>
 
       <section className="space-y-4">
-        <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-          <Icon name="calendar" size={18} className="text-slate-200" />
+        <h3 className="text-lg font-semibold text-terra-ink flex items-center gap-2">
+          <Icon name="calendar" size={18} className="text-terra-ink" />
           Upcoming Deadlines
         </h3>
         <div className="space-y-3">
@@ -377,7 +377,7 @@ function Alerts() {
               title: 'New Appointment System Launch',
               desc: 'Old booking system discontinued',
               timeLeft: '9 days left',
-              tone: 'text-red-200',
+              tone: 'text-red-700',
               badge: 'bg-red-500/80'
             },
             {
@@ -386,7 +386,7 @@ function Alerts() {
               title: 'ZTM Ticket Price Increase',
               desc: 'Monthly tickets +10%',
               timeLeft: '37 days left',
-              tone: 'text-amber-200',
+              tone: 'text-amber-700',
               badge: 'bg-amber-500/80'
             },
             {
@@ -395,20 +395,20 @@ function Alerts() {
               title: 'PIT-37 Tax Filing Deadline',
               desc: 'Extended from April 30',
               timeLeft: '112 days left',
-              tone: 'text-slate-300',
-              badge: 'bg-slate-500/70'
+              tone: 'text-terra-ink-soft',
+              badge: 'bg-terra-taupe/80'
             }
           ].map((item) => (
-            <div key={`${item.month}-${item.day}`} className="glass-panel rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
+            <div key={`${item.month}-${item.day}`} className="action-card texture-layer texture-paper rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-4">
-                <div className={`${item.badge} text-white text-center rounded-lg p-2 w-14`}
+                <div className={`${item.badge} text-terra-bg text-center rounded-lg p-2 w-14`}
                 >
                   <p className="text-xs">{item.month}</p>
                   <p className="text-xl font-bold">{item.day}</p>
                 </div>
                 <div>
-                  <p className="text-white font-medium">{item.title}</p>
-                  <p className="text-slate-500 text-sm">{item.desc}</p>
+                  <p className="text-terra-ink font-medium">{item.title}</p>
+                  <p className="text-terra-taupe text-sm">{item.desc}</p>
                 </div>
               </div>
               <span className={`${item.tone} text-sm`}>{item.timeLeft}</span>

@@ -106,9 +106,9 @@ function Alerts() {
 
   const getSeverityStyle = (severity) => {
     const styles = {
-      info: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
-      warning: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
-      critical: 'bg-red-500/20 text-red-300 border-red-500/30',
+      info: 'bg-terra-sage/15 text-terra-ink border-terra-sage/30',
+      warning: 'bg-terra-primary/15 text-terra-primary border-terra-primary/30',
+      critical: 'bg-red-500/20 text-red-600 border-red-500/30',
     }
     return styles[severity] || styles.info
   }
@@ -121,51 +121,52 @@ function Alerts() {
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white mb-1">System Alerts</h1>
-          <p className="text-slate-400">Manage system-wide notifications</p>
+          <h1 className="text-2xl font-bold text-terra-ink mb-1">System Alerts</h1>
+          <p className="text-terra-taupe">Manage system-wide notifications</p>
         </div>
         <button
           onClick={handleNew}
-          className="glass-chip px-4 py-2 text-white text-sm font-medium rounded-xl transition-colors"
+          className="px-4 py-2 text-terra-bg text-sm font-medium rounded-xl transition-colors hover-tilt"
+          style={{ background: 'linear-gradient(135deg, #C76B55, #D07C63)' }}
         >
           New Alert
         </button>
       </div>
 
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
-          <div className="w-full max-w-lg glass-strong rounded-2xl p-6 max-h-[90vh] overflow-y-auto">
-            <h2 className="text-lg font-bold text-white mb-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30">
+          <div className="w-full max-w-lg glass-strong texture-layer texture-paper rounded-2xl p-6 max-h-[90vh] overflow-y-auto">
+            <h2 className="text-lg font-bold text-terra-ink mb-4">
               {editingId ? 'Edit Alert' : 'New System Alert'}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm text-slate-400 mb-1">Title</label>
+                <label className="block text-sm text-terra-taupe mb-1">Title</label>
                 <input
                   type="text"
                   value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  className="w-full px-3 py-2 glass-panel border border-white/10 rounded-xl text-white text-sm focus:border-slate-400 focus:outline-none"
+                  className="w-full px-3 py-2 bg-terra-cream border border-black/10 rounded-xl text-terra-ink text-sm focus:border-terra-primary focus:outline-none"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm text-slate-400 mb-1">Message</label>
+                <label className="block text-sm text-terra-taupe mb-1">Message</label>
                 <textarea
                   value={form.message}
                   onChange={(e) => setForm({ ...form, message: e.target.value })}
                   rows={3}
-                  className="w-full px-3 py-2 glass-panel border border-white/10 rounded-xl text-white text-sm focus:border-slate-400 focus:outline-none resize-none"
+                  className="w-full px-3 py-2 bg-terra-cream border border-black/10 rounded-xl text-terra-ink text-sm focus:border-terra-primary focus:outline-none resize-none"
                   required
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm text-slate-400 mb-1">Severity</label>
+                  <label className="block text-sm text-terra-taupe mb-1">Severity</label>
                   <select
                     value={form.severity}
                     onChange={(e) => setForm({ ...form, severity: e.target.value })}
-                    className="w-full px-3 py-2 glass-panel border border-white/10 rounded-xl text-white text-sm focus:border-slate-400 focus:outline-none"
+                    className="w-full px-3 py-2 bg-terra-cream border border-black/10 rounded-xl text-terra-ink text-sm focus:border-terra-primary focus:outline-none"
                   >
                     {severityOptions.map((s) => (
                       <option key={s.value} value={s.value}>{s.label}</option>
@@ -173,11 +174,11 @@ function Alerts() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm text-slate-400 mb-1">Audience</label>
+                  <label className="block text-sm text-terra-taupe mb-1">Audience</label>
                   <select
                     value={form.target_audience}
                     onChange={(e) => setForm({ ...form, target_audience: e.target.value })}
-                    className="w-full px-3 py-2 glass-panel border border-white/10 rounded-xl text-white text-sm focus:border-slate-400 focus:outline-none"
+                    className="w-full px-3 py-2 bg-terra-cream border border-black/10 rounded-xl text-terra-ink text-sm focus:border-terra-primary focus:outline-none"
                   >
                     {audiences.map((a) => (
                       <option key={a.value} value={a.value}>{a.label}</option>
@@ -187,21 +188,21 @@ function Alerts() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm text-slate-400 mb-1">Start Date (optional)</label>
+                  <label className="block text-sm text-terra-taupe mb-1">Start Date (optional)</label>
                   <input
                     type="datetime-local"
                     value={form.start_date}
                     onChange={(e) => setForm({ ...form, start_date: e.target.value })}
-                    className="w-full px-3 py-2 glass-panel border border-white/10 rounded-xl text-white text-sm focus:border-slate-400 focus:outline-none"
+                    className="w-full px-3 py-2 bg-terra-cream border border-black/10 rounded-xl text-terra-ink text-sm focus:border-terra-primary focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-slate-400 mb-1">End Date (optional)</label>
+                  <label className="block text-sm text-terra-taupe mb-1">End Date (optional)</label>
                   <input
                     type="datetime-local"
                     value={form.end_date}
                     onChange={(e) => setForm({ ...form, end_date: e.target.value })}
-                    className="w-full px-3 py-2 glass-panel border border-white/10 rounded-xl text-white text-sm focus:border-slate-400 focus:outline-none"
+                    className="w-full px-3 py-2 bg-terra-cream border border-black/10 rounded-xl text-terra-ink text-sm focus:border-terra-primary focus:outline-none"
                   />
                 </div>
               </div>
@@ -210,35 +211,36 @@ function Alerts() {
                   <button
                     type="button"
                     onClick={() => setForm({ ...form, active: !form.active })}
-                    className={`w-12 h-7 rounded-full transition-colors ${form.active ? 'bg-slate-200/60' : 'bg-slate-700'}`}
+                    className={`w-12 h-7 rounded-full transition-colors ${form.active ? 'bg-terra-primary/60' : 'bg-terra-cream'}`}
                   >
-                    <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${form.active ? 'translate-x-6' : 'translate-x-1'}`} />
+                    <div className={`w-5 h-5 bg-terra-bg rounded-full shadow transition-transform ${form.active ? 'translate-x-6' : 'translate-x-1'}`} />
                   </button>
-                  <span className="text-sm text-slate-400">Active</span>
+                  <span className="text-sm text-terra-taupe">Active</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={() => setForm({ ...form, dismissible: !form.dismissible })}
-                    className={`w-12 h-7 rounded-full transition-colors ${form.dismissible ? 'bg-slate-200/60' : 'bg-slate-700'}`}
+                    className={`w-12 h-7 rounded-full transition-colors ${form.dismissible ? 'bg-terra-primary/60' : 'bg-terra-cream'}`}
                   >
-                    <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${form.dismissible ? 'translate-x-6' : 'translate-x-1'}`} />
+                    <div className={`w-5 h-5 bg-terra-bg rounded-full shadow transition-transform ${form.dismissible ? 'translate-x-6' : 'translate-x-1'}`} />
                   </button>
-                  <span className="text-sm text-slate-400">Dismissible</span>
+                  <span className="text-sm text-terra-taupe">Dismissible</span>
                 </div>
               </div>
               <div className="flex gap-3 pt-4">
                 <button
                   type="button"
                   onClick={() => { setShowForm(false); setEditingId(null); setForm(emptyForm) }}
-                  className="flex-1 px-4 py-2 glass-panel text-white text-sm font-medium rounded-xl transition-colors"
+                  className="flex-1 px-4 py-2 bg-terra-cream text-terra-ink text-sm font-medium rounded-xl transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex-1 px-4 py-2 glass-chip text-white text-sm font-medium rounded-xl transition-colors"
+                  className="flex-1 px-4 py-2 text-terra-bg text-sm font-medium rounded-xl transition-colors"
+                  style={{ background: 'linear-gradient(135deg, #C76B55, #D07C63)' }}
                 >
                   {saving ? 'Saving...' : editingId ? 'Update' : 'Create'}
                 </button>
@@ -249,14 +251,14 @@ function Alerts() {
       )}
 
       {deleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
-          <div className="w-full max-w-sm glass-strong rounded-2xl p-6">
-            <h2 className="text-lg font-bold text-white mb-2">Delete Alert?</h2>
-            <p className="text-sm text-slate-400 mb-4">This action cannot be undone.</p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30">
+          <div className="w-full max-w-sm glass-strong texture-layer texture-paper rounded-2xl p-6">
+            <h2 className="text-lg font-bold text-terra-ink mb-2">Delete Alert?</h2>
+            <p className="text-sm text-terra-taupe mb-4">This action cannot be undone.</p>
             <div className="flex gap-3">
               <button
                 onClick={() => setDeleteConfirm(null)}
-                className="flex-1 px-4 py-2 glass-panel text-white text-sm font-medium rounded-xl transition-colors"
+                className="flex-1 px-4 py-2 bg-terra-cream text-terra-ink text-sm font-medium rounded-xl transition-colors"
               >
                 Cancel
               </button>
@@ -273,11 +275,11 @@ function Alerts() {
 
       <div className="space-y-3">
         {loading ? (
-          <div className="p-8 rounded-2xl glass-panel text-center text-slate-400">
+          <div className="p-8 rounded-2xl action-card texture-layer texture-paper text-center text-terra-taupe">
             Loading alerts...
           </div>
         ) : alerts.length === 0 ? (
-          <div className="p-8 rounded-2xl glass-panel text-center text-slate-400">
+          <div className="p-8 rounded-2xl action-card texture-layer texture-paper text-center text-terra-taupe">
             No system alerts. Create one when needed.
           </div>
         ) : (
@@ -289,32 +291,32 @@ function Alerts() {
                   ? 'bg-red-500/10 border-red-500/30'
                   : alert.severity === 'warning'
                   ? 'bg-amber-500/10 border-amber-500/30'
-                  : 'glass-panel border-white/10'
+                  : 'action-card texture-layer texture-paper border-black/10'
               }`}
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <Icon name={getSeverityIcon(alert.severity)} size={16} className="text-slate-200" />
+                    <Icon name={getSeverityIcon(alert.severity)} size={16} className="text-terra-ink" />
                     <span className={`text-xs px-2 py-0.5 rounded-full border ${getSeverityStyle(alert.severity)}`}>
                       {alert.severity}
                     </span>
                     <span className={`text-xs px-2 py-0.5 rounded-full ${
                       alert.active
-                        ? 'bg-emerald-500/20 text-emerald-300'
-                        : 'bg-slate-700 text-slate-400'
+                        ? 'bg-terra-sage/20 text-terra-sage'
+                        : 'bg-terra-cream text-terra-taupe'
                     }`}>
                       {alert.active ? 'Active' : 'Inactive'}
                     </span>
                     {!alert.dismissible && (
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-slate-700 text-slate-400">
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-terra-cream text-terra-taupe">
                         Non-dismissible
                       </span>
                     )}
                   </div>
-                  <h3 className="text-white font-medium mb-1">{alert.title}</h3>
-                  <p className="text-sm text-slate-400 line-clamp-2">{alert.message}</p>
-                  <div className="flex items-center gap-3 mt-2 text-xs text-slate-500">
+                  <h3 className="text-terra-ink font-medium mb-1">{alert.title}</h3>
+                  <p className="text-sm text-terra-ink-soft line-clamp-2">{alert.message}</p>
+                  <div className="flex items-center gap-3 mt-2 text-xs text-terra-taupe">
                     <span>{alert.target_audience}</span>
                     {alert.start_date && (
                       <>
@@ -335,8 +337,8 @@ function Alerts() {
                     onClick={() => handleToggleActive(alert)}
                     className={`p-2 rounded-lg transition-colors ${
                       alert.active
-                        ? 'text-emerald-300 hover:bg-emerald-500/20'
-                        : 'text-slate-400 hover:bg-slate-700'
+                        ? 'text-terra-sage hover:bg-terra-sage/20'
+                        : 'text-terra-taupe hover:bg-terra-cream'
                     }`}
                     title={alert.active ? 'Deactivate' : 'Activate'}
                   >
@@ -350,7 +352,7 @@ function Alerts() {
                   </button>
                   <button
                     onClick={() => handleEdit(alert)}
-                    className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
+                    className="p-2 rounded-lg text-terra-taupe hover:text-terra-ink hover:bg-terra-cream transition-colors"
                     title="Edit"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -359,7 +361,7 @@ function Alerts() {
                   </button>
                   <button
                     onClick={() => setDeleteConfirm(alert.id)}
-                    className="p-2 rounded-lg text-slate-400 hover:text-red-300 hover:bg-red-500/20 transition-colors"
+                    className="p-2 rounded-lg text-terra-taupe hover:text-red-500 hover:bg-red-500/20 transition-colors"
                     title="Delete"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

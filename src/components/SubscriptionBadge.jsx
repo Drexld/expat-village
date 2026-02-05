@@ -12,16 +12,16 @@ function SubscriptionBadge({ size = 'sm' }) {
   const badges = {
     basic: {
       label: 'Basic',
-      bg: 'linear-gradient(135deg, rgba(242,166,90,0.25), rgba(246,195,143,0.15))',
-      border: 'rgba(242,166,90,0.45)',
-      text: 'text-slate-100',
+      bg: 'linear-gradient(135deg, rgba(199,107,85,0.2), rgba(210,160,115,0.12))',
+      border: 'rgba(199,107,85,0.4)',
+      text: 'text-terra-ink',
       icon: 'star',
     },
     premium: {
       label: 'Premium',
-      bg: 'linear-gradient(135deg, rgba(242,143,123,0.3), rgba(242,166,90,0.18))',
-      border: 'rgba(242,143,123,0.5)',
-      text: 'text-slate-100',
+      bg: 'linear-gradient(135deg, rgba(199,107,85,0.3), rgba(117,153,124,0.15))',
+      border: 'rgba(199,107,85,0.5)',
+      text: 'text-terra-ink',
       icon: 'crown',
     },
   }
@@ -43,7 +43,7 @@ function SubscriptionBadge({ size = 'sm' }) {
         border: `1px solid ${badge.border}`,
       }}
     >
-      <Icon name={badge.icon} size={14} className="text-slate-100" />
+      <Icon name={badge.icon} size={14} className="text-terra-primary" />
       <span>{badge.label}</span>
     </span>
   )

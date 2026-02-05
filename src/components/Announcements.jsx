@@ -86,22 +86,21 @@ function Announcements() {
       success: 'success',
       alert: 'alert',
       event: 'calendar',
-      update: 'bell',
+      update: 'bellPin',
     }
     const iconName = iconMap[typeKey] || 'info'
     return (
       <div
         key={announcement.id}
-        className="px-3 py-2.5 rounded-2xl prism-card prism-reveal"
+        className="action-card texture-layer texture-paper"
         style={{
           borderColor: colors.border,
-          '--prism': colors.glow,
-          '--glass-glow': colors.glow,
+          boxShadow: `0 12px 28px ${colors.glow}`,
         }}
       >
         {/* Header */}
         <div className="flex items-start gap-2 mb-1.5">
-          <Icon name={iconName} className="w-4 h-4 text-slate-200 mt-0.5" />
+          <Icon name={iconName} className="w-4 h-4 text-terra-ink mt-0.5" />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <h3 className="text-xs font-semibold uppercase tracking-wide" style={{ color: colors.text }}>
@@ -118,7 +117,7 @@ function Announcements() {
         </div>
 
         {/* Message */}
-        <p className="text-xs text-slate-300 leading-relaxed pl-6">
+        <p className="text-xs text-terra-ink-soft leading-relaxed pl-6">
           {announcement.message}
         </p>
 
@@ -131,12 +130,12 @@ function Announcements() {
             href={announcement.link_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 mt-1.5 ml-6 text-[11px] font-medium hover:underline"
-            style={{ color: colors.text }}
-          >
-            {(announcement.link_text && announcement.link_text !== 'Null' && announcement.link_text !== 'null')
-              ? announcement.link_text
-              : 'Learn more'}
+          className="inline-flex items-center gap-1.5 mt-1.5 ml-6 text-[11px] font-medium hover:underline"
+          style={{ color: colors.text }}
+        >
+          {(announcement.link_text && announcement.link_text !== 'Null' && announcement.link_text !== 'null')
+            ? announcement.link_text
+            : 'Learn more'}
             <Icon name="arrowRight" className="w-3 h-3" />
           </a>
         )}
@@ -145,23 +144,23 @@ function Announcements() {
   }
 
   return (
-    <div className="flex flex-col gap-3 prism-reveal">
+    <div className="flex flex-col gap-3">
       {(loading || error || topAlerts.length > 0) && (
         <div>
-          <p className="text-[11px] uppercase tracking-widest text-slate-500 mb-2 px-1">City Alerts</p>
+          <p className="text-[11px] uppercase tracking-widest text-terra-taupe mb-2 px-1">City Alerts</p>
           <div className="flex flex-col gap-2">
             {loading && (
-              <div className="px-3 py-2.5 rounded-xl border border-white/10 bg-white/5 text-xs text-slate-400">
+              <div className="px-3 py-2.5 rounded-xl border border-black/10 bg-terra-cream text-xs text-terra-taupe">
                 Loading alerts...
               </div>
             )}
             {error && !loading && topAlerts.length === 0 && (
-              <div className="px-3 py-2.5 rounded-xl border border-red-500/20 bg-red-500/10 text-xs text-red-200">
+              <div className="px-3 py-2.5 rounded-xl border border-red-400/30 bg-red-100 text-xs text-red-700">
                 Couldn't load alerts. Try again later.
               </div>
             )}
             {!loading && !error && topAlerts.length === 0 && (
-              <div className="px-3 py-2.5 rounded-xl border border-white/10 bg-white/5 text-xs text-slate-400">
+              <div className="px-3 py-2.5 rounded-xl border border-black/10 bg-terra-cream text-xs text-terra-taupe">
                 No city alerts right now.
               </div>
             )}
@@ -172,7 +171,7 @@ function Announcements() {
 
       {topPersonal.length > 0 && (
         <div>
-          <p className="text-[11px] uppercase tracking-widest text-slate-500 mb-2 px-1">Your Updates</p>
+          <p className="text-[11px] uppercase tracking-widest text-terra-taupe mb-2 px-1">Your Updates</p>
           <div className="flex flex-col gap-2">
             {topPersonal.map(renderCard)}
           </div>
@@ -181,20 +180,20 @@ function Announcements() {
 
       {(loading || error || topOpportunities.length > 0) && (
         <div>
-          <p className="text-[11px] uppercase tracking-widest text-slate-500 mb-2 px-1">Village Opportunities</p>
+          <p className="text-[11px] uppercase tracking-widest text-terra-taupe mb-2 px-1">Village Opportunities</p>
           <div className="flex flex-col gap-2">
             {loading && (
-              <div className="px-3 py-2.5 rounded-xl border border-white/10 bg-white/5 text-xs text-slate-400">
+              <div className="px-3 py-2.5 rounded-xl border border-black/10 bg-terra-cream text-xs text-terra-taupe">
                 Loading opportunities...
               </div>
             )}
             {error && !loading && topOpportunities.length === 0 && (
-              <div className="px-3 py-2.5 rounded-xl border border-red-500/20 bg-red-500/10 text-xs text-red-200">
+              <div className="px-3 py-2.5 rounded-xl border border-red-400/30 bg-red-100 text-xs text-red-700">
                 Couldn't load opportunities. Try again later.
               </div>
             )}
             {!loading && !error && topOpportunities.length === 0 && (
-              <div className="px-3 py-2.5 rounded-xl border border-white/10 bg-white/5 text-xs text-slate-400">
+              <div className="px-3 py-2.5 rounded-xl border border-black/10 bg-terra-cream text-xs text-terra-taupe">
                 No opportunities yet - we'll surface perks and events here.
               </div>
             )}
@@ -206,7 +205,7 @@ function Announcements() {
       {!noData && hasMore && (
         <Link
           to="/alerts"
-          className="text-[11px] text-slate-400 hover:text-white transition-colors px-1"
+          className="text-[11px] text-terra-ink-soft hover:text-terra-ink transition-colors px-1"
         >
           View all updates
         </Link>

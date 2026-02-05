@@ -25,9 +25,9 @@ function ExchangeRates() {
 
   if (loading) {
     return (
-      <div className="glass-panel flex items-center gap-2 rounded-2xl px-4 py-3">
-        <Icon name="update" size={14} className="text-slate-400" />
-        <span className="text-sm text-slate-400">Loading rates...</span>
+      <div className="action-card texture-layer texture-paper flex items-center gap-2 rounded-2xl px-4 py-3">
+        <Icon name="update" size={14} className="text-terra-taupe" />
+        <span className="text-sm text-terra-taupe">Loading rates...</span>
       </div>
     )
   }
@@ -41,10 +41,10 @@ function ExchangeRates() {
   ]
 
   return (
-    <div className="glass-panel flex flex-col gap-2 rounded-2xl px-4 py-3">
+    <div className="action-card texture-layer texture-paper flex flex-col gap-2 rounded-2xl px-4 py-3">
       <div className="flex items-center gap-2 mb-1">
-        <Icon name="globe" size={16} className="text-slate-300" />
-        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+        <Icon name="globe" size={16} className="text-terra-ink-soft" />
+        <span className="text-xs font-semibold text-terra-taupe uppercase tracking-wider">
           Exchange Rates
         </span>
       </div>
@@ -53,21 +53,21 @@ function ExchangeRates() {
         {currencies.map((currency) => (
           <div key={currency.code} className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-slate-300">1 PLN</span>
-              <span className="text-xs text-slate-500">to</span>
-              <span className="text-xs font-semibold text-slate-200">{currency.code}</span>
+              <span className="text-sm font-medium text-terra-ink">1 PLN</span>
+              <span className="text-xs text-terra-taupe">to</span>
+              <span className="text-xs font-semibold text-terra-ink-soft">{currency.code}</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="text-sm font-bold text-white">
+              <span className="text-sm font-bold text-terra-ink">
                 {formatRate(currency.value)}
               </span>
-              <span className="text-[10px] text-slate-500">{currency.code}</span>
+              <span className="text-[10px] text-terra-taupe">{currency.code}</span>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="text-[10px] text-slate-500 text-right mt-1">
+      <div className="text-[10px] text-terra-taupe text-right mt-1">
         Updated {getTimeAgo(rates.timestamp)}
       </div>
     </div>

@@ -1,4 +1,4 @@
-﻿// src/pages/admin/Users.jsx
+// src/pages/admin/Users.jsx
 // User directory page (read-only)
 
 import { useState, useEffect, useCallback } from 'react'
@@ -46,15 +46,15 @@ function Users() {
     <div className="max-w-4xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-white mb-1">Users</h1>
-        <p className="text-slate-400">Community members directory ({total} total)</p>
+        <h1 className="text-2xl font-bold text-terra-ink mb-1">Users</h1>
+        <p className="text-terra-ink-soft">Community members directory ({total} total)</p>
       </div>
 
       {/* Search */}
       <form onSubmit={handleSearch} className="mb-6">
         <div className="flex gap-2">
           <div className="flex-1 relative">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-terra-taupe" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input
@@ -62,12 +62,12 @@ function Users() {
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Search by name or email..."
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:border-purple-500 focus:outline-none"
+              className="w-full pl-10 pr-4 py-2.5 bg-terra-cream border border-terra-taupe/40 rounded-xl text-terra-ink text-sm focus:border-terra-primary/60 focus:outline-none"
             />
           </div>
           <button
             type="submit"
-            className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium rounded-xl transition-colors"
+            className="px-4 py-2 bg-terra-primary hover:opacity-95 text-white text-sm font-medium rounded-xl transition-colors shadow-glass"
           >
             Search
           </button>
@@ -75,7 +75,7 @@ function Users() {
             <button
               type="button"
               onClick={() => { setSearch(''); setSearchInput(''); setPage(1) }}
-              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium rounded-xl transition-colors"
+              className="px-4 py-2 bg-terra-cream hover:bg-terra-cream/60 text-terra-ink text-sm font-medium rounded-xl transition-colors border border-terra-taupe/40"
             >
               Clear
             </button>
@@ -86,38 +86,38 @@ function Users() {
       {/* Users List */}
       <div className="space-y-3">
         {loading ? (
-          <div className="p-8 rounded-2xl bg-slate-800/50 border border-slate-700/50 text-center text-slate-400">
+          <div className="p-8 rounded-2xl bg-terra-cream/70 border border-terra-taupe/40 text-center text-terra-ink-soft">
             Loading users...
           </div>
         ) : users.length === 0 ? (
-          <div className="p-8 rounded-2xl bg-slate-800/50 border border-slate-700/50 text-center text-slate-400">
+          <div className="p-8 rounded-2xl bg-terra-cream/70 border border-terra-taupe/40 text-center text-terra-ink-soft">
             {search ? `No users found matching "${search}"` : 'No users yet.'}
           </div>
         ) : (
           users.map((user) => (
             <div
               key={user.id}
-              className="p-4 rounded-2xl bg-slate-800/50 border border-slate-700/50"
+              className="p-4 rounded-2xl bg-terra-cream/70 border border-terra-taupe/40"
             >
               <div className="flex items-center gap-4">
                 {/* Avatar */}
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-amber-500 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                <div className="w-12 h-12 bg-gradient-to-br from-terra-primary to-amber-400 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
                   {(user.display_name || user.email || '?').charAt(0).toUpperCase()}
                 </div>
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <h3 className="text-white font-medium truncate">
+                    <h3 className="text-terra-ink font-medium truncate">
                       {user.display_name || 'Anonymous'}
                     </h3>
                     {user.years_in_poland !== null && (
                       <span className={`text-xs px-2 py-0.5 rounded-full ${
                         user.years_in_poland < 1
-                          ? 'bg-green-500/20 text-green-400'
+                          ? 'bg-terra-sage/20 text-terra-sage'
                           : user.years_in_poland >= 3
-                          ? 'bg-purple-500/20 text-purple-400'
-                          : 'bg-blue-500/20 text-blue-400'
+                          ? 'bg-terra-primary/20 text-terra-primary'
+                          : 'bg-terra-taupe/30 text-terra-ink-soft'
                       }`}>
                         {user.years_in_poland < 1
                           ? 'Newcomer'
@@ -127,8 +127,8 @@ function Users() {
                       </span>
                     )}
                   </div>
-                  <p className="text-sm text-slate-500 truncate">{user.email}</p>
-                  <div className="flex items-center gap-3 mt-1 text-xs text-slate-500">
+                  <p className="text-sm text-terra-taupe truncate">{user.email}</p>
+                  <div className="flex items-center gap-3 mt-1 text-xs text-terra-taupe">
                     <span>Joined {formatDate(user.created_at)}</span>
                     {user.years_in_poland !== null && (
                       <>
@@ -151,13 +151,13 @@ function Users() {
                     {user.interests.slice(0, 3).map((interest, i) => (
                       <span
                         key={i}
-                        className="text-xs px-2 py-0.5 rounded-full bg-slate-700 text-slate-300"
+                        className="text-xs px-2 py-0.5 rounded-full bg-terra-cream/60 text-terra-ink"
                       >
                         {interest}
                       </span>
                     ))}
                     {user.interests.length > 3 && (
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-slate-700 text-slate-400">
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-terra-cream/60 text-terra-ink-soft">
                         +{user.interests.length - 3}
                       </span>
                     )}
@@ -171,25 +171,25 @@ function Users() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-800">
-          <p className="text-sm text-slate-500">
+        <div className="flex items-center justify-between mt-6 pt-4 border-t border-terra-taupe/40">
+          <p className="text-sm text-terra-taupe">
             Showing {(page - 1) * 20 + 1} - {Math.min(page * 20, total)} of {total}
           </p>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setPage(p => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm rounded-lg transition-colors"
+              className="px-3 py-1.5 bg-terra-cream hover:bg-terra-cream/60 disabled:opacity-50 disabled:cursor-not-allowed text-terra-ink text-sm rounded-lg transition-colors border border-terra-taupe/40"
             >
               Previous
             </button>
-            <span className="text-sm text-slate-400">
+            <span className="text-sm text-terra-ink-soft">
               Page {page} of {totalPages}
             </span>
             <button
               onClick={() => setPage(p => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm rounded-lg transition-colors"
+              className="px-3 py-1.5 bg-terra-cream hover:bg-terra-cream/60 disabled:opacity-50 disabled:cursor-not-allowed text-terra-ink text-sm rounded-lg transition-colors border border-terra-taupe/40"
             >
               Next
             </button>
@@ -201,4 +201,5 @@ function Users() {
 }
 
 export default Users
+
 

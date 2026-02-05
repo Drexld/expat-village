@@ -10,7 +10,7 @@ import Icon from './Icon'
 const NAV_ITEMS = [
   { icon: 'home', label: 'Home', path: '/' },
   { icon: 'checklist', label: 'Tasks', path: '/get-things-done' },
-  { icon: 'search', label: 'Search', path: '/search', isSearch: true },
+  { icon: 'search', label: 'Ask', path: '/search', isSearch: true },
   { icon: 'community', label: 'Community', path: '/town-hall' },
   { icon: 'menu', label: 'More', path: '/menu', isMenu: true },
 ]
@@ -107,15 +107,15 @@ function BottomNav() {
     <>
       {/* Search Overlay */}
       {searchOpen && (
-        <div className="fixed inset-0 z-50 bg-ink-900/80 backdrop-blur-lg">
+        <div className="fixed inset-0 z-50 bg-terra-bg/90 backdrop-blur-lg">
           <div className="flex flex-col h-full">
             {/* Search Header */}
             <div className="flex items-center gap-3 px-4 pt-4 pb-3">
               <button
                 onClick={() => setSearchOpen(false)}
-                className="p-2 rounded-full hover:bg-white/5"
+                className="p-2 rounded-full hover:bg-black/5"
               >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-slate-400">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-terra-ink-soft">
                   <path d="M19 12H5M12 19l-7-7 7-7" />
                 </svg>
               </button>
@@ -124,16 +124,19 @@ function BottomNav() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search services, places, guides..."
+                  placeholder="Ask the village... (e.g., find a bank, PESEL help)"
                   autoFocus
-                  className="w-full px-4 py-3 rounded-xl glass-panel text-white placeholder-slate-500 focus:outline-none focus:border-white/30"
+                  className="w-full px-4 py-3 rounded-xl glass-strong text-terra-ink placeholder-terra-taupe focus:outline-none focus:border-black/20"
                 />
               </form>
             </div>
 
             {/* Quick Links */}
             <div className="px-4 py-4">
-              <p className="text-xs font-medium text-slate-400 mb-3">Quick links</p>
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-xs font-medium text-terra-taupe">Quick links</p>
+                <span className="text-xs text-terra-ink-soft">Ask the Village</span>
+              </div>
               <div className="flex flex-wrap gap-2">
                 {['PESEL', 'Residence Permit', 'Bank Account', 'Health Insurance', 'Polish Lessons', 'Coworking'].map((term) => (
                   <button
@@ -143,7 +146,7 @@ function BottomNav() {
                       navigate(`/directory?q=${encodeURIComponent(term)}`)
                       setSearchOpen(false)
                     }}
-                    className="px-3 py-2 rounded-full text-sm text-slate-300 glass-chip hover:bg-white/10 transition-colors"
+                    className="px-3 py-2 rounded-full text-sm text-terra-ink-soft glass-chip hover:bg-terra-bg transition-colors"
                   >
                     {term}
                   </button>
@@ -153,7 +156,7 @@ function BottomNav() {
 
             {/* Popular Sections */}
             <div className="px-4 py-4">
-              <p className="text-xs font-medium text-slate-400 mb-3">Popular sections</p>
+              <p className="text-xs font-medium text-terra-taupe mb-3">Popular sections</p>
               <div className="space-y-2">
                 {[
                   { icon: 'checklist', label: 'Get Things Done', path: '/get-things-done' },
@@ -167,10 +170,10 @@ function BottomNav() {
                       handleMenuItemClick(item.path)
                       setSearchOpen(false)
                     }}
-                    className="flex items-center gap-3 w-full px-4 py-3 rounded-xl glass-panel hover:bg-white/5 transition-colors"
+                    className="flex items-center gap-3 w-full px-4 py-3 rounded-xl action-card texture-layer texture-paper hover-tilt transition-colors"
                   >
-                    <Icon name={item.icon} className="w-5 h-5 text-slate-200" />
-                    <span className="text-sm font-medium text-white">{item.label}</span>
+                    <Icon name={item.icon} className="w-5 h-5 text-terra-ink" />
+                    <span className="text-sm font-medium text-terra-ink">{item.label}</span>
                   </button>
                 ))}
               </div>
@@ -181,15 +184,15 @@ function BottomNav() {
 
       {/* Menu Overlay */}
       {menuOpen && (
-        <div className="fixed inset-0 z-50 bg-ink-900/80 backdrop-blur-lg overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-terra-bg/90 backdrop-blur-lg overflow-y-auto">
           {/* Menu Header */}
-          <div className="sticky top-0 flex items-center justify-between px-4 py-4 glass-panel backdrop-blur-lg border-b border-white/10">
-            <h2 className="text-lg font-bold text-white">Menu</h2>
+          <div className="sticky top-0 flex items-center justify-between px-4 py-4 glass-strong backdrop-blur-lg border-b border-black/10">
+            <h2 className="text-lg font-bold text-terra-ink">Menu</h2>
             <button
               onClick={() => setMenuOpen(false)}
-              className="p-2 rounded-full hover:bg-white/5"
+              className="p-2 rounded-full hover:bg-black/5"
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-slate-400">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-terra-ink-soft">
                 <path d="M18 6L6 18M6 6l12 12" />
               </svg>
             </button>
@@ -199,7 +202,7 @@ function BottomNav() {
           <div className="px-4 py-4 space-y-6 pb-24">
             {MENU_SECTIONS.map((section) => (
               <div key={section.title}>
-                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 px-2">
+                <p className="text-xs font-semibold text-terra-taupe uppercase tracking-wider mb-2 px-2">
                   {section.title}
                 </p>
                 <div className="space-y-1">
@@ -209,12 +212,12 @@ function BottomNav() {
                       onClick={() => handleMenuItemClick(item.path)}
                       className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl transition-colors ${
                         isActive(item.path)
-                          ? 'glass-panel border border-white/10'
-                          : 'hover:bg-white/5'
+                          ? 'glass-panel border border-black/10'
+                          : 'hover:bg-black/5'
                       }`}
                     >
-                      <Icon name={item.icon} className="w-5 h-5 text-slate-200" />
-                      <span className={`text-sm font-medium ${isActive(item.path) ? 'text-white' : 'text-slate-200'}`}>
+                      <Icon name={item.icon} className="w-5 h-5 text-terra-ink" />
+                      <span className={`text-sm font-medium ${isActive(item.path) ? 'text-terra-ink' : 'text-terra-ink-soft'}`}>
                         {item.label}
                       </span>
                     </button>
@@ -228,8 +231,8 @@ function BottomNav() {
 
       {/* Bottom Navigation Bar */}
       <nav
-        className="fixed bottom-0 left-0 right-0 z-40 glass-panel border-t border-white/10 safe-area-pb"
-        style={{ '--glass-glow': 'rgba(242,166,90,0.18)' }}
+        className="fixed bottom-0 left-0 right-0 z-40 glass-strong border-t border-black/10 safe-area-pb"
+        style={{ '--glass-glow': 'rgba(199,107,85,0.2)' }}
       >
         <div className="flex items-center justify-around px-2 py-2">
           {NAV_ITEMS.map((item) => {
@@ -245,10 +248,10 @@ function BottomNav() {
               >
                 <Icon
                   name={item.icon}
-                  className={`w-6 h-6 transition-transform ${active ? 'scale-110 text-white' : 'text-slate-400'}`}
+                  className={`w-6 h-6 transition-transform ${active ? 'scale-110 text-terra-ink' : 'text-terra-taupe'}`}
                 />
                 <span className={`text-[10px] font-medium ${
-                  active ? 'text-white' : 'text-slate-500'
+                  active ? 'text-terra-ink' : 'text-terra-taupe'
                 }`}>
                   {item.label}
                 </span>

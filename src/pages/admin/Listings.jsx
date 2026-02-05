@@ -109,12 +109,12 @@ function Listings() {
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="glass-panel rounded-3xl p-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-white mb-1">Featured Listings</h1>
-          <p className="text-slate-400">Manage featured content by category</p>
+          <h1 className="text-2xl font-semibold text-terra-ink mb-1">Featured Listings</h1>
+          <p className="text-terra-ink-soft">Manage featured content by category</p>
         </div>
         <button
           onClick={handleNew}
-          className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/20"
+          className="rounded-full bg-terra-primary px-4 py-2 text-sm font-medium text-white shadow-glass transition-colors hover:opacity-95"
         >
           New Listing
         </button>
@@ -125,8 +125,8 @@ function Listings() {
           onClick={() => setFilterCategory('all')}
           className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${
             filterCategory === 'all'
-              ? 'bg-white/15 text-white border border-white/20'
-              : 'bg-slate-900/40 text-slate-400 border border-white/10 hover:text-white'
+              ? 'bg-terra-primary/15 text-terra-ink border border-terra-primary/30'
+              : 'bg-terra-cream/70 text-terra-ink-soft border border-terra-taupe/40 hover:text-terra-ink'
           }`}
         >
           All ({listings.length})
@@ -139,12 +139,12 @@ function Listings() {
               onClick={() => setFilterCategory(cat.value)}
               className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${
                 filterCategory === cat.value
-                  ? 'bg-white/15 text-white border border-white/20'
-                  : 'bg-slate-900/40 text-slate-400 border border-white/10 hover:text-white'
+                  ? 'bg-terra-primary/15 text-terra-ink border border-terra-primary/30'
+                  : 'bg-terra-cream/70 text-terra-ink-soft border border-terra-taupe/40 hover:text-terra-ink'
               }`}
             >
               <span className="inline-flex items-center gap-2">
-                <Icon name={cat.icon} size={14} className="text-slate-300" />
+                <Icon name={cat.icon} size={14} className="text-terra-ink" />
                 {cat.label} ({count})
               </span>
             </button>
@@ -155,36 +155,36 @@ function Listings() {
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
           <div className="w-full max-w-lg glass-panel rounded-3xl p-6 max-h-[90vh] overflow-y-auto">
-            <h2 className="text-lg font-semibold text-white mb-4">
+            <h2 className="text-lg font-semibold text-terra-ink mb-4">
               {editingId ? 'Edit Listing' : 'New Featured Listing'}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm text-slate-400 mb-1">Title</label>
+                <label className="block text-sm text-terra-ink-soft mb-1">Title</label>
                 <input
                   type="text"
                   value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-xl text-white text-sm focus:border-emerald-400 focus:outline-none"
+                  className="w-full px-3 py-2 bg-terra-cream/70 border border-terra-taupe/40 rounded-xl text-terra-ink text-sm focus:border-terra-primary/60 focus:outline-none"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm text-slate-400 mb-1">Description</label>
+                <label className="block text-sm text-terra-ink-soft mb-1">Description</label>
                 <textarea
                   value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
                   rows={3}
-                  className="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-xl text-white text-sm focus:border-emerald-400 focus:outline-none resize-none"
+                  className="w-full px-3 py-2 bg-terra-cream/70 border border-terra-taupe/40 rounded-xl text-terra-ink text-sm focus:border-terra-primary/60 focus:outline-none resize-none"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm text-slate-400 mb-1">Category</label>
+                  <label className="block text-sm text-terra-ink-soft mb-1">Category</label>
                   <select
                     value={form.category}
                     onChange={(e) => setForm({ ...form, category: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-xl text-white text-sm focus:border-emerald-400 focus:outline-none"
+                    className="w-full px-3 py-2 bg-terra-cream/70 border border-terra-taupe/40 rounded-xl text-terra-ink text-sm focus:border-terra-primary/60 focus:outline-none"
                   >
                     {categories.map((c) => (
                       <option key={c.value} value={c.value}>{c.label}</option>
@@ -192,27 +192,27 @@ function Listings() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm text-slate-400 mb-1">Display Order</label>
+                  <label className="block text-sm text-terra-ink-soft mb-1">Display Order</label>
                   <input
                     type="number"
                     min="0"
                     value={form.display_order}
                     onChange={(e) => setForm({ ...form, display_order: parseInt(e.target.value) || 0 })}
-                    className="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-xl text-white text-sm focus:border-emerald-400 focus:outline-none"
+                    className="w-full px-3 py-2 bg-terra-cream/70 border border-terra-taupe/40 rounded-xl text-terra-ink text-sm focus:border-terra-primary/60 focus:outline-none"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-slate-400 mb-1">Image URL (optional)</label>
+                <label className="block text-sm text-terra-ink-soft mb-1">Image URL (optional)</label>
                 <input
                   type="url"
                   value={form.image_url}
                   onChange={(e) => setForm({ ...form, image_url: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-xl text-white text-sm focus:border-emerald-400 focus:outline-none"
+                  className="w-full px-3 py-2 bg-terra-cream/70 border border-terra-taupe/40 rounded-xl text-terra-ink text-sm focus:border-terra-primary/60 focus:outline-none"
                   placeholder="https://..."
                 />
                 {form.image_url && (
-                  <div className="mt-2 rounded-lg overflow-hidden bg-slate-800 h-32">
+                  <div className="mt-2 rounded-lg overflow-hidden bg-terra-cream h-32">
                     <img
                       src={form.image_url}
                       alt="Preview"
@@ -223,23 +223,23 @@ function Listings() {
                 )}
               </div>
               <div>
-                <label className="block text-sm text-slate-400 mb-1">Link URL</label>
+                <label className="block text-sm text-terra-ink-soft mb-1">Link URL</label>
                 <input
                   type="url"
                   value={form.link_url}
                   onChange={(e) => setForm({ ...form, link_url: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-xl text-white text-sm focus:border-emerald-400 focus:outline-none"
+                  className="w-full px-3 py-2 bg-terra-cream/70 border border-terra-taupe/40 rounded-xl text-terra-ink text-sm focus:border-terra-primary/60 focus:outline-none"
                   placeholder="https://..."
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm text-slate-400 mb-1">Link Text</label>
+                <label className="block text-sm text-terra-ink-soft mb-1">Link Text</label>
                 <input
                   type="text"
                   value={form.link_text}
                   onChange={(e) => setForm({ ...form, link_text: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-xl text-white text-sm focus:border-emerald-400 focus:outline-none"
+                  className="w-full px-3 py-2 bg-terra-cream/70 border border-terra-taupe/40 rounded-xl text-terra-ink text-sm focus:border-terra-primary/60 focus:outline-none"
                   placeholder="Learn more"
                 />
               </div>
@@ -247,24 +247,24 @@ function Listings() {
                 <button
                   type="button"
                   onClick={() => setForm({ ...form, active: !form.active })}
-                  className={`w-12 h-7 rounded-full transition-colors ${form.active ? 'bg-emerald-500' : 'bg-slate-700'}`}
+                  className={`w-12 h-7 rounded-full transition-colors ${form.active ? 'bg-terra-sage' : 'bg-terra-cream/60'}`}
                 >
-                  <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${form.active ? 'translate-x-6' : 'translate-x-1'}`} />
+                  <div className={`w-5 h-5 bg-terra-bg rounded-full shadow transition-transform ${form.active ? 'translate-x-6' : 'translate-x-1'}`} />
                 </button>
-                <span className="text-sm text-slate-400">Active</span>
+                <span className="text-sm text-terra-ink-soft">Active</span>
               </div>
               <div className="flex gap-3 pt-4">
                 <button
                   type="button"
                   onClick={() => { setShowForm(false); setEditingId(null); setForm(emptyForm) }}
-                  className="flex-1 rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-200 transition-colors hover:bg-white/10"
+                  className="flex-1 rounded-full border border-terra-taupe/40 px-4 py-2 text-sm font-medium text-terra-ink transition-colors hover:bg-terra-cream/60"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex-1 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/20 disabled:opacity-50"
+                  className="flex-1 rounded-full bg-terra-primary px-4 py-2 text-sm font-medium text-white shadow-glass transition-colors hover:opacity-95 disabled:opacity-50"
                 >
                   {saving ? 'Saving...' : editingId ? 'Update' : 'Create'}
                 </button>
@@ -277,12 +277,12 @@ function Listings() {
       {deleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
           <div className="w-full max-w-sm glass-panel rounded-3xl p-6">
-            <h2 className="text-lg font-semibold text-white mb-2">Delete Listing?</h2>
-            <p className="text-sm text-slate-400 mb-4">This action cannot be undone.</p>
+            <h2 className="text-lg font-semibold text-terra-ink mb-2">Delete Listing?</h2>
+            <p className="text-sm text-terra-ink-soft mb-4">This action cannot be undone.</p>
             <div className="flex gap-3">
               <button
                 onClick={() => setDeleteConfirm(null)}
-                className="flex-1 rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-200 transition-colors hover:bg-white/10"
+                className="flex-1 rounded-full border border-terra-taupe/40 px-4 py-2 text-sm font-medium text-terra-ink transition-colors hover:bg-terra-cream/60"
               >
                 Cancel
               </button>
@@ -299,21 +299,21 @@ function Listings() {
 
       <div className="space-y-3">
         {loading ? (
-          <div className="glass-panel rounded-2xl p-8 text-center text-slate-400">
+          <div className="glass-panel rounded-2xl p-8 text-center text-terra-ink-soft">
             Loading listings...
           </div>
         ) : filteredListings.length === 0 ? (
-          <div className="glass-panel rounded-2xl p-8 text-center text-slate-400">
+          <div className="glass-panel rounded-2xl p-8 text-center text-terra-ink-soft">
             No listings in this category yet.
           </div>
         ) : (
           filteredListings.map((listing) => {
             const catInfo = getCategoryInfo(listing.category)
             return (
-              <div key={listing.id} className="glass-panel rounded-2xl p-4 border border-white/10">
+              <div key={listing.id} className="glass-panel rounded-2xl p-4 border border-terra-taupe/40">
                 <div className="flex items-start gap-4">
                   {listing.image_url && (
-                    <div className="w-20 h-20 rounded-xl overflow-hidden bg-slate-700 flex-shrink-0">
+                    <div className="w-20 h-20 rounded-xl overflow-hidden bg-terra-cream/60 flex-shrink-0">
                       <img
                         src={listing.image_url}
                         alt={listing.title}
@@ -324,30 +324,30 @@ function Listings() {
                   )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
-                      <Icon name={catInfo.icon} size={16} className="text-slate-300" />
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-white/10 text-slate-300">
+                      <Icon name={catInfo.icon} size={16} className="text-terra-ink" />
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-terra-cream/70 text-terra-ink">
                         {catInfo.label}
                       </span>
                       <span className={`text-xs px-2 py-0.5 rounded-full ${
                         listing.active
-                          ? 'bg-emerald-500/20 text-emerald-200'
-                          : 'bg-slate-700 text-slate-400'
+                          ? 'bg-terra-sage/20 text-terra-sage'
+                          : 'bg-terra-cream/60 text-terra-ink-soft'
                       }`}>
                         {listing.active ? 'Active' : 'Inactive'}
                       </span>
-                      <span className="text-xs text-slate-500">
+                      <span className="text-xs text-terra-taupe">
                         Order: {listing.display_order}
                       </span>
                     </div>
-                    <h3 className="text-white font-medium mb-1 truncate">{listing.title}</h3>
+                    <h3 className="text-terra-ink font-medium mb-1 truncate">{listing.title}</h3>
                     {listing.description && (
-                      <p className="text-sm text-slate-400 line-clamp-2">{listing.description}</p>
+                      <p className="text-sm text-terra-ink-soft line-clamp-2">{listing.description}</p>
                     )}
                     <a
                       href={listing.link_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xs text-emerald-200 hover:text-emerald-100 mt-1 inline-block"
+                      className="text-xs text-terra-sage hover:text-terra-ink mt-1 inline-block"
                     >
                       {listing.link_text || 'View link'}
                     </a>
@@ -357,8 +357,8 @@ function Listings() {
                       onClick={() => handleToggleActive(listing)}
                       className={`p-2 rounded-lg transition-colors ${
                         listing.active
-                          ? 'text-emerald-200 hover:bg-emerald-500/20'
-                          : 'text-slate-400 hover:bg-white/10'
+                          ? 'text-terra-sage hover:bg-terra-sage/15'
+                          : 'text-terra-ink-soft hover:bg-terra-cream/60'
                       }`}
                       title={listing.active ? 'Deactivate' : 'Activate'}
                     >
@@ -372,7 +372,7 @@ function Listings() {
                     </button>
                     <button
                       onClick={() => handleEdit(listing)}
-                      className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+                      className="p-2 rounded-lg text-terra-ink-soft hover:text-terra-ink hover:bg-terra-cream/60 transition-colors"
                       title="Edit"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -381,7 +381,7 @@ function Listings() {
                     </button>
                     <button
                       onClick={() => setDeleteConfirm(listing.id)}
-                      className="p-2 rounded-lg text-slate-400 hover:text-red-300 hover:bg-red-500/20 transition-colors"
+                      className="p-2 rounded-lg text-terra-ink-soft hover:text-red-300 hover:bg-red-500/20 transition-colors"
                       title="Delete"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -400,3 +400,4 @@ function Listings() {
 }
 
 export default Listings
+

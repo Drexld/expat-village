@@ -292,7 +292,7 @@ function LiveYourLife() {
       {activeCategory ? (
         <button
           onClick={() => setActiveCategory(null)}
-          className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
+          className="inline-flex items-center gap-2 text-terra-ink-soft hover:text-terra-ink transition-colors"
         >
           <Icon name="arrowLeft" size={16} />
           Back to Live Your Life
@@ -300,7 +300,7 @@ function LiveYourLife() {
       ) : (
         <Link
           to="/"
-          className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
+          className="inline-flex items-center gap-2 text-terra-ink-soft hover:text-terra-ink transition-colors"
         >
           <Icon name="arrowLeft" size={16} />
           Back to Home
@@ -312,11 +312,11 @@ function LiveYourLife() {
           <header className="glass-panel rounded-3xl p-6">
             <div className="flex items-center gap-3 mb-3">
               <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
-                <Icon name="sun" size={22} className="text-slate-100" />
+                <Icon name="sun" size={22} className="text-terra-ink" />
               </div>
-              <h1 className="text-3xl font-semibold text-white">Live Your Life</h1>
+              <h1 className="text-3xl font-semibold text-terra-ink">Live Your Life</h1>
             </div>
-            <p className="text-slate-400 text-lg">
+            <p className="text-terra-ink-soft text-lg">
               Beyond paperwork - gyms, food, fun, and building your social life in Poland.
             </p>
           </header>
@@ -324,14 +324,14 @@ function LiveYourLife() {
           <div className="glass-3d rounded-3xl p-6 hover-tilt">
             <div className="flex items-start gap-4">
               <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
-                <Icon name="dumbbell" size={20} className="text-slate-100" />
+                <Icon name="dumbbell" size={20} className="text-terra-ink" />
               </div>
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <h3 className="text-lg font-semibold text-white">MultiSport Card</h3>
-                  <span className="glass-chip text-xs px-2 py-0.5 rounded-full text-slate-100">Ask Your Employer</span>
+                  <h3 className="text-lg font-semibold text-terra-ink">MultiSport Card</h3>
+                  <span className="glass-chip text-xs px-2 py-0.5 rounded-full text-terra-primary">Ask Your Employer</span>
                 </div>
-                <p className="text-slate-300 text-sm mb-3">
+                <p className="text-terra-ink-soft text-sm mb-3">
                   Access 4,500+ gyms, pools, and fitness facilities across Poland. Many employers offer this as a free or subsidized benefit.
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -352,26 +352,26 @@ function LiveYourLife() {
                 onClick={() => setActiveCategory(category.id)}
                 className={`w-full text-left glass-panel hover-tilt rounded-2xl p-5 transition-all ${
                   category.featured
-                    ? 'border border-emerald-400/30'
-                    : 'border border-white/10'
+                    ? 'border border-terra-sage/40'
+                    : 'border border-terra-taupe/40'
                 }`}
               >
                 <div className="flex items-center gap-4">
                   <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
-                    <Icon name={category.icon} size={20} className="text-slate-100" />
+                    <Icon name={category.icon} size={20} className="text-terra-ink" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="text-lg font-semibold text-white">{category.title}</h3>
+                      <h3 className="text-lg font-semibold text-terra-ink">{category.title}</h3>
                       {category.featured && (
-                        <span className="glass-chip text-xs px-2 py-0.5 rounded-full text-emerald-100">Popular</span>
+                        <span className="glass-chip text-xs px-2 py-0.5 rounded-full text-terra-sage">Popular</span>
                       )}
                     </div>
-                    <p className="text-slate-400 text-sm">{category.shortDesc}</p>
+                    <p className="text-terra-ink-soft text-sm">{category.shortDesc}</p>
                   </div>
                   <div className="text-right">
-                    <Icon name="arrowRight" size={16} className="text-slate-400" />
-                    <p className="text-xs text-slate-500 mt-1">Updated {category.lastUpdated}</p>
+                    <Icon name="arrowRight" size={16} className="text-terra-taupe" />
+                    <p className="text-xs text-terra-taupe mt-1">Updated {category.lastUpdated}</p>
                   </div>
                 </div>
               </button>
@@ -379,24 +379,24 @@ function LiveYourLife() {
           </div>
 
           <div className="glass-panel rounded-2xl p-6">
-            <h3 className="text-lg font-semibold text-white mb-4">Coming Soon</h3>
+            <h3 className="text-lg font-semibold text-terra-ink mb-4">Coming Soon</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex items-start gap-3">
                 <div className="glass-panel flex h-10 w-10 items-center justify-center rounded-xl">
-                  <Icon name="search" size={18} className="text-slate-100" />
+                  <Icon name="search" size={18} className="text-terra-ink" />
                 </div>
                 <div>
-                  <h4 className="font-medium text-white">Verified Directory</h4>
-                  <p className="text-slate-400 text-sm">Expat-rated salons, gyms, restaurants with real reviews</p>
+                  <h4 className="font-medium text-terra-ink">Verified Directory</h4>
+                  <p className="text-terra-ink-soft text-sm">Expat-rated salons, gyms, restaurants with real reviews</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <div className="glass-panel flex h-10 w-10 items-center justify-center rounded-xl">
-                  <Icon name="calendar" size={18} className="text-slate-100" />
+                  <Icon name="calendar" size={18} className="text-terra-ink" />
                 </div>
                 <div>
-                  <h4 className="font-medium text-white">Events Calendar</h4>
-                  <p className="text-slate-400 text-sm">Weekly roundup of English-friendly events in your city</p>
+                  <h4 className="font-medium text-terra-ink">Events Calendar</h4>
+                  <p className="text-terra-ink-soft text-sm">Weekly roundup of English-friendly events in your city</p>
                 </div>
               </div>
             </div>
@@ -407,37 +407,37 @@ function LiveYourLife() {
           <header className="glass-panel rounded-3xl p-6">
             <div className="flex items-center gap-3">
               <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
-                <Icon name={activeContent.icon} size={22} className="text-slate-100" />
+                <Icon name={activeContent.icon} size={22} className="text-terra-ink" />
               </div>
               <div>
-                <h1 className="text-3xl font-semibold text-white">{activeContent.title}</h1>
-                <p className="text-slate-400 text-sm">Last updated: {activeContent.lastUpdated}</p>
+                <h1 className="text-3xl font-semibold text-terra-ink">{activeContent.title}</h1>
+                <p className="text-terra-ink-soft text-sm">Last updated: {activeContent.lastUpdated}</p>
               </div>
             </div>
           </header>
 
           <section className="glass-panel rounded-2xl p-5">
-            <h2 className="text-xl font-semibold text-slate-100 mb-3">What is it?</h2>
-            <p className="text-slate-300 leading-relaxed">{activeContent.content.whatIsIt}</p>
+            <h2 className="text-xl font-semibold text-terra-ink mb-3">What is it?</h2>
+            <p className="text-terra-ink leading-relaxed">{activeContent.content.whatIsIt}</p>
           </section>
 
           <section className="glass-panel rounded-2xl p-5">
-            <h2 className="text-xl font-semibold text-slate-100 mb-3">Why it matters</h2>
-            <p className="text-slate-300 leading-relaxed">{activeContent.content.whyItMatters}</p>
+            <h2 className="text-xl font-semibold text-terra-ink mb-3">Why it matters</h2>
+            <p className="text-terra-ink leading-relaxed">{activeContent.content.whyItMatters}</p>
           </section>
 
           <section className="glass-panel rounded-2xl p-5">
-            <h2 className="text-xl font-semibold text-slate-100 mb-3">How to do it</h2>
+            <h2 className="text-xl font-semibold text-terra-ink mb-3">How to do it</h2>
             <div className="space-y-4">
               {activeContent.content.steps.map((step) => (
                 <div key={step.step} className="glass-chip rounded-2xl p-4">
                   <div className="flex gap-4">
-                    <span className="w-8 h-8 bg-slate-600/60 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                    <span className="w-8 h-8 bg-terra-primary/80 text-white rounded-full flex items-center justify-center font-bold text-sm">
                       {step.step}
                     </span>
                     <div>
-                      <h3 className="font-semibold text-white mb-1">{step.title}</h3>
-                      <p className="text-slate-400 text-sm leading-relaxed">{step.details}</p>
+                      <h3 className="font-semibold text-terra-ink mb-1">{step.title}</h3>
+                      <p className="text-terra-ink-soft text-sm leading-relaxed">{step.details}</p>
                     </div>
                   </div>
                 </div>
@@ -446,16 +446,16 @@ function LiveYourLife() {
           </section>
 
           <section className="glass-panel rounded-2xl p-5">
-            <h2 className="text-xl font-semibold text-slate-100 mb-3">What to do next</h2>
-            <p className="text-slate-300 leading-relaxed">{activeContent.content.whatNext}</p>
+            <h2 className="text-xl font-semibold text-terra-ink mb-3">What to do next</h2>
+            <p className="text-terra-ink leading-relaxed">{activeContent.content.whatNext}</p>
           </section>
 
           <section className="glass-panel rounded-2xl p-5">
-            <h2 className="text-xl font-semibold text-slate-100 mb-3">Pro Tips</h2>
+            <h2 className="text-xl font-semibold text-terra-ink mb-3">Pro Tips</h2>
             <ul className="space-y-2">
               {activeContent.content.proTips.map((tip, index) => (
-                <li key={index} className="flex gap-2 text-slate-300">
-                  <Icon name="spark" size={14} className="text-slate-400" />
+                <li key={index} className="flex gap-2 text-terra-ink">
+                  <Icon name="spark" size={14} className="text-terra-taupe" />
                   <span>{tip}</span>
                 </li>
               ))}
@@ -463,7 +463,7 @@ function LiveYourLife() {
           </section>
 
           <section className="glass-panel rounded-2xl p-5">
-            <h2 className="text-sm font-semibold text-slate-400 mb-3">Sources and official links</h2>
+            <h2 className="text-sm font-semibold text-terra-ink-soft mb-3">Sources and official links</h2>
             <div className="flex flex-wrap gap-3">
               {activeContent.content.sources.map((source, index) => (
                 <a
@@ -471,7 +471,7 @@ function LiveYourLife() {
                   href={source.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-slate-200 hover:text-white underline"
+                  className="text-sm text-terra-ink hover:text-terra-primary underline"
                 >
                   {source.name}
                 </a>
@@ -485,3 +485,4 @@ function LiveYourLife() {
 }
 
 export default LiveYourLife
+

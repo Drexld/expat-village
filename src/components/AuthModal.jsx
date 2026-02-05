@@ -96,7 +96,7 @@ function AuthModal() {
     <>
       {/* Backdrop with blur */}
       <div 
-        className="fixed inset-0 bg-black/80 backdrop-blur-md z-50"
+        className="fixed inset-0 bg-black/70 backdrop-blur-xl z-50"
         onClick={() => { closeAuthModal(); resetForm(); }}
         style={{ animation: 'fadeIn 0.3s ease' }}
       />
@@ -110,36 +110,36 @@ function AuthModal() {
           {/* Soft Glow Border */}
           <div
             className="absolute -inset-1 rounded-3xl blur-xl opacity-40"
-            style={{ background: 'linear-gradient(135deg, rgba(242,166,90,0.45), rgba(242,143,123,0.35))' }}
+            style={{ background: 'linear-gradient(135deg, rgba(199,107,85,0.45), rgba(246,195,143,0.35))' }}
           />
           
           {/* Modal Content */}
-          <div className="relative glass-strong border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
+          <div className="relative glass-strong texture-layer texture-paper texture-amber border border-black/10 rounded-3xl overflow-hidden shadow-2xl glass-sheen">
             
           {/* ===== GLASS BACKDROP ===== */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
             <div className="absolute inset-0" style={{
-              background: 'linear-gradient(180deg, rgba(11,12,18,0.65) 0%, rgba(17,20,34,0.9) 55%, rgba(11,12,18,0.75) 100%)'
+              background: 'linear-gradient(160deg, rgba(18,14,12,0.7) 0%, rgba(20,16,14,0.82) 55%, rgba(10,8,7,0.9) 100%)'
             }} />
-            <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full blur-3xl opacity-40" style={{ background: 'rgba(242,166,90,0.25)' }} />
-            <div className="absolute -bottom-28 -left-24 w-80 h-80 rounded-full blur-3xl opacity-30" style={{ background: 'rgba(242,143,123,0.2)' }} />
+            <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full blur-3xl opacity-35" style={{ background: 'rgba(199,107,85,0.3)' }} />
+            <div className="absolute -bottom-28 -left-24 w-80 h-80 rounded-full blur-3xl opacity-35" style={{ background: 'rgba(117,153,124,0.3)' }} />
           </div>
 
             {/* ===== MODAL HEADER ===== */}
             <div className="relative pt-8 pb-4 px-6 text-center">
               <button
                 onClick={() => { closeAuthModal(); resetForm(); }}
-                className="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors p-1"
+                className="absolute top-4 right-4 text-terra-taupe hover:text-terra-ink transition-colors p-1"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
               
-              <h2 className="text-2xl font-bold text-white mb-1">
+              <h2 className="text-2xl font-bold text-terra-ink mb-1">
                 {activeTab === 'sign_in' ? 'Welcome Back!' : 'Join the Village'}
               </h2>
-              <p className="text-slate-400 text-sm">
+              <p className="text-terra-taupe text-sm">
                 {activeTab === 'sign_in' ? 'Your village missed you' : 'Your Poland journey starts here'}
               </p>
             </div>
@@ -150,8 +150,8 @@ function AuthModal() {
                 onClick={() => handleTabChange('sign_in')}
                 className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all duration-300 ${
                   activeTab === 'sign_in'
-                    ? 'bg-white/10 text-white shadow-glass'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-terra-cream text-terra-ink shadow-glass'
+                    : 'text-terra-taupe hover:text-terra-ink'
                 }`}
               >
                 Sign In
@@ -160,8 +160,8 @@ function AuthModal() {
                 onClick={() => handleTabChange('sign_up')}
                 className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all duration-300 ${
                   activeTab === 'sign_up'
-                    ? 'bg-white/10 text-white shadow-glass'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-terra-cream text-terra-ink shadow-glass'
+                    : 'text-terra-taupe hover:text-terra-ink'
                 }`}
               >
                 Sign Up
@@ -172,14 +172,14 @@ function AuthModal() {
             <div className="relative px-6 pb-8">
               
               {error && (
-                <div className="bg-red-500/20 border border-red-500/50 rounded-xl px-4 py-3 mb-4">
-                  <p className="text-red-300 text-sm">{error}</p>
+                <div className="bg-red-500/15 border border-red-400/30 rounded-xl px-4 py-3 mb-4">
+                  <p className="text-red-200 text-sm">{error}</p>
                 </div>
               )}
 
               {success && (
-                <div className="bg-emerald-500/20 border border-emerald-500/50 rounded-xl px-4 py-3 mb-4">
-                  <p className="text-emerald-300 text-sm">{success}</p>
+                <div className="bg-emerald-500/15 border border-emerald-400/30 rounded-xl px-4 py-3 mb-4">
+                  <p className="text-emerald-200 text-sm">{success}</p>
                 </div>
               )}
 
@@ -187,7 +187,7 @@ function AuthModal() {
               <button
                 onClick={handleGoogleSignIn}
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-100 text-gray-800 font-medium py-3.5 rounded-xl transition-all duration-300 hover:scale-[1.02] mb-5 disabled:opacity-50"
+                className="w-full flex items-center justify-center gap-3 glass-panel text-terra-ink font-medium py-3.5 rounded-xl transition-all duration-300 hover:scale-[1.02] mb-5 disabled:opacity-50"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -199,40 +199,41 @@ function AuthModal() {
               </button>
 
               <div className="flex items-center gap-4 mb-5">
-                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-                <span className="text-slate-500 text-sm">or</span>
-                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#A89A8F]/40 to-transparent" />
+                <span className="text-terra-taupe text-sm">or</span>
+                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#A89A8F]/40 to-transparent" />
               </div>
 
               {/* Sign In Form */}
               {activeTab === 'sign_in' && (
                 <form onSubmit={handleSignIn} className="space-y-4">
                   <div>
-                    <label className="block text-slate-400 text-sm mb-2 font-medium">Email</label>
+                    <label className="block text-terra-taupe text-sm mb-2 font-medium">Email</label>
                     <input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="w-full bg-white/5 border border-white/10 focus:border-white/30 rounded-xl px-4 py-3.5 text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-white/20"
+                      className="w-full bg-terra-cream/80 border border-black/20 focus:border-[#C76B55] rounded-xl px-4 py-3.5 text-terra-ink placeholder-terra-taupe outline-none transition-all focus:ring-2 focus:ring-[#C76B55]/30"
                       placeholder="you@example.com"
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-400 text-sm mb-2 font-medium">Password</label>
+                    <label className="block text-terra-taupe text-sm mb-2 font-medium">Password</label>
                     <input
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="w-full bg-white/5 border border-white/10 focus:border-white/30 rounded-xl px-4 py-3.5 text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-white/20"
+                      className="w-full bg-terra-cream/80 border border-black/20 focus:border-[#C76B55] rounded-xl px-4 py-3.5 text-terra-ink placeholder-terra-taupe outline-none transition-all focus:ring-2 focus:ring-[#C76B55]/30"
                       placeholder="********"
                     />
                   </div>
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full glass-3d text-white font-bold py-4 rounded-xl transition-all duration-300 hover:scale-[1.02] disabled:opacity-50"
+                    className="w-full text-terra-bg font-bold py-4 rounded-xl transition-all duration-300 hover:scale-[1.02] disabled:opacity-50"
+                    style={{ background: 'linear-gradient(135deg, #C76B55, #D07C63)' }}
                   >
                     {loading ? 'Signing in...' : 'Sign In'}
                   </button>
@@ -243,43 +244,44 @@ function AuthModal() {
               {activeTab === 'sign_up' && !success && (
                 <form onSubmit={handleSignUp} className="space-y-4">
                   <div>
-                    <label className="block text-slate-400 text-sm mb-2 font-medium">What should we call you?</label>
+                    <label className="block text-terra-taupe text-sm mb-2 font-medium">What should we call you?</label>
                     <input
                       type="text"
                       value={displayName}
                       onChange={(e) => setDisplayName(e.target.value)}
                       required
-                      className="w-full bg-white/5 border border-white/10 focus:border-white/30 rounded-xl px-4 py-3.5 text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-white/20"
+                      className="w-full bg-terra-cream/80 border border-black/20 focus:border-[#C76B55] rounded-xl px-4 py-3.5 text-terra-ink placeholder-terra-taupe outline-none transition-all focus:ring-2 focus:ring-[#C76B55]/30"
                       placeholder="Your name or nickname"
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-400 text-sm mb-2 font-medium">Email</label>
+                    <label className="block text-terra-taupe text-sm mb-2 font-medium">Email</label>
                     <input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="w-full bg-white/5 border border-white/10 focus:border-white/30 rounded-xl px-4 py-3.5 text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-white/20"
+                      className="w-full bg-terra-cream/80 border border-black/20 focus:border-[#C76B55] rounded-xl px-4 py-3.5 text-terra-ink placeholder-terra-taupe outline-none transition-all focus:ring-2 focus:ring-[#C76B55]/30"
                       placeholder="you@example.com"
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-400 text-sm mb-2 font-medium">Password</label>
+                    <label className="block text-terra-taupe text-sm mb-2 font-medium">Password</label>
                     <input
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
                       minLength={6}
-                      className="w-full bg-white/5 border border-white/10 focus:border-white/30 rounded-xl px-4 py-3.5 text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-white/20"
+                      className="w-full bg-terra-cream/80 border border-black/20 focus:border-[#C76B55] rounded-xl px-4 py-3.5 text-terra-ink placeholder-terra-taupe outline-none transition-all focus:ring-2 focus:ring-[#C76B55]/30"
                       placeholder="At least 6 characters"
                     />
                   </div>
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full glass-3d text-white font-bold py-4 rounded-xl transition-all duration-300 hover:scale-[1.02] disabled:opacity-50"
+                    className="w-full text-terra-bg font-bold py-4 rounded-xl transition-all duration-300 hover:scale-[1.02] disabled:opacity-50"
+                    style={{ background: 'linear-gradient(135deg, #C76B55, #D07C63)' }}
                   >
                     {loading ? 'Creating account...' : 'Join the Village'}
                   </button>
@@ -290,9 +292,9 @@ function AuthModal() {
               {activeTab === 'sign_up' && success && (
                 <div className="text-center py-4">
                   <div className="w-16 h-16 glass-panel rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Icon name="spark" className="w-7 h-7 text-slate-200" />
+                    <Icon name="spark" className="w-7 h-7 text-terra-primary" />
                   </div>
-                  <p className="text-white font-medium">{success}</p>
+                  <p className="text-terra-ink font-medium">{success}</p>
                 </div>
               )}
             </div>

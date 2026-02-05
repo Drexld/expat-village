@@ -154,13 +154,13 @@ function PersonalityOnboarding() {
         {step === 'welcome' && (
           <div className="text-center space-y-6">
             <div className="glass-panel inline-flex h-14 w-14 items-center justify-center rounded-2xl">
-              <Icon name="community" size={22} className="text-slate-100" />
+              <Icon name="community" size={22} className="text-terra-ink" />
             </div>
             <div>
-              <h1 className="text-3xl font-semibold text-white mb-2">
+              <h1 className="text-3xl font-semibold text-terra-ink mb-2">
                 {username ? `Hey ${username}` : 'Welcome to Expat Village'}
               </h1>
-              <p className="text-slate-400">
+              <p className="text-terra-ink-soft">
                 {username
                   ? 'One more thing before you dive in - let us find your tribe. This is going to be fun.'
                   : 'Before you enter, let us find your tribe. This is not your boring sign-up form.'
@@ -173,20 +173,20 @@ function PersonalityOnboarding() {
                 placeholder="First, what should we call you?"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-400"
+                className="w-full bg-terra-cream/70 border border-terra-taupe/40 rounded-xl px-4 py-3 text-terra-ink placeholder-terra-taupe focus:outline-none focus:border-terra-primary/50"
               />
             )}
             <button
               onClick={() => username && setStep('tribe')}
               disabled={!username}
-              className="w-full rounded-full border border-white/20 bg-white/10 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/20 disabled:opacity-50"
+              className="w-full rounded-full bg-terra-primary px-4 py-3 text-sm font-semibold text-white shadow-glass transition-colors hover:opacity-95 disabled:opacity-50"
             >
               {username ? 'Let us find my tribe' : 'Let us go'}
             </button>
             {isAuthenticated && (
               <button
                 onClick={() => navigate('/')}
-                className="text-slate-500 hover:text-slate-300 text-sm transition-colors"
+                className="text-terra-taupe hover:text-terra-ink text-sm transition-colors"
               >
                 Skip for now
               </button>
@@ -197,19 +197,19 @@ function PersonalityOnboarding() {
         {step === 'tribe' && (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-2xl font-semibold text-white mb-2">Hey {username}</h2>
-              <p className="text-slate-400">What is your thing? Pick your tribe.</p>
+              <h2 className="text-2xl font-semibold text-terra-ink mb-2">Hey {username}</h2>
+              <p className="text-terra-ink-soft">What is your thing? Pick your tribe.</p>
             </div>
             <div className="grid grid-cols-2 gap-3">
               {tribes.map((tribe) => (
                 <button
                   key={tribe.id}
                   onClick={() => handleTribeSelect(tribe)}
-                  className="glass-panel hover-tilt rounded-2xl p-4 text-left transition-all border border-white/10"
+                  className="glass-panel hover-tilt rounded-2xl p-4 text-left transition-all border border-terra-taupe/40"
                 >
-                  <Icon name={tribe.icon} size={24} className="text-slate-100 mb-2" />
-                  <h3 className="font-semibold text-white">{tribe.name}</h3>
-                  <p className="text-slate-500 text-sm">{tribe.desc}</p>
+                  <Icon name={tribe.icon} size={24} className="text-terra-ink mb-2" />
+                  <h3 className="font-semibold text-terra-ink">{tribe.name}</h3>
+                  <p className="text-terra-taupe text-sm">{tribe.desc}</p>
                 </button>
               ))}
             </div>
@@ -220,16 +220,16 @@ function PersonalityOnboarding() {
           <div className="space-y-6">
             <button
               onClick={() => setStep('tribe')}
-              className="text-slate-400 hover:text-white text-sm"
+              className="text-terra-ink-soft hover:text-terra-ink text-sm"
             >
               Back
             </button>
             <div className="text-center">
               <div className="glass-panel inline-flex h-14 w-14 items-center justify-center rounded-2xl mb-4">
-                <Icon name={selectedTribe.icon} size={22} className="text-slate-100" />
+                <Icon name={selectedTribe.icon} size={22} className="text-terra-ink" />
               </div>
-              <h2 className="text-2xl font-semibold text-white mb-2">{selectedTribe.name}</h2>
-              <p className="text-slate-400">Now tell us specifically - who or what do you support or follow?</p>
+              <h2 className="text-2xl font-semibold text-terra-ink mb-2">{selectedTribe.name}</h2>
+              <p className="text-terra-ink-soft">Now tell us specifically - who or what do you support or follow?</p>
             </div>
             <input
               type="text"
@@ -237,13 +237,13 @@ function PersonalityOnboarding() {
               value={userInput}
               onChange={(e) => setUserInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleInterestSubmit()}
-              className="w-full bg-slate-900/60 border border-white/10 rounded-xl px-4 py-3 text-white text-lg focus:outline-none focus:border-emerald-400"
+              className="w-full bg-terra-cream/70 border border-terra-taupe/40 rounded-xl px-4 py-3 text-terra-ink placeholder-terra-taupe text-lg focus:outline-none focus:border-terra-primary/50"
               autoFocus
             />
             <button
               onClick={handleInterestSubmit}
               disabled={!userInput.trim()}
-              className="w-full rounded-full border border-white/20 bg-white/10 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/20 disabled:opacity-50"
+              className="w-full rounded-full bg-terra-primary px-4 py-3 text-sm font-semibold text-white shadow-glass transition-colors hover:opacity-95 disabled:opacity-50"
             >
               Let us see what you got
             </button>
@@ -252,24 +252,24 @@ function PersonalityOnboarding() {
 
         {step === 'loading-banter' && (
           <div className="text-center py-10">
-            <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-6" />
-            <h2 className="text-xl font-semibold text-white mb-2">Hmm, {userInput}...</h2>
-            <p className="text-slate-400">Let me think of something to say about that.</p>
+            <div className="w-16 h-16 border-4 border-terra-primary border-t-transparent rounded-full animate-spin mx-auto mb-6" />
+            <h2 className="text-xl font-semibold text-terra-ink mb-2">Hmm, {userInput}...</h2>
+            <p className="text-terra-ink-soft">Let me think of something to say about that.</p>
           </div>
         )}
 
         {step === 'banter1' && initialBanter && (
           <div className="text-center space-y-6">
             <div className="glass-panel inline-flex h-14 w-14 items-center justify-center rounded-2xl">
-              <Icon name="spark" size={22} className="text-slate-100" />
+              <Icon name="spark" size={22} className="text-terra-ink" />
             </div>
-            <h2 className="text-2xl font-semibold text-white">{userInput}? Really?</h2>
+            <h2 className="text-2xl font-semibold text-terra-ink">{userInput}? Really?</h2>
             <div className="glass-chip rounded-2xl p-5">
-              <p className="text-slate-300 leading-relaxed">{initialBanter.banter}</p>
+              <p className="text-terra-ink leading-relaxed">{initialBanter.banter}</p>
             </div>
             <button
               onClick={handleStartQuiz}
-              className="w-full rounded-full border border-white/20 bg-white/10 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/20"
+              className="w-full rounded-full bg-terra-primary px-4 py-3 text-sm font-semibold text-white shadow-glass transition-colors hover:opacity-95"
             >
               Prove Me Wrong
             </button>
@@ -278,31 +278,31 @@ function PersonalityOnboarding() {
 
         {step === 'loading-quiz' && (
           <div className="text-center py-10">
-            <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-6" />
-            <h2 className="text-xl font-semibold text-white mb-2">Preparing your quiz...</h2>
-            <p className="text-slate-400">Let us see if you really know your stuff.</p>
+            <div className="w-16 h-16 border-4 border-terra-primary border-t-transparent rounded-full animate-spin mx-auto mb-6" />
+            <h2 className="text-xl font-semibold text-terra-ink mb-2">Preparing your quiz...</h2>
+            <p className="text-terra-ink-soft">Let us see if you really know your stuff.</p>
           </div>
         )}
 
         {step === 'quiz' && quizQuestions.length > 0 && (
           <div className="space-y-6">
-            <div className="flex justify-between items-center text-sm text-slate-400">
+            <div className="flex justify-between items-center text-sm text-terra-ink-soft">
               <span>Question {currentQuestion + 1}/{quizQuestions.length}</span>
-              <span className="text-emerald-200">Score: {score}</span>
+              <span className="text-terra-sage">Score: {score}</span>
             </div>
-            <div className="w-full bg-slate-900/60 rounded-full h-2">
+            <div className="w-full bg-terra-cream/70 rounded-full h-2">
               <div
-                className="bg-emerald-500 h-2 rounded-full transition-all duration-300"
+                className="bg-terra-primary h-2 rounded-full transition-all duration-300"
                 style={{ width: `${((currentQuestion + 1) / quizQuestions.length) * 100}%` }}
               />
             </div>
-            <h2 className="text-xl font-semibold text-white">{quizQuestions[currentQuestion].q}</h2>
+            <h2 className="text-xl font-semibold text-terra-ink">{quizQuestions[currentQuestion].q}</h2>
             <div className="space-y-3">
               {quizQuestions[currentQuestion].options.map((option, index) => (
                 <button
                   key={index}
                   onClick={() => handleAnswer(index)}
-                  className="w-full glass-panel hover-tilt rounded-2xl p-4 text-left text-white transition-all border border-white/10"
+                  className="w-full glass-panel hover-tilt rounded-2xl p-4 text-left text-terra-ink transition-all border border-terra-taupe/40"
                 >
                   {option}
                 </button>
@@ -313,29 +313,29 @@ function PersonalityOnboarding() {
 
         {step === 'loading-results' && (
           <div className="text-center py-10">
-            <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-6" />
-            <h2 className="text-xl font-semibold text-white mb-2">Analyzing your answers...</h2>
-            <p className="text-slate-400">The AI is judging you. Please wait.</p>
+            <div className="w-16 h-16 border-4 border-terra-primary border-t-transparent rounded-full animate-spin mx-auto mb-6" />
+            <h2 className="text-xl font-semibold text-terra-ink mb-2">Analyzing your answers...</h2>
+            <p className="text-terra-ink-soft">The AI is judging you. Please wait.</p>
           </div>
         )}
 
         {step === 'results' && finalBanter && (
           <div className="text-center space-y-6">
             <div className="glass-panel inline-flex h-14 w-14 items-center justify-center rounded-2xl">
-              <Icon name={score >= 4 ? 'trophy' : score >= 2 ? 'star' : 'spark'} size={22} className="text-slate-100" />
+              <Icon name={score >= 4 ? 'trophy' : score >= 2 ? 'star' : 'spark'} size={22} className="text-terra-ink" />
             </div>
             <div>
-              <h2 className="text-2xl font-semibold text-white mb-2">
+              <h2 className="text-2xl font-semibold text-terra-ink mb-2">
                 {score}/{quizQuestions.length} - {finalBanter.badge}
               </h2>
               <div className="glass-chip rounded-2xl p-5">
-                <p className="text-slate-300 leading-relaxed italic">"{finalBanter.banter}"</p>
+                <p className="text-terra-ink leading-relaxed italic">"{finalBanter.banter}"</p>
               </div>
             </div>
-            <p className="text-emerald-200 text-sm">{finalBanter.townHallSuggestion}</p>
+            <p className="text-terra-sage text-sm">{finalBanter.townHallSuggestion}</p>
             <button
               onClick={() => setStep('badge')}
-              className="w-full rounded-full border border-white/20 bg-white/10 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/20"
+              className="w-full rounded-full bg-terra-primary px-4 py-3 text-sm font-semibold text-white shadow-glass transition-colors hover:opacity-95"
             >
               Claim My Badge
             </button>
@@ -346,21 +346,21 @@ function PersonalityOnboarding() {
           <div className="text-center space-y-6">
             <div className="glass-3d rounded-3xl p-6 hover-tilt">
               <div className="glass-panel inline-flex h-14 w-14 items-center justify-center rounded-2xl mb-4">
-                <Icon name={selectedTribe?.icon} size={22} className="text-slate-100" />
+                <Icon name={selectedTribe?.icon} size={22} className="text-terra-ink" />
               </div>
-              <h2 className="text-2xl font-semibold text-white mb-2">{userInput}</h2>
-              <p className="text-emerald-200 font-medium mb-4">{finalBanter?.badge || 'Fan'}</p>
+              <h2 className="text-2xl font-semibold text-terra-ink mb-2">{userInput}</h2>
+              <p className="text-terra-sage font-medium mb-4">{finalBanter?.badge || 'Fan'}</p>
               <div className="glass-panel rounded-2xl p-4">
-                <p className="text-slate-400 text-sm">Badge Holder</p>
-                <p className="text-white font-semibold text-lg">@{username}</p>
+                <p className="text-terra-ink-soft text-sm">Badge Holder</p>
+                <p className="text-terra-ink font-semibold text-lg">@{username}</p>
               </div>
             </div>
-            <p className="text-slate-400">
+            <p className="text-terra-ink-soft">
               Your badge is now visible on your profile. Find your people in Town Hall.
             </p>
             <button
               onClick={handleFinish}
-              className="w-full rounded-full border border-white/20 bg-white/10 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/20"
+              className="w-full rounded-full bg-terra-primary px-4 py-3 text-sm font-semibold text-white shadow-glass transition-colors hover:opacity-95"
             >
               Enter the Village
             </button>
@@ -372,3 +372,5 @@ function PersonalityOnboarding() {
 }
 
 export default PersonalityOnboarding
+
+

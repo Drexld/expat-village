@@ -105,49 +105,49 @@ function Settings() {
       <div>
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-slate-400 hover:text-white mb-4 transition-colors"
+          className="flex items-center gap-2 text-terra-ink-soft hover:text-terra-ink mb-4 transition-colors"
         >
           <Icon name="arrowLeft" size={16} />
           Back
         </button>
-        <h1 className="text-2xl font-bold text-white">Settings</h1>
-        <p className="text-slate-400 text-sm mt-1">
+        <h1 className="text-2xl font-bold text-terra-ink">Settings</h1>
+        <p className="text-terra-ink-soft text-sm mt-1">
           Personalize your Expat Village experience
         </p>
       </div>
 
       <section>
-        <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-          <Icon name="document" size={14} className="text-slate-400" /> Residence Permit (TRC)
+        <h2 className="text-sm font-semibold text-terra-taupe uppercase tracking-wider mb-4 flex items-center gap-2">
+          <Icon name="document" size={14} className="text-terra-taupe" /> Residence Permit (TRC)
         </h2>
-        <div className="glass-panel rounded-2xl p-4">
-          <label className="block text-sm text-white mb-2">
+        <div className="action-card texture-layer texture-paper">
+          <label className="block text-sm text-terra-ink mb-2">
             TRC Expiry Date
           </label>
           <input
             type="date"
             value={trcExpiryDate}
             onChange={(e) => setTrcExpiryDate(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl glass-panel border border-white/10 text-white focus:outline-none focus:border-slate-400 transition-colors"
+            className="w-full px-4 py-3 rounded-xl bg-terra-cream border border-black/10 text-terra-ink focus:outline-none focus:border-terra-primary transition-colors"
           />
-          <p className="text-xs text-slate-500 mt-2">
+          <p className="text-xs text-terra-taupe mt-2">
             We will remind you 60, 45, and 30 days before expiry
           </p>
         </div>
       </section>
 
       <section>
-        <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-          <Icon name="globe" size={14} className="text-slate-400" /> Experience Level
+        <h2 className="text-sm font-semibold text-terra-taupe uppercase tracking-wider mb-4 flex items-center gap-2">
+          <Icon name="globe" size={14} className="text-terra-taupe" /> Experience Level
         </h2>
-        <div className="glass-panel rounded-2xl p-4">
-          <label className="block text-sm text-white mb-2">
+        <div className="action-card texture-layer texture-paper">
+          <label className="block text-sm text-terra-ink mb-2">
             How long have you been in Poland?
           </label>
           <select
             value={yearsInPoland}
             onChange={(e) => setYearsInPoland(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl glass-panel border border-white/10 text-white focus:outline-none focus:border-slate-400 transition-colors"
+            className="w-full px-4 py-3 rounded-xl bg-terra-cream border border-black/10 text-terra-ink focus:outline-none focus:border-terra-primary transition-colors"
           >
             <option value="">Select...</option>
             <option value="0">Just arrived (less than 1 year)</option>
@@ -156,17 +156,17 @@ function Settings() {
             <option value="5">5+ years</option>
             <option value="10">10+ years (veteran)</option>
           </select>
-          <p className="text-xs text-slate-500 mt-2">
+          <p className="text-xs text-terra-taupe mt-2">
             This helps us show you relevant content
           </p>
         </div>
       </section>
 
       <section>
-        <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-          <Icon name="star" size={14} className="text-slate-400" /> Your Interests
+        <h2 className="text-sm font-semibold text-terra-taupe uppercase tracking-wider mb-4 flex items-center gap-2">
+          <Icon name="star" size={14} className="text-terra-taupe" /> Your Interests
         </h2>
-        <p className="text-xs text-slate-500 mb-4">
+        <p className="text-xs text-terra-taupe mb-4">
           Select topics you want to see updates about
         </p>
         <div className="grid grid-cols-2 gap-2">
@@ -177,15 +177,15 @@ function Settings() {
                 key={option.id}
                 onClick={() => toggleInterest(option.id)}
                 className={`flex items-center gap-2 px-3 py-3 rounded-xl transition-all text-left ${
-                  isSelected ? 'glass-strong ring-1 ring-white/20' : 'glass-panel'
+                  isSelected ? 'glass-strong ring-1 ring-terra-primary/30' : 'glass-panel'
                 }`}
               >
-                <Icon name={option.icon} size={16} className="text-slate-200" />
-                <span className={`text-sm ${isSelected ? 'text-white' : 'text-slate-300'}`}>
+                <Icon name={option.icon} size={16} className="text-terra-ink" />
+                <span className={`text-sm ${isSelected ? 'text-terra-ink' : 'text-terra-ink-soft'}`}>
                   {option.label}
                 </span>
                 {isSelected && (
-                  <Icon name="success" size={14} className="text-emerald-200 ml-auto" />
+                  <Icon name="success" size={14} className="text-terra-sage ml-auto" />
                 )}
               </button>
             )
@@ -194,8 +194,8 @@ function Settings() {
       </section>
 
       <section>
-        <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-          <Icon name="bell" size={14} className="text-slate-400" /> Notifications
+        <h2 className="text-sm font-semibold text-terra-taupe uppercase tracking-wider mb-4 flex items-center gap-2">
+          <Icon name="bell" size={14} className="text-terra-taupe" /> Notifications
         </h2>
         <div className="space-y-3">
           {[
@@ -205,11 +205,11 @@ function Settings() {
           ].map((pref) => (
             <div
               key={pref.key}
-              className="flex items-center justify-between p-4 rounded-xl glass-panel"
+              className="flex items-center justify-between p-4 rounded-xl action-card texture-layer texture-paper"
             >
               <div>
-                <p className="text-sm text-white">{pref.label}</p>
-                <p className="text-xs text-slate-500">{pref.desc}</p>
+                <p className="text-sm text-terra-ink">{pref.label}</p>
+                <p className="text-xs text-terra-taupe">{pref.desc}</p>
               </div>
               <button
                 onClick={() => setReminderPrefs(prev => ({
@@ -217,11 +217,11 @@ function Settings() {
                   [pref.key]: !prev[pref.key]
                 }))}
                 className={`w-12 h-7 rounded-full transition-colors relative ${
-                  reminderPrefs[pref.key] ? 'bg-slate-200/60' : 'bg-slate-700'
+                  reminderPrefs[pref.key] ? 'bg-terra-primary/30' : 'bg-terra-cream'
                 }`}
               >
                 <div
-                  className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-transform ${
+                  className={`absolute top-1 w-5 h-5 bg-terra-bg rounded-full transition-transform ${
                     reminderPrefs[pref.key] ? 'translate-x-6' : 'translate-x-1'
                   }`}
                 />
@@ -232,20 +232,20 @@ function Settings() {
       </section>
 
       <section>
-        <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-          <Icon name="crown" size={14} className="text-slate-400" /> Subscription
+        <h2 className="text-sm font-semibold text-terra-taupe uppercase tracking-wider mb-4 flex items-center gap-2">
+          <Icon name="crown" size={14} className="text-terra-taupe" /> Subscription
         </h2>
-        <div className="glass-panel rounded-2xl p-4">
+        <div className="action-card texture-layer texture-paper">
           <div className="flex items-center justify-between mb-3">
             <div>
               <div className="flex items-center gap-2">
-                <p className="text-white font-medium">
+                <p className="text-terra-ink font-medium">
                   {plan === 'free' ? 'Free Plan' : `${plan.charAt(0).toUpperCase() + plan.slice(1)} Plan`}
                 </p>
                 <SubscriptionBadge />
               </div>
               {subscription?.current_period_end && (
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-terra-taupe mt-1">
                   {subscription.status === 'active'
                     ? `Renews ${new Date(subscription.current_period_end).toLocaleDateString()}`
                     : `Expires ${new Date(subscription.current_period_end).toLocaleDateString()}`}
@@ -255,7 +255,8 @@ function Settings() {
             {plan === 'free' ? (
               <Link
                 to="/pricing"
-                className="glass-chip px-4 py-2 rounded-lg text-white text-sm font-medium transition-colors"
+                className="text-terra-bg px-4 py-2 rounded-lg text-sm font-medium transition-colors hover-tilt"
+                style={{ background: 'linear-gradient(135deg, #C76B55, #D07C63)' }}
               >
                 Upgrade
               </Link>
@@ -273,14 +274,15 @@ function Settings() {
                   setPortalLoading(false)
                 }}
                 disabled={portalLoading || subLoading}
-                className="glass-chip px-4 py-2 rounded-lg text-white text-sm font-medium transition-colors disabled:opacity-50"
+                className="text-terra-bg px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 hover-tilt"
+                style={{ background: 'linear-gradient(135deg, #C76B55, #D07C63)' }}
               >
                 {portalLoading ? 'Loading...' : 'Manage'}
               </button>
             )}
           </div>
           {plan !== 'free' && (
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-terra-taupe">
               Manage your subscription, update payment methods, or cancel via the Stripe portal.
             </p>
           )}
@@ -289,32 +291,33 @@ function Settings() {
 
       <div className="sticky bottom-20 pt-4">
         {error && (
-          <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-200 text-sm">
+          <div className="mb-4 p-3 rounded-xl bg-red-100 border border-red-400/30 text-red-700 text-sm">
             {error}
           </div>
         )}
         {saved && (
-          <div className="mb-4 p-3 rounded-xl glass-panel text-emerald-200 text-sm flex items-center gap-2">
-            <Icon name="success" size={16} className="text-emerald-200" />
+          <div className="mb-4 p-3 rounded-xl action-card texture-layer texture-paper text-terra-sage text-sm flex items-center gap-2">
+            <Icon name="success" size={16} className="text-terra-sage" />
             Settings saved
           </div>
         )}
         <button
           onClick={handleSave}
           disabled={saving}
-          className="w-full py-4 rounded-2xl font-semibold text-white transition-all disabled:opacity-50 glass-strong"
+          className="w-full py-4 rounded-2xl font-semibold text-terra-bg transition-all disabled:opacity-50 hover-tilt"
+          style={{ background: 'linear-gradient(135deg, #C76B55, #D07C63)' }}
         >
           {saving ? 'Saving...' : 'Save Settings'}
         </button>
       </div>
 
-      <section className="mt-8 pt-8 border-t border-white/10">
-        <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">
+      <section className="mt-8 pt-8 border-t border-black/10">
+        <h2 className="text-sm font-semibold text-terra-taupe uppercase tracking-wider mb-4">
           Account
         </h2>
-        <div className="glass-panel rounded-xl p-4">
-          <p className="text-sm text-slate-400">Signed in as</p>
-          <p className="text-white">{user?.email}</p>
+        <div className="action-card texture-layer texture-paper rounded-xl p-4">
+          <p className="text-sm text-terra-taupe">Signed in as</p>
+          <p className="text-terra-ink">{user?.email}</p>
         </div>
       </section>
     </div>

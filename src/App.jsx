@@ -58,8 +58,8 @@ function DeviceCheck({ children }) {
   // Show loading while checking
   if (isChecking) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="text-purple-400">Loading...</div>
+      <div className="min-h-screen bg-terra-bg flex items-center justify-center">
+        <div className="text-terra-primary">Loading...</div>
       </div>
     )
   }

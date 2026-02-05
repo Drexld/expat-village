@@ -24,13 +24,14 @@ function TownHall() {
   const [sending, setSending] = useState(false)
   const [messageError, setMessageError] = useState(null)
   const [joinError, setJoinError] = useState(null)
+  const [joinPulse, setJoinPulse] = useState(null)
   const channelRef = useRef(null)
 
   const activityLabel = useMemo(() => ({
-    very_active: { label: 'Very Active', color: 'text-emerald-200' },
-    active: { label: 'Active', color: 'text-sky-200' },
-    moderate: { label: 'Moderate', color: 'text-amber-200' },
-    quiet: { label: 'Quiet', color: 'text-slate-400' },
+    very_active: { label: 'Very Active', color: 'text-terra-primary' },
+    active: { label: 'Active', color: 'text-terra-ink' },
+    moderate: { label: 'Moderate', color: 'text-terra-sage' },
+    quiet: { label: 'Quiet', color: 'text-terra-taupe' },
   }), [])
 
   const roomIcons = useMemo(() => ({
@@ -97,6 +98,8 @@ function TownHall() {
   }, [activeRoom?.conversation_id])
 
   const handleJoinRoom = async (room) => {
+    setJoinPulse(room?.id)
+    setTimeout(() => setJoinPulse(null), 600)
     if (!isAuthenticated) {
       openAuthModal('sign_up')
       return
@@ -147,63 +150,94 @@ function TownHall() {
 
   const renderMainView = () => (
     <>
-      <header className="glass-panel rounded-3xl p-6">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
-            <Icon name="chat" size={22} className="text-slate-100" />
+      <header className="hero-card texture-layer texture-paper texture-amber glass-sheen">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="glass-3d flex h-12 w-12 items-center justify-center rounded-2xl">
+            <Icon name="chat" size={22} className="text-terra-ink" />
           </div>
-          <h1 className="text-3xl font-semibold text-white">Town Hall</h1>
+          <div>
+            <p className="text-xs uppercase tracking-widest text-terra-taupe">Town Hall</p>
+            <h1 className="text-2xl font-semibold text-terra-ink">Real conversations, right now</h1>
+          </div>
         </div>
-        <p className="text-slate-400 text-lg">
-          Real expats, real conversations, real-time. Your community hub.
+        <p className="text-terra-ink-soft text-sm">
+          A cozy community hub for real expats. Tap a room and jump in.
         </p>
       </header>
 
+      <section className="hero-card texture-layer texture-paper texture-photo glass-sheen">
+        <div className="flex items-start gap-4">
+          <div className="glass-3d flex h-12 w-12 items-center justify-center rounded-2xl">
+            <Icon name="mic" size={20} className="text-terra-ink" />
+          </div>
+          <div className="flex-1">
+            <p className="text-xs uppercase tracking-widest text-terra-taupe">Host Your Own Session</p>
+            <h3 className="text-xl font-semibold text-terra-ink mb-2">Share what you know</h3>
+            <p className="text-terra-ink-soft mb-4 text-sm">
+              Tax tips, apartment hunting stories, language exchange - anything goes.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <button className="rounded-full px-4 py-2 text-sm font-medium text-terra-bg hover-tilt"
+                style={{ background: 'linear-gradient(135deg, #C76B55, #D07C63)' }}
+              >
+                Start Live Now
+              </button>
+              <button className="rounded-full border border-black/10 bg-terra-cream px-4 py-2 text-sm text-terra-ink-soft transition-colors hover:bg-terra-bg">
+                Schedule for Later
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="space-y-3">
-        <h2 className="text-xl font-semibold text-white">Community Rooms</h2>
+        <h2 className="text-sm font-semibold text-terra-ink">Community Rooms</h2>
 
         {joinError && (
-          <div className="glass-panel rounded-2xl p-4 border border-red-500/30 text-red-200 text-sm">
+          <div className="action-card texture-layer texture-paper border border-red-400/30 text-red-700 text-sm">
             {joinError}
           </div>
         )}
         {roomsLoading ? (
-          <div className="glass-panel rounded-2xl p-6 text-slate-400 text-sm">Loading rooms...</div>
+          <div className="action-card texture-layer texture-paper text-terra-taupe text-sm">Loading rooms...</div>
         ) : roomsError ? (
-          <div className="glass-panel rounded-2xl p-6 border border-red-500/30 text-red-200 text-sm">
+          <div className="action-card texture-layer texture-paper border border-red-400/30 text-red-700 text-sm">
             {roomsError}
           </div>
         ) : rooms.length === 0 ? (
-          <div className="glass-panel rounded-2xl p-6 text-slate-400 text-sm">No rooms available yet.</div>
+          <div className="action-card texture-layer texture-paper text-terra-taupe text-sm">No rooms available yet.</div>
         ) : (
           <div className="space-y-2">
-            {rooms.map((room) => {
+            {rooms.map((room, index) => {
               const activity = activityLabel[room.activity_level] || activityLabel.active
               const iconName = roomIcons[room.slug] || 'chat'
               return (
                 <button
                   key={room.id}
                   onClick={() => handleJoinRoom(room)}
-                  className="w-full text-left glass-panel hover-tilt rounded-2xl p-4 transition-all border border-white/10"
+                  className={`w-full text-left action-card texture-layer texture-paper hover-tilt transition-all ${
+                    joinPulse === room.id ? 'bounce-soft' : ''
+                  } motion-rise`}
+                  style={{ animationDelay: `${index * 70}ms` }}
                 >
                   <div className="flex items-center gap-4">
                     <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
-                      <Icon name={iconName} size={20} className="text-slate-100" />
+                      <Icon name={iconName} size={20} className="text-terra-ink" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-0.5">
-                        <h3 className="font-semibold text-white">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <h3 className="font-semibold text-terra-ink">
                           {room.title}
                         </h3>
-                        <span className={`text-xs ${activity.color}`}>{activity.label}</span>
+                        <span className="pill text-xs">{activity.label}</span>
                       </div>
-                      <p className="text-slate-500 text-sm truncate">
+                      <p className="text-terra-ink-soft text-sm truncate">
                         {room.description || 'Join the conversation'}
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-slate-500 text-xs">Live chat</p>
-                      <p className="text-slate-600 text-xs">Tap to join</p>
+                      <p className="text-terra-taupe text-xs">Live chat</p>
+                      <p className="text-terra-primary text-xs font-semibold">Tap to join</p>
                     </div>
                   </div>
                 </button>
@@ -213,38 +247,15 @@ function TownHall() {
         )}
       </section>
 
-      <section className="glass-3d rounded-3xl p-6 hover-tilt">
-        <div className="flex items-start gap-4">
-          <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
-            <Icon name="mic" size={20} className="text-slate-100" />
-          </div>
-          <div className="flex-1">
-            <h3 className="text-xl font-semibold text-white mb-2">Host Your Own Session</h3>
-            <p className="text-slate-300 mb-4">
-              Got expertise to share? Host a live session and help fellow expats.
-              Tax tips, apartment hunting stories, language exchange - anything goes.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <button className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/20">
-                Start Live Now
-              </button>
-              <button className="rounded-full border border-white/10 px-4 py-2 text-sm text-slate-200 transition-colors hover:bg-white/10">
-                Schedule for Later
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
           { label: 'Community Members', value: '8.2k+' },
           { label: 'Sessions This Month', value: '156', accent: true },
           { label: 'Active Community', value: '24/7' }
         ].map((stat) => (
-          <div key={stat.label} className="glass-panel rounded-2xl p-4 text-center">
-            <p className={`text-2xl font-semibold ${stat.accent ? 'text-emerald-200' : 'text-white'}`}>{stat.value}</p>
-            <p className="text-slate-400 text-sm">{stat.label}</p>
+          <div key={stat.label} className="action-card texture-layer texture-paper text-center">
+            <p className={`text-2xl font-semibold ${stat.accent ? 'text-terra-primary' : 'text-terra-ink'}`}>{stat.value}</p>
+            <p className="text-terra-taupe text-sm">{stat.label}</p>
           </div>
         ))}
       </section>
@@ -255,10 +266,10 @@ function TownHall() {
     const iconName = roomIcons[activeRoom?.slug] || 'chat'
     return (
       <div className="flex flex-col h-[calc(100vh-200px)]">
-        <div className="glass-panel rounded-t-3xl p-4">
+        <div className="glass-strong rounded-t-3xl p-4">
           <button
             onClick={() => setActiveView('main')}
-            className="text-slate-400 hover:text-white mb-3 text-sm flex items-center gap-2"
+            className="text-terra-ink-soft hover:text-terra-ink mb-3 text-sm flex items-center gap-2"
           >
             <Icon name="arrowLeft" size={14} />
             Back to Town Hall
@@ -266,24 +277,24 @@ function TownHall() {
 
           <div className="flex items-center gap-3">
             <div className="glass-panel flex h-10 w-10 items-center justify-center rounded-xl">
-              <Icon name={iconName} size={18} className="text-slate-100" />
+              <Icon name={iconName} size={18} className="text-terra-ink" />
             </div>
             <div>
-              <h1 className="text-xl font-semibold text-white">{activeRoom?.title}</h1>
-              <p className="text-slate-400 text-sm">{activeRoom?.description || 'Live room'}</p>
+              <h1 className="text-xl font-semibold text-terra-ink">{activeRoom?.title}</h1>
+              <p className="text-terra-ink-soft text-sm">{activeRoom?.description || 'Live room'}</p>
             </div>
           </div>
         </div>
 
-        <div className="flex-1 glass-panel border-x border-white/5 p-4 overflow-y-auto">
+        <div className="flex-1 glass-panel border-x border-black/5 p-4 overflow-y-auto">
           {messagesLoading ? (
-            <div className="text-center text-slate-400">Loading messages...</div>
+            <div className="text-center text-terra-taupe">Loading messages...</div>
           ) : messages.length === 0 ? (
             <div className="text-center">
               <div className="glass-panel inline-flex h-14 w-14 items-center justify-center rounded-2xl mb-3">
-                <Icon name="chat" size={22} className="text-slate-100" />
+                <Icon name="chat" size={22} className="text-terra-ink" />
               </div>
-              <p className="text-slate-400">No messages yet. Start the conversation.</p>
+              <p className="text-terra-ink-soft">No messages yet. Start the conversation.</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -296,13 +307,15 @@ function TownHall() {
                 return (
                   <div key={msg.id} className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
                     <div className={`max-w-[75%] rounded-2xl px-3 py-2 text-sm ${
-                      isOwn ? 'bg-emerald-500/80 text-white' : 'glass-chip text-slate-200'
-                    }`}>
+                      isOwn ? 'text-terra-bg' : 'glass-chip text-terra-ink'
+                    }`}
+                    style={isOwn ? { background: 'linear-gradient(135deg, #C76B55, #D07C63)' } : undefined}
+                    >
                       {!isOwn && (
-                        <p className="text-xs text-slate-400 mb-1">{senderName}</p>
+                        <p className="text-xs text-terra-taupe mb-1">{senderName}</p>
                       )}
                       <p className="whitespace-pre-line">{msg.content}</p>
-                      <p className="text-[10px] text-slate-300/70 mt-1">
+                      <p className="text-[10px] text-terra-taupe mt-1">
                         {new Date(msg.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                       </p>
                     </div>
@@ -313,9 +326,9 @@ function TownHall() {
           )}
         </div>
 
-        <div className="glass-panel rounded-b-3xl p-4">
+        <div className="glass-strong rounded-b-3xl p-4">
           {messageError && (
-            <div className="mb-2 text-xs text-red-300">{messageError}</div>
+            <div className="mb-2 text-xs text-red-700">{messageError}</div>
           )}
           <div className="flex items-center gap-3">
             <input
@@ -325,14 +338,15 @@ function TownHall() {
               onChange={(e) => setMessageInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
               disabled={!isAuthenticated || sending}
-              className={`flex-1 bg-slate-900/60 border border-white/10 rounded-xl px-4 py-2 placeholder-slate-500 ${
-                !isAuthenticated ? 'text-slate-400 cursor-not-allowed' : 'text-white'
+              className={`flex-1 bg-terra-cream border border-black/10 rounded-xl px-4 py-2 placeholder-terra-taupe ${
+                !isAuthenticated ? 'text-terra-taupe cursor-not-allowed' : 'text-terra-ink'
               }`}
             />
             <button
               onClick={handleSendMessage}
               disabled={!isAuthenticated || sending || !messageInput.trim()}
-              className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/20 disabled:opacity-50"
+              className="rounded-full px-4 py-2 text-sm font-medium text-terra-bg transition-colors disabled:opacity-50"
+              style={{ background: 'linear-gradient(135deg, #C76B55, #D07C63)' }}
             >
               {sending ? 'Sending...' : 'Send'}
             </button>
@@ -347,7 +361,7 @@ function TownHall() {
       {activeView === 'main' && (
         <Link
           to="/"
-          className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
+          className="inline-flex items-center gap-2 text-terra-ink-soft hover:text-terra-ink transition-colors"
         >
           <Icon name="arrowLeft" size={16} />
           Back to Home

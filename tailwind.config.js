@@ -11,21 +11,20 @@ export default {
         display: ['Fraunces', 'serif'],
       },
       colors: {
-        ink: {
-          900: '#070a14',
-          800: '#0d1222',
-          700: '#151b2f',
-        },
-        accent: {
-          1: '#f2a65a',
-          2: '#f6c38f',
-          3: '#f28f7b',
-          4: '#f7d9b5',
+        terra: {
+          bg: '#FDFBF8',
+          cream: '#F6F1EA',
+          primary: '#C76B55',
+          sage: '#75997C',
+          taupe: '#A89A8F',
+          ink: '#4D302A',
+          inkSoft: '#6A4A42',
+          'ink-soft': '#6A4A42',
         },
       },
       boxShadow: {
-        glass: '0 14px 40px rgba(4, 6, 12, 0.55)',
-        'glass-soft': '0 8px 24px rgba(4, 6, 12, 0.35)',
+        glass: '0 16px 36px rgba(77, 48, 42, 0.16)',
+        'glass-soft': '0 10px 24px rgba(77, 48, 42, 0.12)',
       },
     },
   },

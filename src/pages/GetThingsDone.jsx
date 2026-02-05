@@ -1,4 +1,4 @@
-﻿import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import Icon from '../components/Icon'
 
@@ -12,6 +12,8 @@ function GetThingsDone() {
       title: 'Open a Bank Account',
       shortDesc: 'Expat-friendly banks that speak English',
       lastUpdated: 'January 2025',
+      progress: 0.45,
+      nextStep: 'Choose a bank',
       content: {
         whatIsIt: 'A Polish bank account (konto bankowe) lets you receive salary, pay rent, and handle daily transactions. Without one, you will struggle with everything from paying bills to getting a phone contract.',
         whyItMatters: 'Most landlords require Polish bank transfers. Employers pay salaries to Polish accounts. Many services (phone, internet, gym) need a Polish IBAN for direct debit.',
@@ -56,6 +58,8 @@ function GetThingsDone() {
       title: 'Get Your PESEL Number',
       shortDesc: 'Your Polish ID number for everything',
       lastUpdated: 'January 2025',
+      progress: 0.25,
+      nextStep: 'Book the district office',
       content: {
         whatIsIt: 'PESEL is an 11-digit national identification number. Think of it like a Social Security Number. It is used for taxes, healthcare, banking, and most official processes.',
         whyItMatters: 'Without PESEL: no public healthcare, complicated banking, cannot sign many contracts, tax filing is harder. With PESEL: everything becomes easier. It is free and takes about 30 minutes to get.',
@@ -100,6 +104,8 @@ function GetThingsDone() {
       title: 'Residency Registration',
       shortDesc: 'Temporary and permanent residence permits',
       lastUpdated: 'January 2025',
+      progress: 0.12,
+      nextStep: 'Collect documents',
       content: {
         whatIsIt: 'Residency registration (zameldowanie) is registering your address with authorities. For non-EU citizens, you also need a residence permit (karta pobytu) to stay legally beyond your visa.',
         whyItMatters: 'EU citizens: Zameldowanie is technically required but rarely enforced. Non-EU citizens: a residence permit is required to live and work legally.',
@@ -144,6 +150,8 @@ function GetThingsDone() {
       title: 'Rental Contract Review',
       shortDesc: 'Red flags and what to watch for',
       lastUpdated: 'January 2025',
+      progress: 0.62,
+      nextStep: 'Review key clauses',
       content: {
         whatIsIt: 'A rental contract (umowa najmu) is a legal agreement between you and your landlord. Contracts are usually in Polish, which puts expats at a disadvantage.',
         whyItMatters: 'Bad contracts can let landlords evict you with no notice, keep your deposit unfairly, or lock you in with huge penalties.',
@@ -186,6 +194,8 @@ function GetThingsDone() {
       title: 'English-Speaking Lawyers',
       shortDesc: 'Legal help when you need it',
       lastUpdated: 'January 2025',
+      progress: 0.08,
+      nextStep: 'Collect recommendations',
       content: {
         whatIsIt: 'Sometimes you need professional legal help for immigration issues, contract disputes, employment problems, or starting a business.',
         whyItMatters: 'Polish law is different from your home country. A good lawyer can speed up immigration cases, protect you from bad contracts, and handle disputes professionally.',
@@ -228,6 +238,8 @@ function GetThingsDone() {
       title: 'ZUS and Social Security',
       shortDesc: 'Understanding Polish social insurance',
       lastUpdated: 'January 2025',
+      progress: 0.33,
+      nextStep: 'Create ZUS account',
       content: {
         whatIsIt: 'ZUS is Poland social insurance institution. If you work in Poland, you and your employer pay into ZUS. This covers healthcare (NFZ), pension, disability, sick leave, and maternity benefits.',
         whyItMatters: 'ZUS contributions give you access to public healthcare (NFZ), future pension rights, paid sick leave, and maternity/paternity leave.',
@@ -275,12 +287,12 @@ function GetThingsDone() {
         {activeCategory ? (
           <button
             onClick={() => setActiveCategory(null)}
-            className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
+            className="inline-flex items-center gap-2 text-terra-ink-soft hover:text-terra-ink transition-colors"
           >
-            <Icon name="arrowLeft" size={16} /> Back to Get Things Done
+            <Icon name="arrowLeft" size={16} /> Back to action plan
           </button>
         ) : (
-          <Link to="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
+          <Link to="/" className="inline-flex items-center gap-2 text-terra-ink-soft hover:text-terra-ink transition-colors">
             <Icon name="arrowLeft" size={16} /> Back to Home
           </Link>
         )}
@@ -288,38 +300,54 @@ function GetThingsDone() {
 
       {!activeCategory ? (
         <>
-          <header className="glass-panel rounded-3xl p-6">
+          <header className="hero-card texture-layer texture-paper texture-amber glass-sheen motion-rise">
             <div className="flex items-center gap-3 mb-3">
-              <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
-                <Icon name="checklist" size={22} className="text-slate-100" />
+              <div className="glass-3d flex h-12 w-12 items-center justify-center rounded-2xl">
+                <Icon name="checklist" size={22} className="text-terra-ink" />
               </div>
-              <h1 className="text-3xl font-semibold text-white">Get Things Done</h1>
+              <div>
+                <p className="text-xs uppercase tracking-widest text-terra-taupe">Action Plan</p>
+                <h1 className="text-2xl font-semibold text-terra-ink">Settle In, Step by Step</h1>
+              </div>
             </div>
-            <p className="text-slate-400 text-lg">
-              The essential tasks every expat needs to handle. Step by step, no confusion.
+            <p className="text-terra-ink-soft text-sm">
+              The essential tasks every expat needs to handle. One clear step at a time.
             </p>
           </header>
 
           <div className="space-y-3">
-            {categories.map((category) => (
+            {categories.map((category, index) => (
               <button
                 key={category.id}
                 onClick={() => setActiveCategory(category.id)}
-                className="w-full text-left glass-panel hover-tilt rounded-2xl p-5 transition-all"
+                className="w-full text-left action-card texture-layer texture-paper hover-tilt transition-all motion-rise"
+                style={{ '--rise-delay': `${0.04 + index * 0.05}s` }}
               >
                 <div className="flex items-center gap-4">
                   <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
-                    <Icon name={category.icon} size={20} className="text-slate-100" />
+                    <Icon name={category.icon} size={20} className="text-terra-ink" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-white">
+                    <h3 className="text-lg font-semibold text-terra-ink">
                       {category.title}
                     </h3>
-                    <p className="text-slate-400 text-sm">{category.shortDesc}</p>
+                    <p className="text-terra-taupe text-sm">{category.shortDesc}</p>
+                    <div className="mt-3">
+                      <div className="flex items-center justify-between text-xs text-terra-taupe mb-1">
+                        <span>Progress</span>
+                        <span>{Math.round(category.progress * 100)}%</span>
+                      </div>
+                      <div className="h-2 rounded-full bg-terra-cream">
+                        <div
+                          className="h-2 rounded-full"
+                          style={{ width: `${Math.round(category.progress * 100)}%`, background: '#C76B55' }}
+                        />
+                      </div>
+                    </div>
                   </div>
                   <div className="text-right">
-                    <Icon name="arrowRight" size={16} className="text-slate-400" />
-                    <p className="text-xs text-slate-500 mt-1">Updated {category.lastUpdated}</p>
+                    <Icon name="arrowRight" size={16} className="text-terra-primary" />
+                    <p className="text-xs text-terra-taupe mt-1">Next: {category.nextStep}</p>
                   </div>
                 </div>
               </button>
@@ -327,39 +355,44 @@ function GetThingsDone() {
           </div>
         </>
       ) : (
-        <article className="space-y-8">
-          <header className="glass-panel rounded-3xl p-6">
+        <article className="space-y-6">
+          <header className="hero-card texture-layer texture-paper texture-photo glass-sheen motion-rise">
             <div className="flex items-center gap-3 mb-2">
-              <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
-                <Icon name={activeContent.icon} size={22} className="text-slate-100" />
+              <div className="glass-3d flex h-12 w-12 items-center justify-center rounded-2xl">
+                <Icon name={activeContent.icon} size={22} className="text-terra-ink" />
               </div>
-              <h1 className="text-3xl font-semibold text-white">{activeContent.title}</h1>
+              <div>
+                <h1 className="text-2xl font-semibold text-terra-ink">{activeContent.title}</h1>
+                <p className="text-xs text-terra-taupe">Updated {activeContent.lastUpdated}</p>
+              </div>
             </div>
-            <p className="text-slate-500 text-sm">Last updated: {activeContent.lastUpdated}</p>
+            <p className="text-terra-ink-soft text-sm">
+              Keep this close and take one step today.
+            </p>
           </header>
 
-          <section className="glass-panel rounded-2xl p-5">
-            <h2 className="text-xl font-semibold text-slate-100 mb-3">What is it?</h2>
-            <p className="text-slate-300 leading-relaxed">{activeContent.content.whatIsIt}</p>
+          <section className="action-card texture-layer texture-paper">
+            <h2 className="text-lg font-semibold text-terra-ink mb-2">What is it?</h2>
+            <p className="text-terra-ink-soft leading-relaxed text-sm">{activeContent.content.whatIsIt}</p>
           </section>
 
-          <section className="glass-panel rounded-2xl p-5">
-            <h2 className="text-xl font-semibold text-slate-100 mb-3">Why it matters</h2>
-            <p className="text-slate-300 leading-relaxed">{activeContent.content.whyItMatters}</p>
+          <section className="action-card texture-layer texture-paper">
+            <h2 className="text-lg font-semibold text-terra-ink mb-2">Why it matters</h2>
+            <p className="text-terra-ink-soft leading-relaxed text-sm">{activeContent.content.whyItMatters}</p>
           </section>
 
-          <section className="glass-panel rounded-2xl p-5">
-            <h2 className="text-xl font-semibold text-slate-100 mb-4">How to do it</h2>
-            <div className="space-y-4">
+          <section className="action-card texture-layer texture-paper">
+            <h2 className="text-lg font-semibold text-terra-ink mb-3">How to do it</h2>
+            <div className="space-y-3">
               {activeContent.content.howToDoIt.map((step) => (
-                <div key={step.step} className="glass-chip rounded-lg p-4">
+                <div key={step.step} className="glass-panel rounded-xl p-4">
                   <div className="flex gap-3">
-                    <span className="flex-shrink-0 w-8 h-8 bg-white/10 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                    <span className="flex-shrink-0 w-8 h-8 bg-terra-primary/15 text-terra-ink rounded-full flex items-center justify-center font-bold text-sm">
                       {step.step}
                     </span>
                     <div>
-                      <h3 className="font-semibold text-white mb-1">{step.title}</h3>
-                      <p className="text-slate-400 text-sm leading-relaxed">{step.details}</p>
+                      <h3 className="font-semibold text-terra-ink mb-1">{step.title}</h3>
+                      <p className="text-terra-ink-soft text-sm leading-relaxed">{step.details}</p>
                     </div>
                   </div>
                 </div>
@@ -367,25 +400,25 @@ function GetThingsDone() {
             </div>
           </section>
 
-          <section className="glass-panel rounded-2xl p-5">
-            <h2 className="text-xl font-semibold text-slate-100 mb-3">What to do next</h2>
-            <p className="text-slate-300 leading-relaxed">{activeContent.content.whatNext}</p>
+          <section className="action-card texture-layer texture-paper">
+            <h2 className="text-lg font-semibold text-terra-ink mb-2">What to do next</h2>
+            <p className="text-terra-ink-soft leading-relaxed text-sm">{activeContent.content.whatNext}</p>
           </section>
 
-          <section className="glass-panel rounded-2xl p-5">
-            <h2 className="text-xl font-semibold text-slate-100 mb-3">Pro Tips</h2>
+          <section className="action-card texture-layer texture-paper">
+            <h2 className="text-lg font-semibold text-terra-ink mb-2">Pro tips</h2>
             <ul className="space-y-2">
               {activeContent.content.proTips.map((tip, index) => (
-                <li key={index} className="flex gap-2 text-slate-300">
-                  <Icon name="spark" size={14} className="text-slate-400" />
+                <li key={index} className="flex gap-2 text-terra-ink-soft text-sm">
+                  <Icon name="spark" size={14} className="text-terra-taupe" />
                   <span>{tip}</span>
                 </li>
               ))}
             </ul>
           </section>
 
-          <section className="glass-panel rounded-2xl p-5">
-            <h2 className="text-sm font-semibold text-slate-400 mb-3">Sources and official links</h2>
+          <section className="action-card texture-layer texture-paper">
+            <h2 className="text-sm font-semibold text-terra-taupe mb-3">Sources and official links</h2>
             <div className="flex flex-wrap gap-3">
               {activeContent.content.sources.map((source, index) => (
                 <a
@@ -393,7 +426,7 @@ function GetThingsDone() {
                   href={source.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-slate-200 hover:text-white underline"
+                  className="text-sm text-terra-ink hover:text-terra-primary underline"
                 >
                   {source.name}
                 </a>
