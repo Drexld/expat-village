@@ -37,12 +37,12 @@ This document outlines all security measures required to protect users.
 
 | Table | RLS | Policies |
 |-------|-----|----------|
-| `profiles` | ✅ | Users own data, admins read all |
-| `announcements` | ✅ | Public read, admin manage |
-| `system_alerts` | ✅ | Public read active, admin manage |
-| `featured_listings` | ✅ | Public read active, admin manage |
-| `checklist_progress` | ✅ | Users own data |
-| `vibes_votes` | ✅ | Users own votes |
+| `profiles` | Yes | Users own data, admins read all |
+| `announcements` | Yes | Public read, admin manage |
+| `system_alerts` | Yes | Public read active, admin manage |
+| `featured_listings` | Yes | Public read active, admin manage |
+| `checklist_progress` | Yes | Users own data |
+| `vibes_votes` | Yes | Users own votes |
 
 ### New Tables Required
 
@@ -872,7 +872,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 ## 12. Security Checklist
 
-### Implemented ✅
+### Implemented
 
 - [x] Row Level Security on core tables
 - [x] is_admin() security function
@@ -880,7 +880,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 - [x] Session management
 - [x] Supabase auth configuration
 
-### To Implement 🔲
+### To Implement
 
 - [ ] File upload validation (PDF)
 - [ ] Storage bucket policies

@@ -1,4 +1,4 @@
-// src/lib/groq.js
+﻿// src/lib/groq.js
 // Groq API integration for AI-powered features
 
 const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY
@@ -56,17 +56,17 @@ Rules:
 - Reference something specific about their choice (a meme, controversy, famous moment, rival, etc.)
 - Keep it to 2-3 sentences MAX
 - End with something like "Let's see if you're a real fan..."
-- Use 1-2 emojis max
+- Do not use emojis
 
 Examples of good banter:
-- For "Manchester United": "A Man United fan? Still living off the Fergie years, I see. Haven't won the league since Instagram was invented. 😏 Let's see if you actually know your stuff..."
-- For "Taylor Swift": "A Swiftie! Let me guess, you have a ranking of all her albums and get personally offended when someone says Fearless is mid. 💀 Let's test that superfan status..."
-- For "One Piece": "One Piece fan? So you've dedicated 1000+ episodes of your life to watching a rubber boy punch people. Respect. 🏴‍☠️ Let's see if you're nakama material..."
+- For "Manchester United": "A Man United fan? Still living off the Fergie years, I see. Haven't won the league since Instagram was invented.  Let's see if you actually know your stuff..."
+- For "Taylor Swift": "A Swiftie! Let me guess, you have a ranking of all her albums and get personally offended when someone says Fearless is mid.  Let's test that superfan status..."
+- For "One Piece": "One Piece fan? So you've dedicated 1000+ episodes of your life to watching a rubber boy punch people. Respect.  Let's see if you're nakama material..."
 
 IMPORTANT: Respond ONLY with valid JSON:
 {
   "banter": "Your witty 2-3 sentence roast here",
-  "emoji": "A single relevant emoji"
+  "emoji": ""
 }`
 
   try {
@@ -83,8 +83,8 @@ IMPORTANT: Respond ONLY with valid JSON:
   } catch (error) {
     console.error('Generate initial banter error:', error)
     return {
-      banter: `A ${interest} fan? Interesting choice... Let's see if you're actually a real fan or just here for the vibes. 😏`,
-      emoji: '🤔'
+      banter: `A ${interest} fan? Interesting choice... Let's see if you're actually a real fan or just here for the vibes. `,
+      emoji: ''
     }
   }
 }
@@ -161,7 +161,7 @@ They scored ${score}/${totalQuestions} (${percentage}%).
 Generate personalized banter based on their score:
 - 80-100%: Praise them! They're legit. But still be cheeky about it.
 - 50-79%: Tease them. Decent but room for improvement. Maybe a casual fan?
-- Below 50%: Roast them gently! Are they sure they're a fan? Wikipedia is free. 😂
+- Below 50%: Roast them gently! Are they sure they're a fan? Wikipedia is free. 
 
 Rules:
 - 2-3 sentences MAX
@@ -192,10 +192,10 @@ IMPORTANT: Respond ONLY with valid JSON:
     console.error('Generate final banter error:', error)
     return {
       banter: score >= 4 
-        ? `${score}/${totalQuestions}! Okay, you actually know your stuff. Welcome to the village, true ${interest} fan! 🔥`
+        ? `${score}/${totalQuestions}! Okay, you actually know your stuff. Welcome to the village, true ${interest} fan! `
         : score >= 2
-        ? `${score}/${totalQuestions}... Not terrible, but there's room for improvement. We'll let you in anyway. 😏`
-        : `${score}/${totalQuestions}?! Are you SURE you're a ${interest} fan? Wikipedia is free, my friend. 😂 We're letting you in anyway... on probation.`,
+        ? `${score}/${totalQuestions}... Not terrible, but there's room for improvement. We'll let you in anyway. `
+        : `${score}/${totalQuestions}?! Are you SURE you're a ${interest} fan? Wikipedia is free, my friend.  We're letting you in anyway... on probation.`,
       badge: score >= 4 ? 'Certified Superfan' : score >= 2 ? 'Casual Enjoyer' : 'Work in Progress',
       townHallSuggestion: `Head to Town Hall to find fellow ${interest} fans in Poland!`
     }
@@ -217,8 +217,7 @@ function getFallbackContractAnalysis(contractText) {
   const hasHighDeposit = textLower.includes('3 miesi') || contractText.includes('10,500') || contractText.includes('10500') || textLower.includes('three month')
   const hasEntryClause = textLower.includes('dowolnym momencie') || textLower.includes('any time') || textLower.includes('bez uprzedzenia') || textLower.includes('without notice')
   const hasShortNotice = textLower.includes('2-tygodn') || textLower.includes('2 week') || textLower.includes('dwutygodni')
-  const hasRepairClause = textLower.includes('wszystkie naprawy') || textLower.includes('all repairs') || textLower.includes('wszelkie naprawy')
-  const hasNoZameldowanie = textLower.includes('bez zameldowania') || textLower.includes('no registration') || textLower.includes('zameldowanie niemożliwe')
+  const hasNoZameldowanie = textLower.includes('bez zameldowania') || textLower.includes('no registration') || textLower.includes('zameldowanie niemoliwe')
 
   const redFlags = []
   const warnings = []
@@ -229,7 +228,7 @@ function getFallbackContractAnalysis(contractText) {
       clause: "Landlord entry without notice",
       issue: "ILLEGAL under Polish law. Art. 10 of Tenant Protection Act requires tenant consent.",
       recommendation: "Request removal of this clause",
-      polishLaw: "Art. 10 Ustawa o ochronie praw lokatorów"
+      polishLaw: "Art. 10 Ustawa o ochronie praw lokatorw"
     })
   }
 
@@ -247,7 +246,7 @@ function getFallbackContractAnalysis(contractText) {
       clause: "3-month deposit",
       issue: "High but legal. Maximum allowed is 12x monthly rent under Art. 6.",
       recommendation: "Try to negotiate down to 1-2 months",
-      polishLaw: "Art. 6 Ustawa o ochronie praw lokatorów"
+      polishLaw: "Art. 6 Ustawa o ochronie praw lokatorw"
     })
   }
 
@@ -256,7 +255,7 @@ function getFallbackContractAnalysis(contractText) {
       clause: "No registration allowed",
       issue: "ILLEGAL. Landlord cannot prohibit zameldowanie.",
       recommendation: "This clause is unenforceable - you have the right to register",
-      polishLaw: "Ustawa o ewidencji ludności"
+      polishLaw: "Ustawa o ewidencji ludnoci"
     })
   }
 
@@ -270,8 +269,8 @@ function getFallbackContractAnalysis(contractText) {
     warnings,
     goodClauses,
     questions: [
-      "Can we remove the entry clause? (Czy możemy usunąć klauzulę o wejściu?)",
-      "Can we extend the notice period? (Czy możemy wydłużyć okres wypowiedzenia?)"
+      "Can we remove the entry clause? (Czy moemy usun klauzul o wejciu?)",
+      "Can we extend the notice period? (Czy moemy wyduy okres wypowiedzenia?)"
     ],
     disclaimer: "This is AI analysis, not legal advice. Consult a Polish lawyer for binding guidance."
   }
@@ -279,13 +278,13 @@ function getFallbackContractAnalysis(contractText) {
 
 function getFallbackDocumentAnalysis(documentText) {
   const textLower = documentText.toLowerCase()
-  const isZUS = textLower.includes('zus') || textLower.includes('składk') || textLower.includes('ubezpiecz')
+  const isZUS = textLower.includes('zus') || textLower.includes('skadk') || textLower.includes('ubezpiecz')
   const isTax = textLower.includes('pit') || textLower.includes('podatk') || textLower.includes('skarbowy')
   const isResidency = textLower.includes('pobyt') || textLower.includes('karta') || textLower.includes('wojewod')
   
   return {
     documentType: isZUS ? "ZUS/Social Security Document" : isTax ? "Tax Document" : isResidency ? "Residency Document" : "Official Government Document",
-    polishName: "Dokument urzędowy",
+    polishName: "Dokument urzdowy",
     urgency: "ACTION NEEDED",
     summary: "This appears to be an official Polish government document. Please review the content carefully.",
     whatItMeans: "Government documents in Poland often require timely responses. Check for any deadlines mentioned.",
@@ -352,15 +351,15 @@ export async function analyzeDocument(documentText) {
 
 Common Polish government offices:
 - ZUS: Social security, health insurance
-- Urząd Skarbowy: Tax office
-- Urząd Wojewódzki: Residency permits
-- Urząd Miasta/Gminy: Local registration
+- Urzd Skarbowy: Tax office
+- Urzd Wojewdzki: Residency permits
+- Urzd Miasta/Gminy: Local registration
 
 Key terms:
 - Decyzja = Decision
 - Wezwanie = Summons (must respond)
 - Termin = Deadline
-- Odwołanie = Appeal
+- Odwoanie = Appeal
 
 IMPORTANT: Respond ONLY with valid JSON:
 {
@@ -426,3 +425,5 @@ export default {
   generateFinalBanter,
   generateGroqResponse
 }
+
+

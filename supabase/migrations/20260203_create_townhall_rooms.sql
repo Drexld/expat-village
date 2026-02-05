@@ -35,14 +35,14 @@ CREATE POLICY "Admins manage rooms" ON townhall_rooms
 -- Seed rooms (idempotent by slug)
 INSERT INTO townhall_rooms (slug, title, description, icon, activity_level, is_public)
 VALUES
-  ('newcomers', 'Newcomers Corner', 'Just arrived? Start here. Ask anything.', '👋', 'very_active', true),
-  ('housing', 'Housing & Rentals', 'Apartment hunting, roommates, landlord issues', '🏠', 'very_active', true),
-  ('jobs', 'Jobs & Networking', 'Career chat, job leads, professional connections', '💼', 'active', true),
-  ('social', 'Social & Events', 'Meetups, activities, and making friends', '🎉', 'very_active', true),
-  ('daily-life', 'Daily Life', 'Shopping, services, and everyday questions', '☕', 'active', true),
-  ('parents', 'Parents & Families', 'Kids, schools, and family life in Poland', '👨‍👩‍👧', 'active', true),
-  ('polish', 'Polish Language', 'Learning Polish, translation help, language wins', '🇵🇱', 'active', true),
-  ('buy-sell', 'Buy, Sell, Give', 'Marketplace for expats - furniture, items, freebies', '🛒', 'moderate', true)
+  ('newcomers', 'Newcomers Corner', 'Just arrived? Start here. Ask anything.', '', 'very_active', true),
+  ('housing', 'Housing & Rentals', 'Apartment hunting, roommates, landlord issues', '', 'very_active', true),
+  ('jobs', 'Jobs & Networking', 'Career chat, job leads, professional connections', '', 'active', true),
+  ('social', 'Social & Events', 'Meetups, activities, and making friends', '', 'very_active', true),
+  ('daily-life', 'Daily Life', 'Shopping, services, and everyday questions', '', 'active', true),
+  ('parents', 'Parents & Families', 'Kids, schools, and family life in Poland', '', 'active', true),
+  ('polish', 'Polish Language', 'Learning Polish, translation help, language wins', '', 'active', true),
+  ('buy-sell', 'Buy, Sell, Give', 'Marketplace for expats - furniture, items, freebies', '', 'moderate', true)
 ON CONFLICT (slug) DO NOTHING;
 
 -- Helper: create conversation for rooms that don't yet have one

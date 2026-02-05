@@ -1,9 +1,9 @@
-// src/components/UpgradePrompt.jsx
+﻿// src/components/UpgradePrompt.jsx
 // Inline upgrade prompt for contextual upsells
 
 import { Link } from 'react-router-dom'
 import { useSubscription } from '../hooks/useSubscription'
-
+import Icon from './Icon'
 /**
  * UpgradePrompt - Contextual upgrade prompt
  *
@@ -30,9 +30,9 @@ function UpgradePrompt({
     return (
       <Link
         to="/pricing"
-        className={`inline-flex items-center gap-1.5 text-sm text-purple-400 hover:text-purple-300 transition-colors ${className}`}
+        className={`inline-flex items-center gap-1.5 text-sm text-slate-300 hover:text-white transition-colors ${className}`}
       >
-        <span>👑</span>
+        <Icon name="crown" className="w-4 h-4" />
         <span className="underline">{message}</span>
       </Link>
     )
@@ -41,19 +41,14 @@ function UpgradePrompt({
   // Banner variant - horizontal strip
   if (variant === 'banner') {
     return (
-      <div className={`px-4 py-3 rounded-xl flex items-center justify-between ${className}`}
-        style={{
-          background: 'linear-gradient(90deg, rgba(139,92,246,0.15), rgba(251,191,36,0.1))',
-          border: '1px solid rgba(139,92,246,0.25)',
-        }}
-      >
+      <div className={`px-4 py-3 rounded-xl flex items-center justify-between glass-panel ${className}`}>
         <div className="flex items-center gap-2">
-          <span>👑</span>
+          <Icon name="crown" className="w-4 h-4 text-slate-200" />
           <span className="text-slate-300 text-sm">{message}</span>
         </div>
         <Link
           to="/pricing"
-          className="px-4 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium transition-colors"
+          className="px-4 py-1.5 rounded-lg glass-3d text-white text-sm font-medium transition-colors"
         >
           Upgrade
         </Link>
@@ -63,21 +58,15 @@ function UpgradePrompt({
 
   // Card variant - prominent
   return (
-    <div className={`p-5 rounded-2xl ${className}`}
-      style={{
-        background: 'linear-gradient(135deg, rgba(139,92,246,0.2), rgba(30,27,75,0.7))',
-        border: '1px solid rgba(139,92,246,0.3)',
-      }}
-    >
+    <div className={`p-5 rounded-2xl glass-strong ${className}`}>
       <div className="flex items-start gap-4">
-        <span className="text-3xl">👑</span>
+        <Icon name="crown" className="w-7 h-7 text-slate-200" />
         <div className="flex-1">
           <h4 className="text-white font-semibold mb-1">Upgrade to {targetPlan === 'premium' ? 'Premium' : 'Basic'}</h4>
           <p className="text-slate-400 text-sm mb-3">{message}</p>
           <Link
             to="/pricing"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-white text-sm transition-all"
-            style={{ background: 'linear-gradient(135deg, #8B5CF6, #7C3AED)' }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-white text-sm transition-all glass-3d"
           >
             See Plans
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -91,3 +80,5 @@ function UpgradePrompt({
 }
 
 export default UpgradePrompt
+
+

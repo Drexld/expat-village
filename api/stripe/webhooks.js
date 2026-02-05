@@ -1,6 +1,7 @@
 // api/stripe/webhooks.js
 // Handles Stripe webhook events for subscription lifecycle
 
+/* global process, Buffer */
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
 

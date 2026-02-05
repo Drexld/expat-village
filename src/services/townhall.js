@@ -24,7 +24,7 @@ export async function getTownHallRooms() {
   }
 }
 
-export async function joinRoomConversation(conversationId, userId) {
+export async function joinRoomConversation(conversationId) {
   try {
     const { data, error } = await supabase
       .rpc('join_conversation_participant', { p_conversation_id: conversationId })

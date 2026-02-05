@@ -3,6 +3,14 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
+import Icon from '../components/Icon'
+
+const SAMPLE_SONGS = [
+  { id: 'sample-1', title: 'Nie patrz Ewie', artist: 'Meskie Granie', vote_count: 24 },
+  { id: 'sample-2', title: 'Ostatni', artist: 'Sanah', vote_count: 18 },
+  { id: 'sample-3', title: 'Gdzie jest bialy wegorz', artist: 'Cypis', vote_count: 31 },
+  { id: 'sample-4', title: 'Melodia ulotna', artist: 'Daria Zawialow', vote_count: 15 },
+]
 
 function VillageVibes() {
   const { user, isAuthenticated, openAuthModal } = useAuth()
@@ -11,27 +19,18 @@ function VillageVibes() {
   const [loading, setLoading] = useState(true)
   const [voting, setVoting] = useState(null)
 
-  // Sample data - always available
-  const sampleSongs = [
-    { id: 'sample-1', title: 'Nie płacz Evie', artist: 'Męskie Granie', vote_count: 24 },
-    { id: 'sample-2', title: 'Ostatni', artist: 'Sanah', vote_count: 18 },
-    { id: 'sample-3', title: 'Gdzie jest biały węgorz?', artist: 'Cypis', vote_count: 31 },
-    { id: 'sample-4', title: 'Melodia ulotna', artist: 'Daria Zawiałow', vote_count: 15 },
-  ]
-
   useEffect(() => {
-    // Load saved votes from localStorage
     const savedVotes = localStorage.getItem('vibes-votes')
     if (savedVotes) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setUserVotes(JSON.parse(savedVotes))
     }
 
-    // Load saved song counts from localStorage
     const savedSongs = localStorage.getItem('vibes-songs')
     if (savedSongs) {
       setSongs(JSON.parse(savedSongs))
     } else {
-      setSongs(sampleSongs)
+      setSongs(SAMPLE_SONGS)
     }
 
     setLoading(false)
@@ -47,7 +46,6 @@ function VillageVibes() {
 
     const hasVoted = userVotes[songId]
 
-    // Update songs
     const updatedSongs = songs.map(song => {
       if (song.id === songId) {
         return { ...song, vote_count: song.vote_count + (hasVoted ? -1 : 1) }
@@ -57,7 +55,6 @@ function VillageVibes() {
     setSongs(updatedSongs)
     localStorage.setItem('vibes-songs', JSON.stringify(updatedSongs))
 
-    // Update user votes
     const updatedVotes = { ...userVotes }
     if (hasVoted) {
       delete updatedVotes[songId]
@@ -67,7 +64,6 @@ function VillageVibes() {
     setUserVotes(updatedVotes)
     localStorage.setItem('vibes-votes', JSON.stringify(updatedVotes))
 
-    // Try to save to database (optional - won't block UI)
     if (user) {
       try {
         if (hasVoted) {
@@ -75,7 +71,7 @@ function VillageVibes() {
         } else {
           await supabase.from('vibes_votes').insert({ user_id: user.id, item_id: songId })
         }
-      } catch (e) {
+      } catch {
         // Silently fail - localStorage has the data
       }
     }
@@ -83,7 +79,6 @@ function VillageVibes() {
     setVoting(null)
   }
 
-  // Sort by votes
   const sortedSongs = [...songs].sort((a, b) => b.vote_count - a.vote_count)
   const totalVotes = songs.reduce((sum, s) => sum + s.vote_count, 0)
 
@@ -96,41 +91,41 @@ function VillageVibes() {
   }
 
   return (
-    <div>
-      <nav className="mb-6">
-        <Link to="/" className="text-slate-400 hover:text-white transition-colors">
-          ← Back to Home
-        </Link>
-      </nav>
+    <div className="min-h-screen space-y-8">
+      <Link to="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
+        <Icon name="arrowLeft" size={16} />
+        Back to Home
+      </Link>
 
-      {/* Header */}
-      <header className="text-center mb-8">
-        <div className="text-5xl mb-4">🎵</div>
-        <h1 className="text-3xl font-bold text-white mb-2">Village Vibes</h1>
+      <header className="glass-panel rounded-3xl p-6 text-center">
+        <div className="glass-panel inline-flex h-14 w-14 items-center justify-center rounded-2xl mb-4">
+          <Icon name="music" size={22} className="text-slate-100" />
+        </div>
+        <h1 className="text-3xl font-semibold text-white mb-2">Village Vibes</h1>
         <p className="text-slate-400">
-          Vote for today's anthem! What's the expat community vibing to?
+          Vote for today anthem. What is the expat community vibing to?
         </p>
       </header>
 
-      {/* Today's Theme */}
-      <div className="bg-gradient-to-r from-purple-900/30 to-pink-900/30 border border-purple-700/50 rounded-xl p-6 mb-8 text-center">
-        <p className="text-purple-300 text-sm uppercase tracking-wide mb-2">Today's Theme</p>
-        <h2 className="text-2xl font-bold text-white">🇵🇱 Polish Bangers</h2>
+      <div className="glass-3d rounded-3xl p-6 text-center hover-tilt">
+        <p className="text-slate-400 text-xs uppercase tracking-wide mb-2">Today Theme</p>
+        <h2 className="text-2xl font-semibold text-white">Polish Bangers</h2>
         <p className="text-slate-400 mt-2">Songs that made us fall in love with Poland</p>
       </div>
 
-      {/* Auth Notice */}
       {!isAuthenticated && (
-        <div className="bg-amber-900/30 border border-amber-700/50 rounded-xl p-4 mb-6">
+        <div className="glass-panel rounded-2xl p-4 border border-amber-500/30">
           <div className="flex items-center gap-3">
-            <span className="text-xl">🗳️</span>
+            <div className="glass-panel flex h-10 w-10 items-center justify-center rounded-xl">
+              <Icon name="warning" size={18} className="text-amber-200" />
+            </div>
             <div className="flex-1">
-              <p className="text-amber-200 font-medium">Sign in to vote!</p>
+              <p className="text-amber-200 font-medium">Sign in to vote</p>
               <p className="text-slate-400 text-sm">Join the community and make your voice heard.</p>
             </div>
             <button
               onClick={() => openAuthModal('sign_up')}
-              className="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-lg text-sm transition-colors"
+              className="rounded-full border border-amber-400/40 bg-amber-500/20 px-4 py-2 text-sm text-amber-100 hover:bg-amber-500/30"
             >
               Sign Up
             </button>
@@ -138,17 +133,13 @@ function VillageVibes() {
         </div>
       )}
 
-      {/* Voting Stats */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="text-slate-400">
+      <div className="flex items-center justify-between text-sm text-slate-400">
+        <div>
           <span className="text-white font-semibold">{totalVotes}</span> votes today
         </div>
-        <div className="text-slate-500 text-sm">
-          Resets daily at midnight
-        </div>
+        <div>Resets daily at midnight</div>
       </div>
 
-      {/* Songs List */}
       <div className="space-y-3">
         {sortedSongs.map((song, index) => {
           const hasVoted = userVotes[song.id]
@@ -158,63 +149,55 @@ function VillageVibes() {
           return (
             <div
               key={song.id}
-              className={`relative bg-slate-800 border rounded-xl overflow-hidden transition-all ${
-                hasVoted ? 'border-emerald-500' : 'border-slate-700 hover:border-slate-600'
-              } ${isWinning ? 'ring-2 ring-yellow-500/50' : ''}`}
+              className={`relative glass-panel rounded-2xl overflow-hidden border ${
+                hasVoted ? 'border-emerald-500/40' : 'border-white/10'
+              } ${isWinning ? 'ring-2 ring-amber-400/40' : ''}`}
             >
-              {/* Progress bar background */}
               <div
                 className={`absolute inset-y-0 left-0 transition-all duration-500 ${
-                  hasVoted ? 'bg-emerald-900/30' : 'bg-slate-700/30'
+                  hasVoted ? 'bg-emerald-900/30' : 'bg-slate-700/20'
                 }`}
                 style={{ width: `${percentage}%` }}
               />
 
               <div className="relative p-4 flex items-center gap-4">
-                {/* Rank */}
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
-                  index === 0 ? 'bg-yellow-500 text-yellow-900' :
-                  index === 1 ? 'bg-slate-400 text-slate-900' :
-                  index === 2 ? 'bg-amber-600 text-amber-100' :
-                  'bg-slate-700 text-slate-400'
+                  index === 0 ? 'bg-amber-500 text-amber-900' :
+                  index === 1 ? 'bg-slate-300 text-slate-900' :
+                  index === 2 ? 'bg-amber-700 text-amber-100' :
+                  'bg-slate-700 text-slate-300'
                 }`}>
                   {index + 1}
                 </div>
 
-                {/* Song Info */}
                 <div className="flex-1 min-w-0">
-                  <h3 className={`font-semibold truncate ${hasVoted ? 'text-emerald-400' : 'text-white'}`}>
+                  <h3 className={`font-semibold truncate ${hasVoted ? 'text-emerald-200' : 'text-white'}`}>
                     {song.title}
                   </h3>
                   <p className="text-slate-400 text-sm">{song.artist}</p>
                 </div>
 
-                {/* Vote Count */}
                 <div className="text-right mr-2">
-                  <div className="text-white font-bold">{song.vote_count}</div>
-                  <div className="text-slate-500 text-xs">{percentage}%</div>
+                  <div className="text-white font-semibold">{song.vote_count}</div>
+                  <div className="text-slate-400 text-xs">{percentage}%</div>
                 </div>
 
-                {/* Vote Button */}
                 <button
                   onClick={() => handleVote(song.id)}
                   disabled={voting === song.id}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap ${
+                  className={`rounded-full border px-4 py-2 text-sm font-medium transition-all whitespace-nowrap ${
                     hasVoted
-                      ? 'bg-emerald-600 text-white hover:bg-emerald-500'
-                      : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                      ? 'border-emerald-400/50 bg-emerald-500/20 text-emerald-100 hover:bg-emerald-500/30'
+                      : 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'
                   } ${voting === song.id ? 'opacity-50' : ''}`}
                 >
-                  {voting === song.id ? '...' : hasVoted ? '✓ Voted' : 'Vote'}
+                  {voting === song.id ? '...' : hasVoted ? 'Voted' : 'Vote'}
                 </button>
               </div>
 
-              {/* Winning badge */}
               {isWinning && (
                 <div className="absolute top-2 right-2">
-                  <span className="bg-yellow-500 text-yellow-900 text-xs font-bold px-2 py-0.5 rounded-full">
-                    🏆 LEADING
-                  </span>
+                  <span className="glass-chip text-xs px-2 py-0.5 rounded-full text-amber-100">Leading</span>
                 </div>
               )}
             </div>
@@ -222,50 +205,41 @@ function VillageVibes() {
         })}
       </div>
 
-      {/* User's Voting Status */}
       {isAuthenticated && Object.keys(userVotes).length > 0 && (
-        <div className="mt-6 bg-emerald-900/20 border border-emerald-700/50 rounded-xl p-4">
+        <div className="glass-panel rounded-2xl p-4 border border-emerald-500/30">
           <div className="flex items-center gap-3">
-            <span className="text-2xl">🎉</span>
+            <div className="glass-panel flex h-10 w-10 items-center justify-center rounded-xl">
+              <Icon name="spark" size={18} className="text-emerald-200" />
+            </div>
             <div>
-              <p className="text-emerald-300 font-medium">You voted!</p>
-              <p className="text-slate-400 text-sm">
-                Thanks for sharing your vibe with the community.
-              </p>
+              <p className="text-emerald-200 font-medium">You voted</p>
+              <p className="text-slate-400 text-sm">Thanks for sharing your vibe with the community.</p>
             </div>
           </div>
         </div>
       )}
 
-      {/* Past Winners */}
-      <div className="mt-12">
-        <h2 className="text-xl font-bold text-white mb-4">🏆 Hall of Fame</h2>
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold text-white">Hall of Fame</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
-            <p className="text-slate-500 text-xs uppercase tracking-wide">Last Week</p>
-            <p className="text-white font-semibold mt-1">Gdzie jest biały węgorz?</p>
-            <p className="text-slate-400 text-sm">Cypis • 847 votes</p>
-          </div>
-          <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
-            <p className="text-slate-500 text-xs uppercase tracking-wide">Movie of the Month</p>
-            <p className="text-white font-semibold mt-1">Zimna Wojna</p>
-            <p className="text-slate-400 text-sm">Cold War • 623 votes</p>
-          </div>
-          <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
-            <p className="text-slate-500 text-xs uppercase tracking-wide">Album of the Month</p>
-            <p className="text-white font-semibold mt-1">Męskie Granie 2024</p>
-            <p className="text-slate-400 text-sm">Various • 512 votes</p>
-          </div>
+          {[
+            { label: 'Last Week', title: 'Gdzie jest bialy wegorz', detail: 'Cypis - 847 votes' },
+            { label: 'Movie of the Month', title: 'Zimna Wojna', detail: 'Cold War - 623 votes' },
+            { label: 'Album of the Month', title: 'Meskie Granie 2024', detail: 'Various - 512 votes' }
+          ].map((item) => (
+            <div key={item.label} className="glass-panel rounded-2xl p-4">
+              <p className="text-slate-500 text-xs uppercase tracking-wide">{item.label}</p>
+              <p className="text-white font-semibold mt-1">{item.title}</p>
+              <p className="text-slate-400 text-sm">{item.detail}</p>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Suggest a Song */}
-      <div className="mt-8 text-center">
-        <p className="text-slate-500 text-sm">
-          Got a song that defines your Poland experience?
-        </p>
-        <button className="mt-2 text-emerald-400 hover:text-emerald-300 text-sm transition-colors">
-          Suggest a song for tomorrow →
+      <div className="text-center">
+        <p className="text-slate-500 text-sm">Got a song that defines your Poland experience?</p>
+        <button className="mt-2 text-emerald-200 hover:text-emerald-100 text-sm transition-colors">
+          Suggest a song for tomorrow
         </button>
       </div>
     </div>

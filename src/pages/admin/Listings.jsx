@@ -3,12 +3,13 @@
 
 import { useState, useEffect } from 'react'
 import { getAllListings, createListing, updateListing, deleteListing } from '../../services/admin'
+import Icon from '../../components/Icon'
 
 const categories = [
-  { value: 'housing', label: 'Housing', icon: '🏠' },
-  { value: 'jobs', label: 'Jobs', icon: '💼' },
-  { value: 'services', label: 'Services', icon: '🛠️' },
-  { value: 'events', label: 'Events', icon: '🎉' },
+  { value: 'housing', label: 'Housing', icon: 'home' },
+  { value: 'jobs', label: 'Jobs', icon: 'briefcase' },
+  { value: 'services', label: 'Services', icon: 'tools' },
+  { value: 'events', label: 'Events', icon: 'calendar' },
 ]
 
 const emptyForm = {
@@ -32,16 +33,17 @@ function Listings() {
   const [deleteConfirm, setDeleteConfirm] = useState(null)
   const [filterCategory, setFilterCategory] = useState('all')
 
-  useEffect(() => {
-    fetchListings()
-  }, [])
-
-  async function fetchListings() {
+  const fetchListings = async () => {
     setLoading(true)
     const data = await getAllListings()
     setListings(data)
     setLoading(false)
   }
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchListings()
+  }, [])
 
   function handleEdit(listing) {
     setForm({
@@ -104,29 +106,27 @@ function Listings() {
     : listings.filter(l => l.category === filterCategory)
 
   return (
-    <div className="max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+    <div className="max-w-4xl mx-auto space-y-6">
+      <div className="glass-panel rounded-3xl p-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white mb-1">Featured Listings</h1>
+          <h1 className="text-2xl font-semibold text-white mb-1">Featured Listings</h1>
           <p className="text-slate-400">Manage featured content by category</p>
         </div>
         <button
           onClick={handleNew}
-          className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium rounded-xl transition-colors"
+          className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/20"
         >
-          + New Listing
+          New Listing
         </button>
       </div>
 
-      {/* Category Filter */}
-      <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2">
+      <div className="flex items-center gap-2 overflow-x-auto pb-2">
         <button
           onClick={() => setFilterCategory('all')}
-          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+          className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${
             filterCategory === 'all'
-              ? 'bg-purple-600 text-white'
-              : 'bg-slate-800 text-slate-400 hover:text-white'
+              ? 'bg-white/15 text-white border border-white/20'
+              : 'bg-slate-900/40 text-slate-400 border border-white/10 hover:text-white'
           }`}
         >
           All ({listings.length})
@@ -137,23 +137,25 @@ function Listings() {
             <button
               key={cat.value}
               onClick={() => setFilterCategory(cat.value)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+              className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${
                 filterCategory === cat.value
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-slate-800 text-slate-400 hover:text-white'
+                  ? 'bg-white/15 text-white border border-white/20'
+                  : 'bg-slate-900/40 text-slate-400 border border-white/10 hover:text-white'
               }`}
             >
-              {cat.icon} {cat.label} ({count})
+              <span className="inline-flex items-center gap-2">
+                <Icon name={cat.icon} size={14} className="text-slate-300" />
+                {cat.label} ({count})
+              </span>
             </button>
           )
         })}
       </div>
 
-      {/* Form Modal */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="w-full max-w-lg bg-slate-900 border border-slate-700 rounded-2xl p-6 max-h-[90vh] overflow-y-auto">
-            <h2 className="text-lg font-bold text-white mb-4">
+          <div className="w-full max-w-lg glass-panel rounded-3xl p-6 max-h-[90vh] overflow-y-auto">
+            <h2 className="text-lg font-semibold text-white mb-4">
               {editingId ? 'Edit Listing' : 'New Featured Listing'}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -163,7 +165,7 @@ function Listings() {
                   type="text"
                   value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:border-purple-500 focus:outline-none"
+                  className="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-xl text-white text-sm focus:border-emerald-400 focus:outline-none"
                   required
                 />
               </div>
@@ -173,7 +175,7 @@ function Listings() {
                   value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
                   rows={3}
-                  className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:border-purple-500 focus:outline-none resize-none"
+                  className="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-xl text-white text-sm focus:border-emerald-400 focus:outline-none resize-none"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -182,10 +184,10 @@ function Listings() {
                   <select
                     value={form.category}
                     onChange={(e) => setForm({ ...form, category: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:border-purple-500 focus:outline-none"
+                    className="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-xl text-white text-sm focus:border-emerald-400 focus:outline-none"
                   >
                     {categories.map((c) => (
-                      <option key={c.value} value={c.value}>{c.icon} {c.label}</option>
+                      <option key={c.value} value={c.value}>{c.label}</option>
                     ))}
                   </select>
                 </div>
@@ -196,7 +198,7 @@ function Listings() {
                     min="0"
                     value={form.display_order}
                     onChange={(e) => setForm({ ...form, display_order: parseInt(e.target.value) || 0 })}
-                    className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:border-purple-500 focus:outline-none"
+                    className="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-xl text-white text-sm focus:border-emerald-400 focus:outline-none"
                   />
                 </div>
               </div>
@@ -206,7 +208,7 @@ function Listings() {
                   type="url"
                   value={form.image_url}
                   onChange={(e) => setForm({ ...form, image_url: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:border-purple-500 focus:outline-none"
+                  className="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-xl text-white text-sm focus:border-emerald-400 focus:outline-none"
                   placeholder="https://..."
                 />
                 {form.image_url && (
@@ -226,7 +228,7 @@ function Listings() {
                   type="url"
                   value={form.link_url}
                   onChange={(e) => setForm({ ...form, link_url: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:border-purple-500 focus:outline-none"
+                  className="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-xl text-white text-sm focus:border-emerald-400 focus:outline-none"
                   placeholder="https://..."
                   required
                 />
@@ -237,7 +239,7 @@ function Listings() {
                   type="text"
                   value={form.link_text}
                   onChange={(e) => setForm({ ...form, link_text: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:border-purple-500 focus:outline-none"
+                  className="w-full px-3 py-2 bg-slate-900/60 border border-white/10 rounded-xl text-white text-sm focus:border-emerald-400 focus:outline-none"
                   placeholder="Learn more"
                 />
               </div>
@@ -245,7 +247,7 @@ function Listings() {
                 <button
                   type="button"
                   onClick={() => setForm({ ...form, active: !form.active })}
-                  className={`w-12 h-7 rounded-full transition-colors ${form.active ? 'bg-purple-600' : 'bg-slate-700'}`}
+                  className={`w-12 h-7 rounded-full transition-colors ${form.active ? 'bg-emerald-500' : 'bg-slate-700'}`}
                 >
                   <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${form.active ? 'translate-x-6' : 'translate-x-1'}`} />
                 </button>
@@ -255,14 +257,14 @@ function Listings() {
                 <button
                   type="button"
                   onClick={() => { setShowForm(false); setEditingId(null); setForm(emptyForm) }}
-                  className="flex-1 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium rounded-xl transition-colors"
+                  className="flex-1 rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-200 transition-colors hover:bg-white/10"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-500 disabled:bg-purple-800 text-white text-sm font-medium rounded-xl transition-colors"
+                  className="flex-1 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/20 disabled:opacity-50"
                 >
                   {saving ? 'Saving...' : editingId ? 'Update' : 'Create'}
                 </button>
@@ -272,22 +274,21 @@ function Listings() {
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
       {deleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="w-full max-w-sm bg-slate-900 border border-slate-700 rounded-2xl p-6">
-            <h2 className="text-lg font-bold text-white mb-2">Delete Listing?</h2>
+          <div className="w-full max-w-sm glass-panel rounded-3xl p-6">
+            <h2 className="text-lg font-semibold text-white mb-2">Delete Listing?</h2>
             <p className="text-sm text-slate-400 mb-4">This action cannot be undone.</p>
             <div className="flex gap-3">
               <button
                 onClick={() => setDeleteConfirm(null)}
-                className="flex-1 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium rounded-xl transition-colors"
+                className="flex-1 rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-200 transition-colors hover:bg-white/10"
               >
                 Cancel
               </button>
               <button
                 onClick={() => handleDelete(deleteConfirm)}
-                className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-500 text-white text-sm font-medium rounded-xl transition-colors"
+                className="flex-1 rounded-full border border-red-400/40 bg-red-500/20 px-4 py-2 text-sm font-medium text-red-100 transition-colors hover:bg-red-500/30"
               >
                 Delete
               </button>
@@ -296,26 +297,21 @@ function Listings() {
         </div>
       )}
 
-      {/* Listings Grid */}
       <div className="space-y-3">
         {loading ? (
-          <div className="p-8 rounded-2xl bg-slate-800/50 border border-slate-700/50 text-center text-slate-400">
+          <div className="glass-panel rounded-2xl p-8 text-center text-slate-400">
             Loading listings...
           </div>
         ) : filteredListings.length === 0 ? (
-          <div className="p-8 rounded-2xl bg-slate-800/50 border border-slate-700/50 text-center text-slate-400">
+          <div className="glass-panel rounded-2xl p-8 text-center text-slate-400">
             No listings in this category yet.
           </div>
         ) : (
           filteredListings.map((listing) => {
             const catInfo = getCategoryInfo(listing.category)
             return (
-              <div
-                key={listing.id}
-                className="p-4 rounded-2xl bg-slate-800/50 border border-slate-700/50"
-              >
+              <div key={listing.id} className="glass-panel rounded-2xl p-4 border border-white/10">
                 <div className="flex items-start gap-4">
-                  {/* Image preview */}
                   {listing.image_url && (
                     <div className="w-20 h-20 rounded-xl overflow-hidden bg-slate-700 flex-shrink-0">
                       <img
@@ -328,13 +324,13 @@ function Listings() {
                   )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-lg">{catInfo.icon}</span>
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-slate-700 text-slate-300">
+                      <Icon name={catInfo.icon} size={16} className="text-slate-300" />
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-white/10 text-slate-300">
                         {catInfo.label}
                       </span>
                       <span className={`text-xs px-2 py-0.5 rounded-full ${
                         listing.active
-                          ? 'bg-green-500/20 text-green-400'
+                          ? 'bg-emerald-500/20 text-emerald-200'
                           : 'bg-slate-700 text-slate-400'
                       }`}>
                         {listing.active ? 'Active' : 'Inactive'}
@@ -351,9 +347,9 @@ function Listings() {
                       href={listing.link_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xs text-purple-400 hover:text-purple-300 mt-1 inline-block"
+                      className="text-xs text-emerald-200 hover:text-emerald-100 mt-1 inline-block"
                     >
-                      {listing.link_text || 'View link'} →
+                      {listing.link_text || 'View link'}
                     </a>
                   </div>
                   <div className="flex items-center gap-2">
@@ -361,8 +357,8 @@ function Listings() {
                       onClick={() => handleToggleActive(listing)}
                       className={`p-2 rounded-lg transition-colors ${
                         listing.active
-                          ? 'text-green-400 hover:bg-green-500/20'
-                          : 'text-slate-400 hover:bg-slate-700'
+                          ? 'text-emerald-200 hover:bg-emerald-500/20'
+                          : 'text-slate-400 hover:bg-white/10'
                       }`}
                       title={listing.active ? 'Deactivate' : 'Activate'}
                     >
@@ -376,7 +372,7 @@ function Listings() {
                     </button>
                     <button
                       onClick={() => handleEdit(listing)}
-                      className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
+                      className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
                       title="Edit"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -385,7 +381,7 @@ function Listings() {
                     </button>
                     <button
                       onClick={() => setDeleteConfirm(listing.id)}
-                      className="p-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/20 transition-colors"
+                      className="p-2 rounded-lg text-slate-400 hover:text-red-300 hover:bg-red-500/20 transition-colors"
                       title="Delete"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

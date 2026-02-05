@@ -1,17 +1,17 @@
-// src/services/directory.js
+﻿// src/services/directory.js
 // Directory listings and reviews service
 
 import { supabase } from '../lib/supabase'
 
 // Categories for directory
 export const DIRECTORY_CATEGORIES = [
-  { id: 'all', label: 'All', icon: '📍' },
-  { id: 'bank', label: 'Banks', icon: '🏦' },
-  { id: 'restaurant', label: 'Restaurants', icon: '🍽️' },
-  { id: 'doctor', label: 'Healthcare', icon: '🏥' },
-  { id: 'gym', label: 'Gyms', icon: '💪' },
-  { id: 'services', label: 'Services', icon: '🛠️' },
-  { id: 'shopping', label: 'Shopping', icon: '🛒' },
+  { id: 'all', label: 'All', icon: 'pin' },
+  { id: 'bank', label: 'Banks', icon: 'building' },
+  { id: 'restaurant', label: 'Restaurants', icon: 'utensils' },
+  { id: 'doctor', label: 'Healthcare', icon: 'health' },
+  { id: 'gym', label: 'Gyms', icon: 'dumbbell' },
+  { id: 'services', label: 'Services', icon: 'tools' },
+  { id: 'shopping', label: 'Shopping', icon: 'cart' },
 ]
 
 /**
@@ -270,3 +270,4 @@ export async function submitBusinessSuggestion(suggestion) {
     return { data: null, error }
   }
 }
+

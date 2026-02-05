@@ -1,3 +1,4 @@
+/* global process */
 import { createClient } from '@supabase/supabase-js'
 import { XMLParser } from 'fast-xml-parser'
 import { CITY_PULSE_SOURCES } from './cityPulseSources.js'

@@ -1,7 +1,8 @@
-// src/pages/Directory.jsx
-import { useState, useEffect } from 'react'
+﻿// src/pages/Directory.jsx
+import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import Icon from '../components/Icon'
 import {
   getDirectoryListings,
   getListingReviews,
@@ -34,31 +35,33 @@ function Directory() {
   const [suggestionSubmitting, setSuggestionSubmitting] = useState(false)
   const [suggestionSuccess, setSuggestionSuccess] = useState(false)
 
-  // Fetch listings on mount and category change
-  useEffect(() => {
-    fetchListings()
-  }, [activeCategory])
-
-  // Fetch reviews when listing is selected
-  useEffect(() => {
-    if (selectedListing) {
-      fetchReviews(selectedListing.id)
-    }
-  }, [selectedListing?.id])
-
-  async function fetchListings() {
+  const fetchListings = useCallback(async () => {
     setLoading(true)
     const { data } = await getDirectoryListings(activeCategory)
     setListings(data)
     setLoading(false)
-  }
+  }, [activeCategory])
 
-  async function fetchReviews(listingId) {
+  const fetchReviews = useCallback(async (listingId) => {
     setReviewsLoading(true)
     const { data } = await getListingReviews(listingId)
     setReviews(data)
     setReviewsLoading(false)
-  }
+  }, [])
+
+  // Fetch listings on mount and category change
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchListings()
+  }, [fetchListings])
+
+  // Fetch reviews when listing is selected
+  useEffect(() => {
+    if (selectedListing) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      fetchReviews(selectedListing.id)
+    }
+  }, [selectedListing, fetchReviews])
 
   const submitReview = async () => {
     if (!isAuthenticated) {
@@ -150,9 +153,12 @@ function Directory() {
             key={star}
             type="button"
             onClick={() => interactive && onChange && onChange(star)}
-            className={`text-lg ${interactive ? 'cursor-pointer hover:scale-110' : 'cursor-default'} transition-transform`}
+            className={`${interactive ? 'cursor-pointer hover:scale-110' : 'cursor-default'} transition-transform`}
           >
-            {star <= rating ? '⭐' : '☆'}
+            <Icon
+              name={star <= rating ? 'starFill' : 'star'}
+              className={star <= rating ? 'w-4 h-4 text-slate-200' : 'w-4 h-4 text-slate-600'}
+            />
           </button>
         ))}
       </div>
@@ -166,9 +172,10 @@ function Directory() {
         <nav className="mb-6">
           <button
             onClick={() => { setSelectedListing(null); setShowReviewForm(false); setReviews([]) }}
-            className="text-slate-400 hover:text-white transition-colors"
+            className="text-slate-400 hover:text-white transition-colors flex items-center gap-2"
           >
-            ← Back to Directory
+            <Icon name="arrowLeft" className="w-4 h-4" />
+            Back to Directory
           </button>
         </nav>
 
@@ -179,10 +186,16 @@ function Directory() {
               <div className="flex items-center gap-3 mb-2 flex-wrap">
                 <h1 className="text-2xl font-bold text-white">{selectedListing.name}</h1>
                 {selectedListing.verified && (
-                  <span className="bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full">✓ Verified</span>
+                  <span className="bg-white/10 text-white text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <Icon name="success" className="w-3 h-3" />
+                    Verified
+                  </span>
                 )}
                 {selectedListing.expat_approved && (
-                  <span className="bg-emerald-600 text-white text-xs px-2 py-0.5 rounded-full">🌍 Expat Approved</span>
+                  <span className="bg-white/10 text-white text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <Icon name="globe" className="w-3 h-3" />
+                    Expat Approved
+                  </span>
                 )}
               </div>
               <p className="text-slate-400">{selectedListing.description}</p>
@@ -197,7 +210,10 @@ function Directory() {
             <div className="flex items-center gap-2">
               <span className="text-slate-500">English:</span>
               <span className={selectedListing.english_level === 'fluent' ? 'text-emerald-400' : 'text-amber-400'}>
-                {selectedListing.english_level === 'fluent' ? '🗣️ Fluent' : '🗣️ Basic'}
+                <span className="flex items-center gap-1 text-slate-300 text-sm">
+                  <Icon name="user" className="w-3.5 h-3.5" />
+                  {selectedListing.english_level === 'fluent' ? 'Fluent' : 'Basic'} English
+                </span>
               </span>
             </div>
             <div className="flex items-center gap-2">
@@ -206,7 +222,7 @@ function Directory() {
             </div>
             {selectedListing.address && (
               <div className="flex items-center gap-2">
-                <span className="text-slate-500">📍</span>
+                <Icon name="pin" className="w-4 h-4 text-slate-400" />
                 <span className="text-white">{selectedListing.address}</span>
               </div>
             )}
@@ -223,23 +239,25 @@ function Directory() {
           )}
 
           {(selectedListing.website || selectedListing.phone) && (
-            <div className="flex flex-wrap gap-4 mt-4 pt-4 border-t border-slate-700">
+            <div className="flex flex-wrap gap-4 mt-4 pt-4 border-t border-white/10">
               {selectedListing.website && (
                 <a
                   href={selectedListing.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-purple-400 hover:text-purple-300 text-sm"
+                  className="text-slate-300 hover:text-white text-sm flex items-center gap-2"
                 >
-                  🌐 Website
+                  <Icon name="link" className="w-4 h-4" />
+                  Website
                 </a>
               )}
               {selectedListing.phone && (
                 <a
                   href={`tel:${selectedListing.phone}`}
-                  className="text-purple-400 hover:text-purple-300 text-sm"
+                  className="text-slate-300 hover:text-white text-sm flex items-center gap-2"
                 >
-                  📞 {selectedListing.phone}
+                  <Icon name="phone" className="w-4 h-4" />
+                  {selectedListing.phone}
                 </a>
               )}
             </div>
@@ -251,14 +269,15 @@ function Directory() {
           isAuthenticated ? (
             <button
               onClick={() => setShowReviewForm(true)}
-              className="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-xl font-medium transition-colors mb-6"
+              className="w-full glass-3d text-white py-3 rounded-xl font-medium transition-colors mb-6 flex items-center justify-center gap-2"
             >
-              ✍️ Write a Review
+              <Icon name="document" className="w-4 h-4" />
+              Write a Review
             </button>
           ) : (
             <button
               onClick={() => openAuthModal('sign_up')}
-              className="w-full bg-slate-700 hover:bg-slate-600 text-white py-3 rounded-xl font-medium transition-colors mb-6"
+              className="w-full glass-panel text-white py-3 rounded-xl font-medium transition-colors mb-6"
             >
               Sign in to write a review
             </button>
@@ -361,15 +380,16 @@ function Directory() {
   return (
     <div>
       <nav className="mb-6">
-        <Link to="/" className="text-slate-400 hover:text-white transition-colors">
-          ← Back to Home
+        <Link to="/" className="text-slate-400 hover:text-white transition-colors flex items-center gap-2">
+          <Icon name="arrowLeft" className="w-4 h-4" />
+          Back to Home
         </Link>
       </nav>
 
       {/* Header */}
       <header className="mb-8">
         <div className="flex items-center gap-3 mb-4">
-          <span className="text-4xl">📍</span>
+          <Icon name="pin" className="w-8 h-8 text-slate-200" />
           <h1 className="text-3xl font-bold text-white">Directory</h1>
         </div>
         <p className="text-slate-400 text-lg">
@@ -389,7 +409,7 @@ function Directory() {
                 : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
             }`}
           >
-            <span>{cat.icon}</span>
+            <Icon name={cat.icon} className="w-4 h-4" />
             <span>{cat.label}</span>
           </button>
         ))}
@@ -410,23 +430,30 @@ function Directory() {
             <button
               key={listing.id}
               onClick={() => setSelectedListing(listing)}
-              className="w-full bg-slate-800 border border-slate-700 hover:border-slate-600 rounded-xl p-4 text-left transition-colors"
+              className="w-full glass-panel hover:bg-white/5 rounded-xl p-4 text-left transition-colors"
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <h3 className="text-lg font-semibold text-white">{listing.name}</h3>
                     {listing.expat_approved && (
-                      <span className="bg-emerald-600 text-white text-xs px-2 py-0.5 rounded-full">🌍 Expat Approved</span>
+                      <span className="bg-white/10 text-white text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
+                        <Icon name="globe" className="w-3 h-3" />
+                        Expat Approved
+                      </span>
                     )}
                     {listing.verified && (
-                      <span className="bg-blue-600/50 text-blue-300 text-xs px-2 py-0.5 rounded-full">✓</span>
+                      <span className="bg-white/10 text-white text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
+                        <Icon name="success" className="w-3 h-3" />
+                        Verified
+                      </span>
                     )}
                   </div>
                   <p className="text-slate-400 text-sm mb-2">{listing.description}</p>
                   <div className="flex items-center gap-4 text-sm">
-                    <span className={listing.english_level === 'fluent' ? 'text-emerald-400' : 'text-amber-400'}>
-                      {listing.english_level === 'fluent' ? '🗣️ Fluent English' : '🗣️ Basic English'}
+                    <span className="flex items-center gap-1 text-slate-300">
+                      <Icon name="user" className="w-3.5 h-3.5" />
+                      {listing.english_level === 'fluent' ? 'Fluent English' : 'Basic English'}
                     </span>
                     <span className="text-slate-500">{listing.price_range || '$$'}</span>
                   </div>
@@ -459,7 +486,7 @@ function Directory() {
           <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto">
             {suggestionSuccess ? (
               <div className="text-center py-8">
-                <div className="text-5xl mb-4">✅</div>
+                <Icon name="success" className="w-10 h-10 text-slate-200 mx-auto mb-4" />
                 <h3 className="text-xl font-bold text-white mb-2">Thank you!</h3>
                 <p className="text-slate-400">Your suggestion has been submitted for review.</p>
               </div>
@@ -471,7 +498,7 @@ function Directory() {
                     onClick={() => setShowSuggestModal(false)}
                     className="text-slate-400 hover:text-white"
                   >
-                    ✕
+                    <Icon name="close" className="w-4 h-4" />
                   </button>
                 </div>
 
@@ -495,7 +522,7 @@ function Directory() {
                       className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white"
                     >
                       {DIRECTORY_CATEGORIES.filter(c => c.id !== 'all').map(cat => (
-                        <option key={cat.id} value={cat.id}>{cat.icon} {cat.label}</option>
+                        <option key={cat.id} value={cat.id}>{cat.label}</option>
                       ))}
                     </select>
                   </div>
@@ -582,3 +609,4 @@ function Directory() {
 }
 
 export default Directory
+

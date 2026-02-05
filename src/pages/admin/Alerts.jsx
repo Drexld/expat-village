@@ -1,13 +1,14 @@
-// src/pages/admin/Alerts.jsx
+﻿// src/pages/admin/Alerts.jsx
 // System alerts management page
 
 import { useState, useEffect } from 'react'
 import { getAllAlerts, createAlert, updateAlert, deleteAlert } from '../../services/admin'
+import Icon from '../../components/Icon'
 
 const severityOptions = [
-  { value: 'info', label: 'Info', color: 'blue', icon: 'ℹ️' },
-  { value: 'warning', label: 'Warning', color: 'amber', icon: '⚠️' },
-  { value: 'critical', label: 'Critical', color: 'red', icon: '🚨' },
+  { value: 'info', label: 'Info', color: 'blue', icon: 'info' },
+  { value: 'warning', label: 'Warning', color: 'amber', icon: 'warning' },
+  { value: 'critical', label: 'Critical', color: 'red', icon: 'alert' },
 ]
 
 const audiences = [
@@ -36,16 +37,17 @@ function Alerts() {
   const [saving, setSaving] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState(null)
 
-  useEffect(() => {
-    fetchAlerts()
-  }, [])
-
-  async function fetchAlerts() {
+  const fetchAlerts = async () => {
     setLoading(true)
     const data = await getAllAlerts()
     setAlerts(data)
     setLoading(false)
   }
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchAlerts()
+  }, [])
 
   function handleEdit(alert) {
     setForm({
@@ -104,37 +106,35 @@ function Alerts() {
 
   const getSeverityStyle = (severity) => {
     const styles = {
-      info: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-      warning: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
-      critical: 'bg-red-500/20 text-red-400 border-red-500/30',
+      info: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
+      warning: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+      critical: 'bg-red-500/20 text-red-300 border-red-500/30',
     }
     return styles[severity] || styles.info
   }
 
   const getSeverityIcon = (severity) => {
-    return severityOptions.find(s => s.value === severity)?.icon || 'ℹ️'
+    return severityOptions.find(s => s.value === severity)?.icon || 'info'
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+    <div className="max-w-4xl mx-auto space-y-6">
+      <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white mb-1">System Alerts</h1>
           <p className="text-slate-400">Manage system-wide notifications</p>
         </div>
         <button
           onClick={handleNew}
-          className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium rounded-xl transition-colors"
+          className="glass-chip px-4 py-2 text-white text-sm font-medium rounded-xl transition-colors"
         >
-          + New Alert
+          New Alert
         </button>
       </div>
 
-      {/* Form Modal */}
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="w-full max-w-lg bg-slate-900 border border-slate-700 rounded-2xl p-6 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
+          <div className="w-full max-w-lg glass-strong rounded-2xl p-6 max-h-[90vh] overflow-y-auto">
             <h2 className="text-lg font-bold text-white mb-4">
               {editingId ? 'Edit Alert' : 'New System Alert'}
             </h2>
@@ -145,7 +145,7 @@ function Alerts() {
                   type="text"
                   value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:border-purple-500 focus:outline-none"
+                  className="w-full px-3 py-2 glass-panel border border-white/10 rounded-xl text-white text-sm focus:border-slate-400 focus:outline-none"
                   required
                 />
               </div>
@@ -155,7 +155,7 @@ function Alerts() {
                   value={form.message}
                   onChange={(e) => setForm({ ...form, message: e.target.value })}
                   rows={3}
-                  className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:border-purple-500 focus:outline-none resize-none"
+                  className="w-full px-3 py-2 glass-panel border border-white/10 rounded-xl text-white text-sm focus:border-slate-400 focus:outline-none resize-none"
                   required
                 />
               </div>
@@ -165,10 +165,10 @@ function Alerts() {
                   <select
                     value={form.severity}
                     onChange={(e) => setForm({ ...form, severity: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:border-purple-500 focus:outline-none"
+                    className="w-full px-3 py-2 glass-panel border border-white/10 rounded-xl text-white text-sm focus:border-slate-400 focus:outline-none"
                   >
                     {severityOptions.map((s) => (
-                      <option key={s.value} value={s.value}>{s.icon} {s.label}</option>
+                      <option key={s.value} value={s.value}>{s.label}</option>
                     ))}
                   </select>
                 </div>
@@ -177,7 +177,7 @@ function Alerts() {
                   <select
                     value={form.target_audience}
                     onChange={(e) => setForm({ ...form, target_audience: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:border-purple-500 focus:outline-none"
+                    className="w-full px-3 py-2 glass-panel border border-white/10 rounded-xl text-white text-sm focus:border-slate-400 focus:outline-none"
                   >
                     {audiences.map((a) => (
                       <option key={a.value} value={a.value}>{a.label}</option>
@@ -192,7 +192,7 @@ function Alerts() {
                     type="datetime-local"
                     value={form.start_date}
                     onChange={(e) => setForm({ ...form, start_date: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:border-purple-500 focus:outline-none"
+                    className="w-full px-3 py-2 glass-panel border border-white/10 rounded-xl text-white text-sm focus:border-slate-400 focus:outline-none"
                   />
                 </div>
                 <div>
@@ -201,7 +201,7 @@ function Alerts() {
                     type="datetime-local"
                     value={form.end_date}
                     onChange={(e) => setForm({ ...form, end_date: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:border-purple-500 focus:outline-none"
+                    className="w-full px-3 py-2 glass-panel border border-white/10 rounded-xl text-white text-sm focus:border-slate-400 focus:outline-none"
                   />
                 </div>
               </div>
@@ -210,7 +210,7 @@ function Alerts() {
                   <button
                     type="button"
                     onClick={() => setForm({ ...form, active: !form.active })}
-                    className={`w-12 h-7 rounded-full transition-colors ${form.active ? 'bg-purple-600' : 'bg-slate-700'}`}
+                    className={`w-12 h-7 rounded-full transition-colors ${form.active ? 'bg-slate-200/60' : 'bg-slate-700'}`}
                   >
                     <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${form.active ? 'translate-x-6' : 'translate-x-1'}`} />
                   </button>
@@ -220,7 +220,7 @@ function Alerts() {
                   <button
                     type="button"
                     onClick={() => setForm({ ...form, dismissible: !form.dismissible })}
-                    className={`w-12 h-7 rounded-full transition-colors ${form.dismissible ? 'bg-purple-600' : 'bg-slate-700'}`}
+                    className={`w-12 h-7 rounded-full transition-colors ${form.dismissible ? 'bg-slate-200/60' : 'bg-slate-700'}`}
                   >
                     <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${form.dismissible ? 'translate-x-6' : 'translate-x-1'}`} />
                   </button>
@@ -231,14 +231,14 @@ function Alerts() {
                 <button
                   type="button"
                   onClick={() => { setShowForm(false); setEditingId(null); setForm(emptyForm) }}
-                  className="flex-1 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium rounded-xl transition-colors"
+                  className="flex-1 px-4 py-2 glass-panel text-white text-sm font-medium rounded-xl transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-500 disabled:bg-purple-800 text-white text-sm font-medium rounded-xl transition-colors"
+                  className="flex-1 px-4 py-2 glass-chip text-white text-sm font-medium rounded-xl transition-colors"
                 >
                   {saving ? 'Saving...' : editingId ? 'Update' : 'Create'}
                 </button>
@@ -248,22 +248,21 @@ function Alerts() {
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
       {deleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="w-full max-w-sm bg-slate-900 border border-slate-700 rounded-2xl p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
+          <div className="w-full max-w-sm glass-strong rounded-2xl p-6">
             <h2 className="text-lg font-bold text-white mb-2">Delete Alert?</h2>
             <p className="text-sm text-slate-400 mb-4">This action cannot be undone.</p>
             <div className="flex gap-3">
               <button
                 onClick={() => setDeleteConfirm(null)}
-                className="flex-1 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium rounded-xl transition-colors"
+                className="flex-1 px-4 py-2 glass-panel text-white text-sm font-medium rounded-xl transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={() => handleDelete(deleteConfirm)}
-                className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-500 text-white text-sm font-medium rounded-xl transition-colors"
+                className="flex-1 px-4 py-2 bg-red-600/80 text-white text-sm font-medium rounded-xl transition-colors"
               >
                 Delete
               </button>
@@ -272,14 +271,13 @@ function Alerts() {
         </div>
       )}
 
-      {/* Alerts List */}
       <div className="space-y-3">
         {loading ? (
-          <div className="p-8 rounded-2xl bg-slate-800/50 border border-slate-700/50 text-center text-slate-400">
+          <div className="p-8 rounded-2xl glass-panel text-center text-slate-400">
             Loading alerts...
           </div>
         ) : alerts.length === 0 ? (
-          <div className="p-8 rounded-2xl bg-slate-800/50 border border-slate-700/50 text-center text-slate-400">
+          <div className="p-8 rounded-2xl glass-panel text-center text-slate-400">
             No system alerts. Create one when needed.
           </div>
         ) : (
@@ -291,19 +289,19 @@ function Alerts() {
                   ? 'bg-red-500/10 border-red-500/30'
                   : alert.severity === 'warning'
                   ? 'bg-amber-500/10 border-amber-500/30'
-                  : 'bg-slate-800/50 border-slate-700/50'
+                  : 'glass-panel border-white/10'
               }`}
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="text-xl">{getSeverityIcon(alert.severity)}</span>
+                    <Icon name={getSeverityIcon(alert.severity)} size={16} className="text-slate-200" />
                     <span className={`text-xs px-2 py-0.5 rounded-full border ${getSeverityStyle(alert.severity)}`}>
                       {alert.severity}
                     </span>
                     <span className={`text-xs px-2 py-0.5 rounded-full ${
                       alert.active
-                        ? 'bg-green-500/20 text-green-400'
+                        ? 'bg-emerald-500/20 text-emerald-300'
                         : 'bg-slate-700 text-slate-400'
                     }`}>
                       {alert.active ? 'Active' : 'Inactive'}
@@ -320,13 +318,13 @@ function Alerts() {
                     <span>{alert.target_audience}</span>
                     {alert.start_date && (
                       <>
-                        <span>•</span>
+                        <span>|</span>
                         <span>From: {new Date(alert.start_date).toLocaleDateString()}</span>
                       </>
                     )}
                     {alert.end_date && (
                       <>
-                        <span>•</span>
+                        <span>|</span>
                         <span>Until: {new Date(alert.end_date).toLocaleDateString()}</span>
                       </>
                     )}
@@ -337,7 +335,7 @@ function Alerts() {
                     onClick={() => handleToggleActive(alert)}
                     className={`p-2 rounded-lg transition-colors ${
                       alert.active
-                        ? 'text-green-400 hover:bg-green-500/20'
+                        ? 'text-emerald-300 hover:bg-emerald-500/20'
                         : 'text-slate-400 hover:bg-slate-700'
                     }`}
                     title={alert.active ? 'Deactivate' : 'Activate'}
@@ -361,7 +359,7 @@ function Alerts() {
                   </button>
                   <button
                     onClick={() => setDeleteConfirm(alert.id)}
-                    className="p-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/20 transition-colors"
+                    className="p-2 rounded-lg text-slate-400 hover:text-red-300 hover:bg-red-500/20 transition-colors"
                     title="Delete"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

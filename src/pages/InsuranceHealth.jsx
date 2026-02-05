@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
+import Icon from '../components/Icon'
 
 function InsuranceHealth() {
   const [activeCategory, setActiveCategory] = useState(null)
@@ -7,7 +8,7 @@ function InsuranceHealth() {
   const categories = [
     {
       id: 'nfz',
-      icon: '🏥',
+      icon: 'health',
       title: 'NFZ Public Healthcare',
       shortDesc: 'Free healthcare if you qualify - here is how',
       lastUpdated: 'January 2025',
@@ -52,7 +53,7 @@ function InsuranceHealth() {
     },
     {
       id: 'private-health',
-      icon: '🩺',
+      icon: 'shield',
       title: 'Private Health Insurance',
       shortDesc: 'Faster access, English-speaking doctors',
       lastUpdated: 'January 2025',
@@ -78,14 +79,14 @@ function InsuranceHealth() {
           {
             step: 4,
             title: 'Sign up online or through employer',
-            details: 'Many employers offer private healthcare as a benefit - ask HR! If buying yourself, you can sign up online. Most have English websites. You usually get access within a few days.'
+            details: 'Many employers offer private healthcare as a benefit - ask HR. If buying yourself, you can sign up online. Most have English websites. You usually get access within a few days.'
           }
         ],
         whatNext: 'Download your provider app (Medicover, LuxMed, etc.). Book a registration visit to set up your profile. Find English-speaking doctors in the app.',
         proTips: [
           'Employer-provided insurance is often much cheaper than individual',
           'Medicover and LuxMed apps let you filter by English-speaking doctors',
-          'You can have BOTH NFZ and private - use private for convenience, NFZ for major surgery',
+          'You can have both NFZ and private - use private for convenience, NFZ for major surgery',
           'Family packages often offer better value than individual plans',
           'Some packages include dental - worth it if you need regular checkups'
         ],
@@ -98,13 +99,13 @@ function InsuranceHealth() {
     },
     {
       id: 'home-insurance',
-      icon: '🏠',
-      title: 'Apartment & Contents Insurance',
+      icon: 'home',
+      title: 'Apartment and Contents Insurance',
       shortDesc: 'Protect your stuff and your liability',
       lastUpdated: 'January 2025',
       content: {
         whatIsIt: 'Home insurance (ubezpieczenie mieszkania) covers damage to your apartment and belongings. There are two types: building insurance (for owners) and contents insurance (for renters). Many landlords require tenants to have liability insurance.',
-        whyItMatters: 'Without insurance: If you flood your neighbor below, YOU pay for their damages (can be thousands). If your laptop is stolen, you lose it. If there is a fire, you lose everything. Insurance costs 200-500 PLN per year - worth it.',
+        whyItMatters: 'Without insurance: If you flood your neighbor below, you pay for their damages (can be thousands). If your laptop is stolen, you lose it. If there is a fire, you lose everything. Insurance costs 200-500 PLN per year - worth it.',
         howToDoIt: [
           {
             step: 1,
@@ -143,18 +144,18 @@ function InsuranceHealth() {
     },
     {
       id: 'travel-insurance',
-      icon: '✈️',
-      title: 'Travel & Visa Insurance',
+      icon: 'globe',
+      title: 'Travel and Visa Insurance',
       shortDesc: 'Required for visas and smart for trips',
       lastUpdated: 'January 2025',
       content: {
-        whatIsIt: 'Travel insurance covers medical emergencies, trip cancellation, and lost luggage when traveling. For non-EU citizens, specific travel insurance is often REQUIRED for visa applications (Schengen visa requires minimum 30,000 EUR medical coverage).',
+        whatIsIt: 'Travel insurance covers medical emergencies, trip cancellation, and lost luggage when traveling. For non-EU citizens, specific travel insurance is often required for visa applications (Schengen visa requires minimum 30,000 EUR medical coverage).',
         whyItMatters: 'For visa applications: No valid insurance = visa rejected. For travel: Medical emergency abroad without insurance can cost tens of thousands. Even within EU, your NFZ may not cover everything in other countries.',
         howToDoIt: [
           {
             step: 1,
             title: 'For Schengen visa applications',
-            details: 'Requirements: Minimum 30,000 EUR medical coverage, Valid for entire stay + buffer days, Must cover all Schengen countries, Must include repatriation. Get this BEFORE your visa appointment.'
+            details: 'Requirements: Minimum 30,000 EUR medical coverage, Valid for entire stay + buffer days, Must cover all Schengen countries, Must include repatriation. Get this before your visa appointment.'
           },
           {
             step: 2,
@@ -169,7 +170,7 @@ function InsuranceHealth() {
           {
             step: 4,
             title: 'Purchase and keep documents ready',
-            details: 'Buy online - instant policy document via email. For visa: Print the policy for your appointment. For travel: Keep digital copy on phone, Share with travel companion. Check claim process BEFORE you need it.'
+            details: 'Buy online - instant policy document via email. For visa: Print the policy for your appointment. For travel: Keep digital copy on phone, Share with travel companion. Check claim process before you need it.'
           }
         ],
         whatNext: 'For regular travel, check if your credit card includes travel insurance (many premium cards do). Get EKUZ card for EU travel (free for NFZ members).',
@@ -188,7 +189,7 @@ function InsuranceHealth() {
     },
     {
       id: 'dental',
-      icon: '🦷',
+      icon: 'health',
       title: 'Dental Care',
       shortDesc: 'Finding good dentists without breaking the bank',
       lastUpdated: 'January 2025',
@@ -233,7 +234,7 @@ function InsuranceHealth() {
     },
     {
       id: 'mental-health',
-      icon: '🧠',
+      icon: 'book',
       title: 'Mental Health Support',
       shortDesc: 'Therapy and psychiatry in English',
       lastUpdated: 'January 2025',
@@ -281,51 +282,77 @@ function InsuranceHealth() {
   const activeContent = categories.find(c => c.id === activeCategory)
 
   return (
-    <div>
-      <nav className="mb-6">
-        {activeCategory ? (
-          <button 
-            onClick={() => setActiveCategory(null)}
-            className="text-slate-400 hover:text-white transition-colors"
-          >
-            ← Back to Insurance & Health
-          </button>
-        ) : (
-          <Link to="/" className="text-slate-400 hover:text-white transition-colors">
-            ← Back to Home
-          </Link>
-        )}
-      </nav>
+    <div className="min-h-screen space-y-8">
+      {activeCategory ? (
+        <button
+          onClick={() => setActiveCategory(null)}
+          className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
+        >
+          <Icon name="arrowLeft" size={16} />
+          Back to Insurance and Health
+        </button>
+      ) : (
+        <Link to="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
+          <Icon name="arrowLeft" size={16} />
+          Back to Home
+        </Link>
+      )}
 
       {!activeCategory ? (
         <>
-          <header className="mb-8">
-            <div className="flex items-center gap-3 mb-4">
-              <span className="text-4xl">🏥</span>
-              <h1 className="text-3xl font-bold text-white">Insurance & Health</h1>
+          <header className="glass-panel rounded-3xl p-6">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
+                <Icon name="health" size={22} className="text-slate-100" />
+              </div>
+              <h1 className="text-3xl font-semibold text-white">Insurance and Health</h1>
             </div>
             <p className="text-slate-400 text-lg">
               Understanding healthcare in Poland does not have to be confusing. Here is everything you need to stay covered.
             </p>
           </header>
 
+          <div className="glass-3d rounded-3xl p-6 hover-tilt">
+            <div className="flex items-start gap-4">
+              <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
+                <Icon name="shield" size={20} className="text-slate-100" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="text-lg font-semibold text-white">Coverage Stack</h3>
+                  <span className="glass-chip text-xs px-2 py-0.5 rounded-full text-slate-100">Recommended</span>
+                </div>
+                <p className="text-slate-300 text-sm mb-3">
+                  Most expats use NFZ for major care and private insurance for speed and English-speaking doctors.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {['NFZ Core', 'Private Clinics', 'Dental Add-On', 'Travel Cover'].map((tag) => (
+                    <span key={tag} className="glass-chip text-xs px-2 py-1 rounded">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="space-y-3">
             {categories.map((category) => (
               <button
                 key={category.id}
                 onClick={() => setActiveCategory(category.id)}
-                className="w-full text-left bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-slate-600 rounded-xl p-5 transition-all group"
+                className="w-full text-left glass-panel hover-tilt rounded-2xl p-5 transition-all border border-white/10"
               >
                 <div className="flex items-center gap-4">
-                  <span className="text-2xl">{category.icon}</span>
+                  <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
+                    <Icon name={category.icon} size={20} className="text-slate-100" />
+                  </div>
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-white group-hover:text-emerald-400 transition-colors">
-                      {category.title}
-                    </h3>
+                    <h3 className="text-lg font-semibold text-white">{category.title}</h3>
                     <p className="text-slate-400 text-sm">{category.shortDesc}</p>
                   </div>
                   <div className="text-right">
-                    <span className="text-slate-500 group-hover:text-slate-300 transition-colors">→</span>
+                    <Icon name="arrowRight" size={16} className="text-slate-400" />
                     <p className="text-xs text-slate-500 mt-1">Updated {category.lastUpdated}</p>
                   </div>
                 </div>
@@ -333,39 +360,43 @@ function InsuranceHealth() {
             ))}
           </div>
 
-          <div className="mt-8 p-4 bg-slate-800/50 border border-slate-700 rounded-lg">
+          <div className="glass-panel rounded-2xl p-5">
             <p className="text-slate-400 text-sm">
-              💡 <strong className="text-slate-300">Tip:</strong> Most expats use a combination of NFZ (for major procedures) and private insurance (for convenience). You do not have to choose just one.
+              <strong className="text-slate-200">Tip:</strong> Most expats use a combination of NFZ (for major procedures) and private insurance (for convenience). You do not have to choose just one.
             </p>
           </div>
         </>
       ) : (
-        <article>
-          <header className="mb-8">
-            <div className="flex items-center gap-3 mb-2">
-              <span className="text-4xl">{activeContent.icon}</span>
-              <h1 className="text-3xl font-bold text-white">{activeContent.title}</h1>
+        <article className="space-y-6">
+          <header className="glass-panel rounded-3xl p-6">
+            <div className="flex items-center gap-3">
+              <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
+                <Icon name={activeContent.icon} size={22} className="text-slate-100" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-semibold text-white">{activeContent.title}</h1>
+                <p className="text-slate-400 text-sm">Last updated: {activeContent.lastUpdated}</p>
+              </div>
             </div>
-            <p className="text-slate-500 text-sm">Last updated: {activeContent.lastUpdated}</p>
           </header>
 
-          <section className="mb-8">
-            <h2 className="text-xl font-semibold text-emerald-400 mb-3">What is it?</h2>
+          <section className="glass-panel rounded-2xl p-5">
+            <h2 className="text-xl font-semibold text-slate-100 mb-3">What is it?</h2>
             <p className="text-slate-300 leading-relaxed">{activeContent.content.whatIsIt}</p>
           </section>
 
-          <section className="mb-8">
-            <h2 className="text-xl font-semibold text-emerald-400 mb-3">Why it matters</h2>
+          <section className="glass-panel rounded-2xl p-5">
+            <h2 className="text-xl font-semibold text-slate-100 mb-3">Why it matters</h2>
             <p className="text-slate-300 leading-relaxed">{activeContent.content.whyItMatters}</p>
           </section>
 
-          <section className="mb-8">
-            <h2 className="text-xl font-semibold text-emerald-400 mb-4">How to do it</h2>
+          <section className="glass-panel rounded-2xl p-5">
+            <h2 className="text-xl font-semibold text-slate-100 mb-3">How to do it</h2>
             <div className="space-y-4">
               {activeContent.content.howToDoIt.map((step) => (
-                <div key={step.step} className="bg-slate-800 border border-slate-700 rounded-lg p-4">
-                  <div className="flex gap-3">
-                    <span className="flex-shrink-0 w-8 h-8 bg-emerald-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                <div key={step.step} className="glass-chip rounded-2xl p-4">
+                  <div className="flex gap-4">
+                    <span className="w-8 h-8 bg-slate-600/60 text-white rounded-full flex items-center justify-center font-bold text-sm">
                       {step.step}
                     </span>
                     <div>
@@ -378,27 +409,25 @@ function InsuranceHealth() {
             </div>
           </section>
 
-          <section className="mb-8">
-            <h2 className="text-xl font-semibold text-emerald-400 mb-3">What to do next</h2>
-            <div className="bg-slate-800 border border-emerald-700/50 rounded-lg p-4">
-              <p className="text-slate-300 leading-relaxed">{activeContent.content.whatNext}</p>
-            </div>
+          <section className="glass-panel rounded-2xl p-5">
+            <h2 className="text-xl font-semibold text-slate-100 mb-3">What to do next</h2>
+            <p className="text-slate-300 leading-relaxed">{activeContent.content.whatNext}</p>
           </section>
 
-          <section className="mb-8">
-            <h2 className="text-xl font-semibold text-emerald-400 mb-3">Pro Tips</h2>
+          <section className="glass-panel rounded-2xl p-5">
+            <h2 className="text-xl font-semibold text-slate-100 mb-3">Pro Tips</h2>
             <ul className="space-y-2">
               {activeContent.content.proTips.map((tip, index) => (
                 <li key={index} className="flex gap-2 text-slate-300">
-                  <span className="text-emerald-400">•</span>
+                  <Icon name="spark" size={14} className="text-slate-400" />
                   <span>{tip}</span>
                 </li>
               ))}
             </ul>
           </section>
 
-          <section className="border-t border-slate-700 pt-6">
-            <h2 className="text-sm font-semibold text-slate-500 mb-3">Sources and Official Links</h2>
+          <section className="glass-panel rounded-2xl p-5">
+            <h2 className="text-sm font-semibold text-slate-400 mb-3">Sources and official links</h2>
             <div className="flex flex-wrap gap-3">
               {activeContent.content.sources.map((source, index) => (
                 <a
@@ -406,7 +435,7 @@ function InsuranceHealth() {
                   href={source.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-emerald-400 hover:text-emerald-300 underline"
+                  className="text-sm text-slate-200 hover:text-white underline"
                 >
                   {source.name}
                 </a>

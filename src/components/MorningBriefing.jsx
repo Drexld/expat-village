@@ -6,6 +6,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { generatePersonalizedBriefing, getTrcReminder } from '../services/briefing'
 import { getAnnouncements } from '../services/announcements'
 import { filterAnnouncementsForUser } from '../services/briefing'
+import Icon from './Icon'
 
 function MorningBriefing({ weatherData, onClose }) {
   const { user, profile } = useAuth()
@@ -38,7 +39,7 @@ function MorningBriefing({ weatherData, onClose }) {
         console.error('Failed to fetch briefing:', error)
         // Use fallback
         setBriefing({
-          greeting: `Good morning, ${displayName}! It's ${weatherData?.temp || 0}°C outside.`,
+          greeting: `Good morning, ${displayName}! It's ${weatherData?.temp || 0}C outside.`,
           todayInPoland: "Poland has over 9,000 lakes, making it one of the most lake-rich countries in Europe.",
           tip: "Remember: most shops are closed on Sundays in Poland, except the last Sunday of each month.",
           isFallback: true
@@ -102,11 +103,11 @@ function MorningBriefing({ weatherData, onClose }) {
     const hour = new Date().getHours()
     const timeLabel = hour < 12 ? 'morning' : hour < 17 ? 'day' : 'evening'
     const items = [
-      { icon: '⚡', text: dayMood.label },
-      { icon: '🚇', text: transportStatus.label },
+      { icon: 'bolt', text: dayMood.label },
+      { icon: 'train', text: transportStatus.label },
     ]
-    if (pulseItems[0]?.title) items.push({ icon: '📣', text: pulseItems[0].title })
-    items.push({ icon: '☕', text: `Coffee-worthy ${timeLabel}` })
+    if (pulseItems[0]?.title) items.push({ icon: 'bell', text: pulseItems[0].title })
+    items.push({ icon: 'spark', text: `Coffee-worthy ${timeLabel}` })
     return items
   }, [dayMood.label, transportStatus.label, pulseItems])
 
@@ -173,9 +174,9 @@ function MorningBriefing({ weatherData, onClose }) {
       ref={containerRef}
       className="fixed inset-0 z-50 flex flex-col"
       style={{
-        background: 'linear-gradient(180deg, rgba(15,23,42,0.97) 0%, rgba(30,27,75,0.98) 50%, rgba(15,23,42,0.97) 100%)',
-        backdropFilter: 'blur(40px)',
-        WebkitBackdropFilter: 'blur(40px)',
+        background: 'linear-gradient(180deg, rgba(11,12,18,0.96) 0%, rgba(17,20,34,0.98) 50%, rgba(11,12,18,0.96) 100%)',
+        backdropFilter: 'blur(32px)',
+        WebkitBackdropFilter: 'blur(32px)',
         transform: `translateY(${dragY}px)`,
         opacity: Math.max(0, 1 - Math.abs(dragY) / 400),
         transition: isDragging ? 'none' : 'transform 0.3s ease-out, opacity 0.3s ease-out',
@@ -194,13 +195,13 @@ function MorningBriefing({ weatherData, onClose }) {
           <svg viewBox="0 0 390 120" className="w-full h-full">
             <defs>
               <linearGradient id="swooshGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="rgba(139,92,246,0.22)" />
-                <stop offset="55%" stopColor="rgba(56,189,248,0.28)" />
-                <stop offset="100%" stopColor="rgba(251,191,36,0.22)" />
+                <stop offset="0%" stopColor="rgba(154,163,255,0.28)" />
+                <stop offset="55%" stopColor="rgba(136,166,217,0.3)" />
+                <stop offset="100%" stopColor="rgba(194,177,217,0.2)" />
               </linearGradient>
               <linearGradient id="swooshGlow" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="rgba(139,92,246,0.55)" />
-                <stop offset="100%" stopColor="rgba(251,191,36,0.55)" />
+                <stop offset="0%" stopColor="rgba(154,163,255,0.45)" />
+                <stop offset="100%" stopColor="rgba(194,177,217,0.4)" />
               </linearGradient>
             </defs>
             <path
@@ -218,14 +219,14 @@ function MorningBriefing({ weatherData, onClose }) {
         </div>
         <div className="relative flex items-center justify-between px-6">
           <div className="flex items-center gap-3">
-            <div className="text-3xl drop-shadow">{weatherData?.icon || '🌤️'}</div>
+            <Icon name={weatherData?.icon || "cloud"} className="w-8 h-8 text-slate-200" />
             <div>
               <p className="text-xs uppercase tracking-widest text-slate-400">Your Warsaw Pulse</p>
               <p className="text-lg font-semibold text-white">{dateStr}</p>
             </div>
           </div>
           <div className="text-right">
-            <p className="text-3xl font-bold text-white leading-none">{weatherData?.temp ?? '--'}°C</p>
+            <p className="text-3xl font-bold text-white leading-none">{weatherData?.temp ?? '--'}C</p>
             <p className="text-xs text-slate-400 capitalize">{weatherData?.condition || 'Loading...'}</p>
           </div>
         </div>
@@ -235,11 +236,12 @@ function MorningBriefing({ weatherData, onClose }) {
       <div ref={scrollRef} className="flex-1 flex flex-col px-6 py-4 overflow-y-auto">
         {/* Pulse ticker */}
         <div className="mb-5">
-          <div className="rounded-full border border-purple-500/20 bg-purple-500/10 px-3 py-2 overflow-hidden">
+          <div className="rounded-full border border-white/10 bg-white/5 px-3 py-2 overflow-hidden">
             <div className="flex gap-5 animate-briefingMarquee" style={{ width: 'max-content' }}>
               {pulseHighlights.map((item, idx) => (
-                <span key={idx} className="text-xs text-slate-200 whitespace-nowrap">
-                  {item.icon} {item.text}
+                <span key={idx} className="flex items-center gap-2 text-xs text-slate-200 whitespace-nowrap">
+                  <Icon name={item.icon} className="w-3.5 h-3.5" />
+                  {item.text}
                 </span>
               ))}
             </div>
@@ -250,7 +252,7 @@ function MorningBriefing({ weatherData, onClose }) {
         {loading ? (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
-              <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+              <div className="w-8 h-8 border-2 border-white/40 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
               <p className="text-slate-400">Preparing your briefing...</p>
             </div>
           </div>
@@ -263,17 +265,17 @@ function MorningBriefing({ weatherData, onClose }) {
 
             {/* Day snapshot */}
             <div className="grid grid-cols-2 gap-4 mb-7">
-              <div className="p-4 rounded-2xl shadow-lg" style={{ background: 'rgba(139,92,246,0.14)', border: '1px solid rgba(139,92,246,0.25)' }}>
+              <div className="p-4 rounded-2xl glass-panel">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-lg">🌡️</span>
+                  <Icon name="spark" className="w-4 h-4 text-slate-200" />
                   <p className="text-xs uppercase tracking-widest text-slate-400">Weather mood</p>
                 </div>
                 <p className="text-sm text-white font-semibold">{dayMood.label}</p>
                 <p className="text-xs text-slate-400 mt-1">{dayMood.hint}</p>
               </div>
-              <div className="p-4 rounded-2xl shadow-lg" style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.22)' }}>
+              <div className="p-4 rounded-2xl glass-panel">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-lg">🚇</span>
+                  <Icon name="train" className="w-4 h-4 text-slate-200" />
                   <p className="text-xs uppercase tracking-widest text-slate-400">Transit pulse</p>
                 </div>
                 <p className="text-sm font-semibold" style={{ color: transportStatus.color }}>{transportStatus.level === 'busy' ? 'Expect delays' : 'Clear routes'}</p>
@@ -283,12 +285,12 @@ function MorningBriefing({ weatherData, onClose }) {
 
             {/* TRC Alert - Only if applicable */}
             {trcReminder && (
-              <div className="mb-6 p-4 rounded-2xl" style={{
+              <div className="mb-6 p-4 rounded-2xl glass-panel" style={{
                 background: trcReminder.urgent ? 'rgba(239,68,68,0.15)' : 'rgba(245,158,11,0.1)',
                 border: `1px solid ${trcReminder.urgent ? 'rgba(239,68,68,0.3)' : 'rgba(245,158,11,0.2)'}`,
               }}>
                 <div className="flex items-start gap-3">
-                  <span className="text-2xl">{trcReminder.urgent ? '🚨' : '📋'}</span>
+                  <Icon name={trcReminder.urgent ? "alert" : "info"} className="w-5 h-5 text-slate-200" />
                   <div>
                     <p className="font-semibold text-white mb-1">
                       {trcReminder.urgent ? 'TRC Expiry Alert' : 'TRC Reminder'}
@@ -304,26 +306,23 @@ function MorningBriefing({ weatherData, onClose }) {
             {/* City Pulse */}
             <div className="mb-7">
               <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                <span>📍</span> City Pulse
+                <Icon name="pin" className="w-3.5 h-3.5 text-slate-300" /> City Pulse
               </h2>
               <div className="flex flex-col gap-2">
                 {pulseItems.length > 0 ? (
                   pulseItems.map((item) => (
-                    <div key={item.id} className="p-4 rounded-2xl" style={{
-                      background: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                    }}>
+                    <div key={item.id} className="p-4 rounded-2xl glass-panel">
                       <p className="text-sm font-semibold text-white mb-1">{item.title}</p>
                       <p className="text-xs text-slate-400 line-clamp-2">{item.message}</p>
                     </div>
                   ))
                 ) : (
                   <div className="grid gap-2">
-                    <div className="p-4 rounded-2xl" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                    <div className="p-4 rounded-2xl glass-panel">
                       <p className="text-sm text-slate-300">Live events will appear here as the city wakes up.</p>
                     </div>
-                    <div className="p-4 rounded-2xl" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
-                      <p className="text-xs text-slate-400">Add your interests to see hobby‑matched events.</p>
+                    <div className="p-4 rounded-2xl glass-panel">
+                      <p className="text-xs text-slate-400">Add your interests to see hobby-matched events.</p>
                     </div>
                   </div>
                 )}
@@ -332,12 +331,9 @@ function MorningBriefing({ weatherData, onClose }) {
 
             {/* Pro tip */}
             {briefing?.tip && (
-              <div className="p-4 rounded-2xl mb-7 shadow-lg" style={{
-                background: 'rgba(251,191,36,0.1)',
-                border: '1px solid rgba(251,191,36,0.2)',
-              }}>
-                <p className="text-sm text-amber-200">
-                  💡 <strong>Pro tip:</strong> {briefing.tip}
+              <div className="p-4 rounded-2xl mb-7 glass-panel">
+                <p className="text-sm text-slate-200">
+                  <Icon name="spark" className="w-4 h-4 inline-block mr-1.5" /> <strong>Pro tip:</strong> {briefing.tip}
                 </p>
               </div>
             )}
@@ -345,12 +341,9 @@ function MorningBriefing({ weatherData, onClose }) {
             {/* Today in Poland - AI history */}
             <div className="mb-7">
               <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                <span>🇵🇱</span> Today in Poland
+                <Icon name="globe" className="w-3.5 h-3.5 text-slate-300" /> Today in Poland
               </h2>
-              <div className="p-4 rounded-2xl" style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
-              }}>
+              <div className="p-4 rounded-2xl glass-panel">
                 <p className="text-sm text-slate-300 leading-relaxed">
                   {briefing?.todayInPoland || "Poland is home to 17 UNESCO World Heritage Sites."}
                 </p>
@@ -359,8 +352,8 @@ function MorningBriefing({ weatherData, onClose }) {
 
             {/* AI badge if using AI */}
             {!briefing?.isFallback && (
-              <div className="flex items-center gap-2 text-xs text-slate-600 mb-4">
-                <span>✨</span>
+              <div className="flex items-center gap-2 text-xs text-slate-500 mb-4">
+                <Icon name="spark" className="w-3.5 h-3.5 text-slate-500" />
                 <span>Personalized by AI</span>
               </div>
             )}
@@ -372,7 +365,7 @@ function MorningBriefing({ weatherData, onClose }) {
       <div className="px-6 pb-8 flex justify-center">
         <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-slate-300 text-xs animate-floatUp">
           <span>Swipe up to start</span>
-          <span>↑</span>
+          <Icon name="arrowUp" className="w-3.5 h-3.5 text-slate-300" />
         </div>
       </div>
 
@@ -405,3 +398,12 @@ function MorningBriefing({ weatherData, onClose }) {
 }
 
 export default MorningBriefing
+
+
+
+
+
+
+
+
+

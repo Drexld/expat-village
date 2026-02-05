@@ -1,6 +1,7 @@
 // api/stripe/create-customer-portal.js
 // Creates a Stripe Customer Portal session for subscription management
 
+/* global process */
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
 

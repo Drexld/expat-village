@@ -1,4 +1,4 @@
-// src/pages/admin/Announcements.jsx
+﻿// src/pages/admin/Announcements.jsx
 // Announcement management page with CRUD operations
 
 import { useState, useEffect } from 'react'
@@ -52,16 +52,17 @@ function Announcements() {
   const [saving, setSaving] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState(null)
 
-  useEffect(() => {
-    fetchAnnouncements()
-  }, [])
-
-  async function fetchAnnouncements() {
+  const fetchAnnouncements = async () => {
     setLoading(true)
     const data = await getAllAnnouncements()
     setAnnouncements(data)
     setLoading(false)
   }
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchAnnouncements()
+  }, [])
 
   function handleEdit(announcement) {
     setForm({
@@ -345,9 +346,9 @@ function Announcements() {
                   <p className="text-sm text-slate-400 line-clamp-2">{announcement.message}</p>
                   <div className="flex items-center gap-3 mt-2 text-xs text-slate-500">
                     <span>{announcement.scope}</span>
-                    <span>•</span>
+                    <span>-</span>
                     <span>{announcement.target_audience}</span>
-                    <span>•</span>
+                    <span>-</span>
                     <span>{new Date(announcement.created_at).toLocaleDateString()}</span>
                   </div>
                 </div>
@@ -398,3 +399,4 @@ function Announcements() {
 }
 
 export default Announcements
+

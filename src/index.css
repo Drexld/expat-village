@@ -1,7 +1,133 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+:root {
+  color-scheme: dark;
+  --ink-1: #0b0c12;
+  --ink-2: #111422;
+  --ink-3: #15192a;
+  --glass: rgba(20, 24, 36, 0.55);
+  --glass-strong: rgba(24, 28, 42, 0.78);
+  --glass-border: rgba(255, 255, 255, 0.14);
+  --glass-highlight: rgba(255, 255, 255, 0.32);
+  --accent-1: #9aa3ff;
+  --accent-2: #c2b1d9;
+  --accent-3: #88a6d9;
+  --text-1: #f1f3f8;
+  --text-2: #c6cad6;
+  --text-3: #8d93a5;
+}
+
+* {
+  box-sizing: border-box;
+}
 
 body {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
+  background:
+    radial-gradient(60% 40% at 20% 10%, rgba(154, 163, 255, 0.16) 0%, rgba(154, 163, 255, 0) 60%),
+    radial-gradient(40% 50% at 85% 20%, rgba(194, 177, 217, 0.18) 0%, rgba(194, 177, 217, 0) 65%),
+    radial-gradient(60% 60% at 40% 90%, rgba(136, 166, 217, 0.16) 0%, rgba(136, 166, 217, 0) 60%),
+    linear-gradient(180deg, var(--ink-1), var(--ink-2) 55%, var(--ink-3));
+  color: var(--text-1);
+  min-height: 100vh;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.35;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.15'/%3E%3C/svg%3E");
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.font-display {
+  font-family: 'Fraunces', serif;
+  letter-spacing: 0.01em;
+}
+
+.glass-panel {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  box-shadow:
+    0 10px 30px rgba(4, 6, 12, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+.glass-strong {
+  background: var(--glass-strong);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  box-shadow:
+    0 14px 40px rgba(7, 9, 18, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.glass-chip {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.glass-3d {
+  position: relative;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  box-shadow:
+    0 18px 40px rgba(4, 6, 12, 0.6),
+    0 1px 0 rgba(255, 255, 255, 0.18) inset;
+  transform: perspective(900px) translateZ(0);
+}
+
+.glass-3d::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(120% 120% at 10% 0%, rgba(255, 255, 255, 0.2), transparent 50%);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.glass-3d::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+}
+
+.surface-glow {
+  box-shadow:
+    0 20px 50px rgba(11, 12, 18, 0.7),
+    0 0 30px rgba(154, 163, 255, 0.08);
+}
+
+.soft-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.18), transparent);
+}
+
+.hover-tilt {
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.hover-tilt:hover {
+  transform: perspective(900px) translateY(-6px) rotateX(1.2deg) rotateY(-1deg);
+  box-shadow:
+    0 24px 48px rgba(4, 6, 12, 0.7),
+    0 0 30px rgba(154, 163, 255, 0.12);
 }

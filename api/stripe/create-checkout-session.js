@@ -1,6 +1,7 @@
 // api/stripe/create-checkout-session.js
 // Creates a Stripe Checkout Session for subscription purchases
 
+/* global process */
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
 

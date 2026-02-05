@@ -71,6 +71,7 @@ function Pricing() {
 
     // Redirect to Stripe Checkout
     if (data?.url) {
+      // eslint-disable-next-line react-hooks/immutability
       window.location.href = data.url
     }
   }
@@ -167,7 +168,7 @@ function Pricing() {
               <div className="text-right flex flex-col items-end">
                 <div className="mb-3">
                   <span className="text-3xl font-bold text-white">
-                    {plan.price === 0 ? 'Free' : `€${plan.price}`}
+                    {plan.price === 0 ? 'Free' : `${plan.price} EUR`}
                   </span>
                   {plan.price > 0 && (
                     <span className="text-slate-400 text-sm">/mo</span>

@@ -1,4 +1,4 @@
-// src/services/weather.js
+﻿// src/services/weather.js
 // OpenWeatherMap API integration for Warsaw weather
 
 const WARSAW_LAT = 52.2297
@@ -67,7 +67,7 @@ function mapToWeatherState(data) {
     return 'night'
   }
 
-  // Cold weather (below 5°C)
+  // Cold weather (below 5C)
   if (temp < 5) {
     return 'cold'
   }
@@ -110,28 +110,28 @@ function getFallbackWeatherData() {
 
   // Night: 10pm - 6am
   if (hour >= 22 || hour < 6) {
-    return { state: 'night', temp: -5, condition: 'Clear night', icon: '🌙' }
+    return { state: 'night', temp: -5, condition: 'Clear night', icon: 'moon' }
   }
 
   // Default to cloudy during day
-  return { state: 'cloudy', temp: 8, condition: 'Partly cloudy', icon: '🌤️' }
+  return { state: 'cloudy', temp: 8, condition: 'Partly cloudy', icon: 'cloud' }
 }
 
 /**
- * Maps OpenWeatherMap condition to emoji icon
+ * Maps OpenWeatherMap condition to icon name
  */
 function getWeatherIcon(condition) {
   const conditionLower = condition.toLowerCase()
 
-  if (conditionLower.includes('clear')) return '☀️'
-  if (conditionLower.includes('cloud')) return '🌤️'
-  if (conditionLower.includes('rain')) return '🌧️'
-  if (conditionLower.includes('drizzle')) return '🌦️'
-  if (conditionLower.includes('snow')) return '❄️'
-  if (conditionLower.includes('thunder')) return '⛈️'
-  if (conditionLower.includes('mist') || conditionLower.includes('fog')) return '🌫️'
+  if (conditionLower.includes('clear')) return 'sun'
+  if (conditionLower.includes('cloud')) return 'cloud'
+  if (conditionLower.includes('rain')) return 'rain'
+  if (conditionLower.includes('drizzle')) return 'rain'
+  if (conditionLower.includes('snow')) return 'snow'
+  if (conditionLower.includes('thunder')) return 'storm'
+  if (conditionLower.includes('mist') || conditionLower.includes('fog')) return 'mist'
 
-  return '🌤️' // Default
+  return 'cloud' // Default
 }
 
 /**
@@ -176,3 +176,4 @@ export function clearWeatherCache() {
   localStorage.removeItem(CACHE_KEY)
   console.log('Weather cache cleared')
 }
+

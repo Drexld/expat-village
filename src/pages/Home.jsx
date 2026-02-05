@@ -8,87 +8,77 @@ import { useAuth } from '../contexts/AuthContext'
 import { getWarsawWeather } from '../services/weather'
 import MorningBriefing from '../components/MorningBriefing'
 import Announcements from '../components/Announcements'
+import Icon from '../components/Icon'
 
-// ═══════════════════════════════════════════════════════════════════════════════
 // WEATHER STATES
-// ═══════════════════════════════════════════════════════════════════════════════
 const WEATHER = {
   cold: {
-    label: "−3°C", condition: "Heavy snow", icon: "❄️",
-    skyTop: "#1a1a2e", skyMid: "#2d1b4e", skyBot: "#1e1535",
-    fogOpacity: 0.22, skylineOpacity: 0.38, ambientColor: "#8B5CF6",
+    label: "-3C", condition: "Heavy snow", icon: "snow",
+    skyTop: "#0b0d17", skyMid: "#141828", skyBot: "#1a2034",
+    fogOpacity: 0.16, skylineOpacity: 0.32, ambientColor: "#9aa3ff",
     stars: false, windowGlow: true,
   },
   cloudy: {
-    label: "−1°C", condition: "Partly cloudy", icon: "🌤️",
-    skyTop: "#1e1e3a", skyMid: "#3a2860", skyBot: "#251d42",
-    fogOpacity: 0.1, skylineOpacity: 0.46, ambientColor: "#a78bfa",
+    label: "-1C", condition: "Partly cloudy", icon: "cloud",
+    skyTop: "#0b0f19", skyMid: "#13182a", skyBot: "#1b2136",
+    fogOpacity: 0.08, skylineOpacity: 0.42, ambientColor: "#88a6d9",
     stars: false, windowGlow: false,
   },
   sunny: {
-    label: "12°C", condition: "Sunny, warm", icon: "☀️",
-    skyTop: "#1a1630", skyMid: "#3b2d5e", skyBot: "#2a1f4a",
-    fogOpacity: 0, skylineOpacity: 0.58, ambientColor: "#c4b5fd",
+    label: "12C", condition: "Sunny, warm", icon: "sun",
+    skyTop: "#0d0f1a", skyMid: "#1a1e30", skyBot: "#262b42",
+    fogOpacity: 0.02, skylineOpacity: 0.5, ambientColor: "#c2b1d9",
     stars: false, windowGlow: false,
   },
   night: {
-    label: "−5°C", condition: "Clear night", icon: "🌙",
-    skyTop: "#0d0d1a", skyMid: "#1a1230", skyBot: "#120e22",
-    fogOpacity: 0.06, skylineOpacity: 0.5, ambientColor: "#7c3aed",
+    label: "-5C", condition: "Clear night", icon: "moon",
+    skyTop: "#070912", skyMid: "#0d1020", skyBot: "#14172a",
+    fogOpacity: 0.05, skylineOpacity: 0.44, ambientColor: "#8d93a5",
     stars: true, windowGlow: true,
   },
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
 // ACTIVITY STRIP DATA
-// ═══════════════════════════════════════════════════════════════════════════════
 const ACTIVITY = [
-  { id: 0, icon: "🔴", text: "47 in Tax Q&A · Live now", live: true },
-  { id: 1, icon: "🏠", text: "New listing in Mokotów · 12 min ago", live: false },
-  { id: 2, icon: "😤", text: "Warsaw Daily · 68% say brutal", live: false },
-  { id: 3, icon: "👋", text: "12 new villagers today", live: false },
-  { id: 4, icon: "🏛️", text: "Housing Scams talk · Tomorrow 7pm", live: false },
-  { id: 5, icon: "⭐", text: "Top review: Café Czeczka", live: false },
-  { id: 6, icon: "🎤", text: "Newcomers Welcome · 23 listening", live: true },
+  { id: 0, icon: "alert", text: "47 in Tax Q&A - Live now", live: true },
+  { id: 1, icon: "home", text: "New listing in Mokotow - 12 min ago", live: false },
+  { id: 2, icon: "spark", text: "Warsaw Daily - 68% say brutal", live: false },
+  { id: 3, icon: "user", text: "12 new villagers today", live: false },
+  { id: 4, icon: "community", text: "Housing Scams talk - Tomorrow 7pm", live: false },
+  { id: 5, icon: "star", text: "Top review: Cafe Czeczka", live: false },
+  { id: 6, icon: "music", text: "Newcomers Welcome - 23 listening", live: true },
 ]
 
-// ═══════════════════════════════════════════════════════════════════════════════
 // THREE PATHS (for non-authenticated users - onboarding style)
-// ═══════════════════════════════════════════════════════════════════════════════
 const PATHS = [
-  { icon: "📋", label: "Get set up", color: "#8B5CF6", glow: "rgba(139,92,246,0.22)", path: "/get-things-done" },
-  { icon: "🏠", label: "Find a place", color: "#f59e0b", glow: "rgba(245,158,11,0.18)", path: "/housing" },
-  { icon: "🤝", label: "Meet people", color: "#10b981", glow: "rgba(16,185,129,0.18)", path: "/town-hall" },
+  { icon: "checklist", label: "Get set up", color: "#9aa3ff", glow: "rgba(154,163,255,0.18)", path: "/get-things-done" },
+  { icon: "home", label: "Find a place", color: "#c2b1d9", glow: "rgba(194,177,217,0.16)", path: "/housing" },
+  { icon: "community", label: "Meet people", color: "#88a6d9", glow: "rgba(136,166,217,0.18)", path: "/town-hall" },
 ]
 
-// ═══════════════════════════════════════════════════════════════════════════════
 // QUICK ACTIONS (for authenticated users - dashboard style)
-// ═══════════════════════════════════════════════════════════════════════════════
 const QUICK_ACTIONS = [
-  { icon: "✅", label: "My Checklist", path: "/my-checklist", color: "#8B5CF6" },
-  { icon: "🏛️", label: "Town Hall", path: "/town-hall", color: "#f59e0b" },
-  { icon: "📖", label: "Directory", path: "/directory", color: "#10b981" },
-  { icon: "🎯", label: "Get Things Done", path: "/get-things-done", color: "#ec4899" },
+  { icon: "checklist", label: "My Checklist", path: "/my-checklist", color: "#9aa3ff" },
+  { icon: "community", label: "Town Hall", path: "/town-hall", color: "#c2b1d9" },
+  { icon: "pin", label: "Directory", path: "/directory", color: "#88a6d9" },
+  { icon: "spark", label: "Get Things Done", path: "/get-things-done", color: "#9aa3ff" },
 ]
 
-// ═══════════════════════════════════════════════════════════════════════════════
 // STARS
-// ═══════════════════════════════════════════════════════════════════════════════
+const STAR_FIELD = Array.from({ length: 32 }, (_, i) => ({
+  id: i,
+  x: (i * 31.1 + 7) % 100,
+  y: (i * 19.7 + 4) % 48,
+  size: (i % 3) * 0.7 + 0.5,
+  delay: (i * 0.33) % 2.6,
+  dur: (i % 4) * 0.5 + 1.3,
+}))
+
 function Stars({ visible }) {
-  const stars = useRef(
-    Array.from({ length: 32 }, (_, i) => ({
-      id: i,
-      x: (i * 31.1 + 7) % 100,
-      y: (i * 19.7 + 4) % 48,
-      size: (i % 3) * 0.7 + 0.5,
-      delay: (i * 0.33) % 2.6,
-      dur: (i % 4) * 0.5 + 1.3,
-    }))
-  ).current
 
   return (
     <div className="absolute inset-0 pointer-events-none transition-opacity duration-1000" style={{ opacity: visible ? 1 : 0 }}>
-      {stars.map(s => (
+      {STAR_FIELD.map(s => (
         <div key={s.id} className="absolute rounded-full bg-white" style={{
           left: `${s.x}%`, top: `${s.y}%`, width: s.size, height: s.size,
           animation: `twinkle ${s.dur}s ease-in-out ${s.delay}s infinite alternate`, opacity: 0.6,
@@ -98,9 +88,7 @@ function Stars({ visible }) {
   )
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
 // FOG
-// ═══════════════════════════════════════════════════════════════════════════════
 function Fog({ opacity }) {
   return (
     <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{ height: "42%", opacity }}>
@@ -117,9 +105,7 @@ function Fog({ opacity }) {
   )
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
 // WARSAW SKYLINE
-// ═══════════════════════════════════════════════════════════════════════════════
 function Skyline({ weather }) {
   const w = weather
   return (
@@ -145,7 +131,7 @@ function Skyline({ weather }) {
         {/* Left-center tower */}
         <rect x="146" y="52" width="24" height="108" rx="2" fill="url(#bM)" />
 
-        {/* PALACE OF CULTURE – center */}
+        {/* PALACE OF CULTURE - center */}
         <rect x="176" y="10" width="38" height="150" rx="2" fill="url(#bM)" />
         <rect x="170" y="30" width="50" height="130" rx="2" fill="url(#bM)" />
         <rect x="164" y="50" width="62" height="110" rx="2" fill="url(#bM)" />
@@ -167,7 +153,7 @@ function Skyline({ weather }) {
         {/* Ground */}
         <rect x="0" y="158" width="390" height="2" fill={w.ambientColor} opacity="0.3" />
 
-        {/* Window glows – night/cold */}
+        {/* Window glows - night/cold */}
         {w.windowGlow && (
           <g opacity="0.55">
             {[
@@ -191,12 +177,9 @@ function Skyline({ weather }) {
   )
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
 // ACTIVITY STRIP
-// ═══════════════════════════════════════════════════════════════════════════════
 function ActivityStrip() {
   const scrollRef = useRef(null)
-  const navigate = useNavigate()
   const [paused, setPaused] = useState(false)
   const pos = useRef(0)
 
@@ -231,19 +214,19 @@ function ActivityStrip() {
           key={`${a.id}-${i}`}
           className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-full transition-all active:scale-95"
           style={{
-            background: a.live ? "linear-gradient(135deg, rgba(239,68,68,0.18), rgba(185,28,28,0.12))" : "rgba(30,27,75,0.6)",
-            border: a.live ? "1px solid rgba(239,68,68,0.35)" : "1px solid rgba(139,92,246,0.2)",
+            background: a.live ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.04)",
+            border: a.live ? "1px solid rgba(255,255,255,0.25)" : "1px solid rgba(255,255,255,0.12)",
             backdropFilter: "blur(8px)",
           }}
         >
           {a.live && (
             <span className="relative flex h-1.5 w-1.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-red-500" />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white/60 opacity-75" />
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white" />
             </span>
           )}
-          <span className="text-sm">{a.icon}</span>
-          <span className="text-xs font-medium whitespace-nowrap" style={{ color: a.live ? "#fca5a5" : "#cbd5e1" }}>{a.text}</span>
+          <Icon name={a.icon} className="w-4 h-4 text-slate-200" />
+          <span className="text-xs font-medium whitespace-nowrap" style={{ color: a.live ? "#f8fafc" : "#cbd5e1" }}>{a.text}</span>
         </button>
       ))}
       <style>{`div::-webkit-scrollbar { display: none; }`}</style>
@@ -251,13 +234,11 @@ function ActivityStrip() {
   )
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
 // MAIN HOME COMPONENT
-// ═══════════════════════════════════════════════════════════════════════════════
 function Home() {
   const { isAuthenticated, openAuthModal, profile } = useAuth()
   const navigate = useNavigate()
-  const [weatherData, setWeatherData] = useState({ state: "night", temp: -5, condition: "Clear night", icon: "🌙" })
+  const [weatherData, setWeatherData] = useState({ state: "night", temp: -5, condition: "Clear night", icon: "moon" })
   const [tapped, setTapped] = useState(null)
   const [showMorningBriefing, setShowMorningBriefing] = useState(false)
   const w = WEATHER[weatherData.state]
@@ -265,9 +246,9 @@ function Home() {
 
   const MUSIC_PULSE = [
     { genre: "Afrohouse", listeners: 1204 },
-    { genre: "Lo‑fi Beats", listeners: 932 },
+    { genre: "Lo-fi Beats", listeners: 932 },
     { genre: "Polish Indie", listeners: 711 },
-    { genre: "Jazz Café", listeners: 486 },
+    { genre: "Jazz Cafe", listeners: 486 },
   ]
 
   const missionCta = (label) => {
@@ -333,21 +314,18 @@ function Home() {
       {/* CONTENT */}
       <div className="relative z-10 flex flex-col min-h-[calc(100vh-6rem)]">
 
-        {/* ═══════════════════════════════════════════════════════════════════ */}
-        {/* AUTHENTICATED USER EXPERIENCE */}
-        {/* ═══════════════════════════════════════════════════════════════════ */}
-        {isAuthenticated ? (
+                {/* AUTHENTICATED USER EXPERIENCE */}
+                {isAuthenticated ? (
           <div className="flex flex-col gap-6 px-4 pt-4 pb-10">
             {/* Village signal strip */}
-            <div className="relative overflow-hidden rounded-2xl px-4 py-3" style={{
-              background: "rgba(15,23,42,0.55)",
-              border: "1px solid rgba(139,92,246,0.18)",
-              backdropFilter: "blur(10px)",
-            }}>
+            <div className="relative overflow-hidden rounded-2xl px-4 py-3 glass-panel">
               <div className="flex items-center justify-between gap-3 mb-2">
                 <p className="text-[11px] uppercase tracking-widest text-slate-400">Village Signal</p>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-amber-200">⭐ {points.toLocaleString()}</span>
+                  <span className="text-xs text-slate-200 flex items-center gap-1">
+                    <Icon name="star" className="w-3.5 h-3.5" />
+                    {points.toLocaleString()}
+                  </span>
                   <span className="text-[10px] text-slate-500">points</span>
                 </div>
               </div>
@@ -355,10 +333,10 @@ function Home() {
                 <div className="flex gap-4 animate-signalMarquee" style={{ width: "max-content" }}>
                   {MUSIC_PULSE.map((m, i) => (
                     <div key={i} className="flex items-center gap-2 text-xs text-slate-300 whitespace-nowrap">
-                      <span>🎧</span>
+                      <Icon name="music" className="w-3.5 h-3.5 text-slate-300" />
                       <span>Village is listening:</span>
                       <span className="text-white font-semibold">{m.genre}</span>
-                      <span className="text-slate-500">· {m.listeners} villagers</span>
+                      <span className="text-slate-500">- {m.listeners} villagers</span>
                     </div>
                   ))}
                 </div>
@@ -368,33 +346,28 @@ function Home() {
             {/* Daily Pulse - Tap to reopen morning briefing */}
             <button
               onClick={() => setShowMorningBriefing(true)}
-              className="relative overflow-hidden rounded-3xl p-4 text-left transition-all active:scale-[0.99]"
-              style={{
-                background: "linear-gradient(135deg, rgba(139,92,246,0.22), rgba(30,27,75,0.75))",
-                border: "1px solid rgba(139,92,246,0.35)",
-                boxShadow: "0 18px 40px rgba(20,16,38,0.45)",
-              }}
+              className="relative overflow-hidden rounded-3xl p-4 text-left transition-all active:scale-[0.99] glass-3d hover-tilt"
             >
               <div className="absolute inset-0 opacity-30" style={{
-                background: "radial-gradient(120px 120px at 85% 20%, rgba(251,191,36,0.35), transparent 70%)",
+                background: "radial-gradient(120px 120px at 85% 20%, rgba(194,177,217,0.25), transparent 70%)",
               }} />
               <div className="relative flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="text-4xl">{weatherData.icon}</div>
+                  <Icon name={weatherData.icon} className="w-9 h-9 text-slate-100" />
                   <div>
                     <p className="text-xs uppercase tracking-widest text-slate-300">Daily Pulse</p>
-                    <p className="text-2xl font-bold text-white leading-tight">{weatherData.temp}°C</p>
+                    <p className="text-2xl font-bold text-white leading-tight">{weatherData.temp}C</p>
                     <p className="text-xs text-slate-400 capitalize">{weatherData.condition}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs text-purple-300">Tap for briefing</p>
-                  <p className="text-xs text-slate-500">Warsaw · Live</p>
+                  <p className="text-xs text-slate-300">Tap for briefing</p>
+                  <p className="text-xs text-slate-500">Warsaw - Live</p>
                 </div>
               </div>
               <div className="relative mt-4 flex items-center gap-3 text-xs text-slate-300">
-                <span className="px-2 py-1 rounded-full border border-purple-400/30 bg-purple-400/10">City mood: {weatherData.state}</span>
-                <span className="px-2 py-1 rounded-full border border-amber-300/30 bg-amber-300/10">Tonight: cozy</span>
+                <span className="px-2 py-1 rounded-full border border-white/10 bg-white/5">City mood: {weatherData.state}</span>
+                <span className="px-2 py-1 rounded-full border border-white/10 bg-white/5">Tonight: cozy</span>
               </div>
             </button>
 
@@ -409,17 +382,14 @@ function Home() {
                   <button
                     key={i}
                     onClick={() => navigate(p.path)}
-                    className="relative overflow-hidden rounded-3xl p-4 text-left transition-all duration-200 active:scale-95"
-                    style={{
-                      background: `linear-gradient(145deg, ${p.glow}, rgba(20,16,38,0.75))`,
-                      border: `1px solid ${p.color}55`,
-                      boxShadow: `0 10px 24px ${p.glow}`,
-                    }}
+                    className="relative overflow-hidden rounded-3xl p-4 text-left transition-all duration-200 active:scale-95 glass-3d hover-tilt"
                   >
-                    <div className="absolute -top-6 -right-6 w-16 h-16 rounded-full" style={{ background: p.color, opacity: 0.15 }} />
-                    <div className="text-2xl mb-2">{p.icon}</div>
+                    <div className="absolute -top-6 -right-6 w-16 h-16 rounded-full" style={{ background: p.color, opacity: 0.12 }} />
+                    <Icon name={p.icon} className="w-6 h-6 text-slate-100 mb-2" />
                     <p className="text-sm font-semibold text-white">{p.label}</p>
-                    <p className="text-[11px] text-slate-300 mt-1">Jump in →</p>
+                    <p className="text-[11px] text-slate-300 mt-1 flex items-center gap-1">
+                      Jump in <Icon name="arrowRight" className="w-3 h-3" />
+                    </p>
                   </button>
                 ))}
               </div>
@@ -433,20 +403,18 @@ function Home() {
                   <button
                     key={i}
                     onClick={() => navigate(action.path)}
-                    className="flex items-center justify-between gap-3 px-4 py-4 rounded-2xl transition-all duration-200 active:scale-95"
-                    style={{
-                      background: "rgba(17,24,39,0.65)",
-                      border: "1px solid rgba(139,92,246,0.18)",
-                    }}
+                    className="flex items-center justify-between gap-3 px-4 py-4 rounded-2xl transition-all duration-200 active:scale-95 glass-panel"
                   >
                     <div className="flex items-center gap-3">
-                      <span className="text-lg">{action.icon}</span>
+                      <Icon name={action.icon} className="w-5 h-5 text-slate-200" />
                       <div className="text-left">
                         <p className="text-sm font-medium text-white">{action.label}</p>
                         <p className="text-[11px] text-slate-400">Make progress today</p>
                       </div>
                     </div>
-                    <span className="text-xs text-purple-300">{missionCta(action.label)} →</span>
+                    <span className="text-xs text-slate-300 flex items-center gap-1">
+                      {missionCta(action.label)} <Icon name="arrowRight" className="w-3 h-3" />
+                    </span>
                   </button>
                 ))}
               </div>
@@ -459,13 +427,9 @@ function Home() {
                 {ACTIVITY.slice(0, 1).map((a, i) => (
                   <button
                     key={i}
-                    className="relative overflow-hidden rounded-3xl p-4 text-left transition-all active:scale-95"
-                    style={{
-                      background: "linear-gradient(135deg, rgba(239,68,68,0.18), rgba(30,27,75,0.7))",
-                      border: "1px solid rgba(239,68,68,0.35)",
-                    }}
+                    className="relative overflow-hidden rounded-3xl p-4 text-left transition-all active:scale-95 glass-3d"
                   >
-                    <div className="absolute -top-10 -right-10 h-24 w-24 rounded-full bg-red-500/20" />
+                    <div className="absolute -top-10 -right-10 h-24 w-24 rounded-full bg-white/10" />
                     <div className="flex items-center gap-3 mb-2">
                       <span className="relative flex h-2 w-2">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
@@ -474,24 +438,24 @@ function Home() {
                       <span className="text-sm">{a.icon}</span>
                       <span className="text-sm text-white">{a.text}</span>
                     </div>
-                    <p className="text-xs text-slate-300">Drop in and say hi — it’s live now.</p>
-                    <div className="mt-3 text-xs text-red-300">Join room →</div>
+                    <p className="text-xs text-slate-300">Drop in and say hi - it is live now.</p>
+                    <div className="mt-3 text-xs text-slate-200 flex items-center gap-1">
+                      Join room <Icon name="arrowRight" className="w-3 h-3" />
+                    </div>
                   </button>
                 ))}
                 {ACTIVITY.slice(1, 3).map((a, i) => (
                   <button
                     key={i}
-                    className="flex items-center justify-between gap-3 px-4 py-4 rounded-2xl transition-all active:scale-95"
-                    style={{
-                      background: "rgba(30,27,75,0.55)",
-                      border: "1px solid rgba(139,92,246,0.15)",
-                    }}
+                    className="flex items-center justify-between gap-3 px-4 py-4 rounded-2xl transition-all active:scale-95 glass-panel"
                   >
                     <div className="flex items-center gap-3">
                       <span className="text-sm">{a.icon}</span>
                       <span className="text-sm text-white">{a.text}</span>
                     </div>
-                    <span className="text-xs text-slate-300">Enter →</span>
+                    <span className="text-xs text-slate-300 flex items-center gap-1">
+                      Enter <Icon name="arrowRight" className="w-3 h-3" />
+                    </span>
                   </button>
                 ))}
               </div>
@@ -499,10 +463,8 @@ function Home() {
           </div>
         ) : (
           <>
-            {/* ═══════════════════════════════════════════════════════════════════ */}
-            {/* NON-AUTHENTICATED USER EXPERIENCE (Landing page) */}
-            {/* ═══════════════════════════════════════════════════════════════════ */}
-
+                        {/* NON-AUTHENTICATED USER EXPERIENCE (Landing page) */}
+            
             {/* Activity strip */}
             <div className="px-4 pt-6">
               <ActivityStrip />
@@ -518,7 +480,7 @@ function Home() {
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
                 </span>
                 <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: "#a78bfa" }}>
-                  Warsaw · Live
+                  Warsaw - Live
                 </span>
               </div>
 
@@ -541,12 +503,9 @@ function Home() {
               </p>
 
               {/* Weather badge */}
-              <div className="flex items-center gap-2 mb-6 px-4 py-2 rounded-full" style={{
-                background: "rgba(30,27,75,0.5)",
-                border: "1px solid rgba(139,92,246,0.2)",
-              }}>
-                <span className="text-lg">{weatherData.icon}</span>
-                <span className="text-sm text-slate-300">{weatherData.temp}°C · {weatherData.condition}</span>
+              <div className="flex items-center gap-2 mb-6 px-4 py-2 rounded-full glass-panel">
+                <Icon name={weatherData.icon} className="w-4 h-4 text-slate-200" />
+                <span className="text-sm text-slate-300">{weatherData.temp}C - {weatherData.condition}</span>
               </div>
             </div>
 
@@ -579,7 +538,7 @@ function Home() {
                       boxShadow: tapped === i ? `0 4px 18px ${p.glow}` : "0 2px 10px rgba(0,0,0,0.3)",
                     }}
                   >
-                    <span className="text-2xl">{p.icon}</span>
+                    <Icon name={p.icon} className="w-6 h-6 text-slate-100" />
                     <span className="text-xs font-bold text-white">{p.label}</span>
                   </button>
                 ))}
@@ -588,19 +547,11 @@ function Home() {
               {/* Join CTA */}
               <button
                 onClick={() => openAuthModal('sign_up')}
-                className="flex items-center gap-2 px-5 py-3 rounded-full transition-all duration-200 active:scale-95"
-                style={{
-                  background: "rgba(20,16,38,0.55)",
-                  border: "1px solid rgba(251,191,36,0.3)",
-                  backdropFilter: "blur(8px)",
-                  boxShadow: "0 2px 14px rgba(251,191,36,0.1)",
-                }}
+                className="flex items-center gap-2 px-5 py-3 rounded-full transition-all duration-200 active:scale-95 glass-3d"
               >
-                <span>🏘️</span>
-                <span className="text-sm font-semibold text-white">Join the village — it's free</span>
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                  <path d="M4.5 2.5L8.5 6L4.5 9.5" stroke="#fbbf24" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+                <Icon name="home" className="w-4 h-4 text-slate-100" />
+                <span className="text-sm font-semibold text-white">Join the village - it's free</span>
+                <Icon name="arrowRight" className="w-3 h-3 text-slate-200" />
               </button>
             </div>
           </>
@@ -619,7 +570,10 @@ function Home() {
                 border: `1px solid ${weatherData.state === k ? "rgba(139,92,246,0.5)" : "rgba(255,255,255,0.1)"}`,
               }}
             >
-              {WEATHER[k].icon} {k}
+              <span className="inline-flex items-center gap-1">
+                <Icon name={WEATHER[k].icon} className="w-3.5 h-3.5" />
+                {k}
+              </span>
             </button>
           ))}
         </div>
@@ -646,3 +600,9 @@ function Home() {
 }
 
 export default Home
+
+
+
+
+
+

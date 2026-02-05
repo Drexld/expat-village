@@ -1,4 +1,4 @@
-# 🏘️ Expat Village
+# Expat Village
 
 A digital village for expats in Poland, starting with Warsaw.
 
@@ -34,8 +34,8 @@ npm run dev
 
 ## Status
 
-🚧 Currently in development
+Currently in development
 
 ---
 
-Made with ❤️ in Warsaw
+Made with love in Warsaw

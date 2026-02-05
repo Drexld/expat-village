@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
+import Icon from '../components/Icon'
 import {
   getTownHallRooms,
   joinRoomConversation,
@@ -12,7 +13,7 @@ import {
 
 function TownHall() {
   const { user, isAuthenticated, openAuthModal } = useAuth()
-  const [activeView, setActiveView] = useState('main') // main, room
+  const [activeView, setActiveView] = useState('main')
   const [activeRoom, setActiveRoom] = useState(null)
   const [rooms, setRooms] = useState([])
   const [roomsLoading, setRoomsLoading] = useState(true)
@@ -26,10 +27,21 @@ function TownHall() {
   const channelRef = useRef(null)
 
   const activityLabel = useMemo(() => ({
-    very_active: { label: 'Very Active', color: 'text-green-400' },
-    active: { label: 'Active', color: 'text-blue-400' },
-    moderate: { label: 'Moderate', color: 'text-yellow-400' },
+    very_active: { label: 'Very Active', color: 'text-emerald-200' },
+    active: { label: 'Active', color: 'text-sky-200' },
+    moderate: { label: 'Moderate', color: 'text-amber-200' },
     quiet: { label: 'Quiet', color: 'text-slate-400' },
+  }), [])
+
+  const roomIcons = useMemo(() => ({
+    newcomers: 'community',
+    housing: 'home',
+    jobs: 'briefcase',
+    social: 'spark',
+    'daily-life': 'cart',
+    parents: 'heart',
+    polish: 'book',
+    'buy-sell': 'cart'
   }), [])
 
   useEffect(() => {
@@ -111,7 +123,6 @@ function TownHall() {
     setSending(true)
     setMessageError(null)
 
-    // Ensure the user is a participant before sending
     const { error: joinErr } = await joinRoomConversation(activeRoom.conversation_id, user.id)
     if (joinErr) {
       setMessageError('Unable to join this room right now.')
@@ -134,61 +145,57 @@ function TownHall() {
     setSending(false)
   }
 
-  // Main Town Hall View
   const renderMainView = () => (
     <>
-      {/* Header */}
-      <header className="mb-8">
-        <div className="flex items-center gap-3 mb-4">
-          <span className="text-4xl">🏛️</span>
-          <h1 className="text-3xl font-bold text-white">Town Hall</h1>
+      <header className="glass-panel rounded-3xl p-6">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
+            <Icon name="chat" size={22} className="text-slate-100" />
+          </div>
+          <h1 className="text-3xl font-semibold text-white">Town Hall</h1>
         </div>
         <p className="text-slate-400 text-lg">
           Real expats, real conversations, real-time. Your community hub.
         </p>
       </header>
 
-      {/* Community Rooms */}
-      <section className="mb-8">
-        <h2 className="text-xl font-bold text-white mb-4">💬 Community Rooms</h2>
+      <section className="space-y-3">
+        <h2 className="text-xl font-semibold text-white">Community Rooms</h2>
 
         {joinError && (
-          <div className="mb-3 p-3 rounded-xl bg-red-900/30 border border-red-700/50 text-red-300 text-sm">
+          <div className="glass-panel rounded-2xl p-4 border border-red-500/30 text-red-200 text-sm">
             {joinError}
           </div>
         )}
         {roomsLoading ? (
-          <div className="p-6 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 text-sm">
-            Loading rooms...
-          </div>
+          <div className="glass-panel rounded-2xl p-6 text-slate-400 text-sm">Loading rooms...</div>
         ) : roomsError ? (
-          <div className="p-6 rounded-xl bg-red-900/30 border border-red-700/50 text-red-300 text-sm">
+          <div className="glass-panel rounded-2xl p-6 border border-red-500/30 text-red-200 text-sm">
             {roomsError}
           </div>
         ) : rooms.length === 0 ? (
-          <div className="p-6 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 text-sm">
-            No rooms available yet.
-          </div>
+          <div className="glass-panel rounded-2xl p-6 text-slate-400 text-sm">No rooms available yet.</div>
         ) : (
           <div className="space-y-2">
             {rooms.map((room) => {
               const activity = activityLabel[room.activity_level] || activityLabel.active
+              const iconName = roomIcons[room.slug] || 'chat'
               return (
                 <button
                   key={room.id}
                   onClick={() => handleJoinRoom(room)}
-                  className="w-full text-left bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-slate-600 rounded-xl p-4 transition-all group"
+                  className="w-full text-left glass-panel hover-tilt rounded-2xl p-4 transition-all border border-white/10"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="relative">
-                      <span className="text-2xl">{room.icon || '💬'}</span>
+                    <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
+                      <Icon name={iconName} size={20} className="text-slate-100" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
-                        <h3 className="font-semibold text-white group-hover:text-emerald-400 transition-colors">
+                        <h3 className="font-semibold text-white">
                           {room.title}
                         </h3>
-                        <span className={`text-xs ${activity.color}`}>● {activity.label}</span>
+                        <span className={`text-xs ${activity.color}`}>{activity.label}</span>
                       </div>
                       <p className="text-slate-500 text-sm truncate">
                         {room.description || 'Join the conversation'}
@@ -206,21 +213,22 @@ function TownHall() {
         )}
       </section>
 
-      {/* Host CTA */}
-      <section className="bg-gradient-to-r from-emerald-900/40 to-teal-900/40 border border-emerald-700/50 rounded-xl p-6">
+      <section className="glass-3d rounded-3xl p-6 hover-tilt">
         <div className="flex items-start gap-4">
-          <span className="text-4xl">🎙️</span>
+          <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
+            <Icon name="mic" size={20} className="text-slate-100" />
+          </div>
           <div className="flex-1">
-            <h3 className="text-xl font-bold text-white mb-2">Host Your Own Session</h3>
+            <h3 className="text-xl font-semibold text-white mb-2">Host Your Own Session</h3>
             <p className="text-slate-300 mb-4">
               Got expertise to share? Host a live session and help fellow expats.
               Tax tips, apartment hunting stories, language exchange - anything goes.
             </p>
             <div className="flex flex-wrap gap-3">
-              <button className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg transition-colors font-medium">
+              <button className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/20">
                 Start Live Now
               </button>
-              <button className="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg transition-colors">
+              <button className="rounded-full border border-white/10 px-4 py-2 text-sm text-slate-200 transition-colors hover:bg-white/10">
                 Schedule for Later
               </button>
             </div>
@@ -228,122 +236,121 @@ function TownHall() {
         </div>
       </section>
 
-      {/* Community Stats */}
-      <section className="mt-8 grid grid-cols-3 gap-4">
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-white">8.2k+</p>
-          <p className="text-slate-400 text-sm">Community Members</p>
-        </div>
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-emerald-400">156</p>
-          <p className="text-slate-400 text-sm">Sessions This Month</p>
-        </div>
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-white">24/7</p>
-          <p className="text-slate-400 text-sm">Active Community</p>
-        </div>
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {[
+          { label: 'Community Members', value: '8.2k+' },
+          { label: 'Sessions This Month', value: '156', accent: true },
+          { label: 'Active Community', value: '24/7' }
+        ].map((stat) => (
+          <div key={stat.label} className="glass-panel rounded-2xl p-4 text-center">
+            <p className={`text-2xl font-semibold ${stat.accent ? 'text-emerald-200' : 'text-white'}`}>{stat.value}</p>
+            <p className="text-slate-400 text-sm">{stat.label}</p>
+          </div>
+        ))}
       </section>
     </>
   )
 
-  // Room Chat View
-  const renderRoom = () => (
-    <div className="flex flex-col h-[calc(100vh-200px)]">
-      {/* Room Header */}
-      <div className="bg-slate-800 border border-slate-700 rounded-t-xl p-4">
-        <button
-          onClick={() => setActiveView('main')}
-          className="text-slate-400 hover:text-white mb-3 text-sm flex items-center gap-1"
-        >
-          ← Back to Town Hall
-        </button>
-
-        <div className="flex items-center gap-3">
-          <span className="text-3xl">{activeRoom?.icon || '💬'}</span>
-          <div>
-            <h1 className="text-xl font-bold text-white">{activeRoom?.title}</h1>
-            <p className="text-slate-400 text-sm">
-              {activeRoom?.description || 'Live room'}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Chat Area */}
-      <div className="flex-1 bg-slate-900 border-x border-slate-700 p-4 overflow-y-auto">
-        {messagesLoading ? (
-          <div className="text-center text-slate-400">Loading messages...</div>
-        ) : messages.length === 0 ? (
-          <div className="text-center">
-            <span className="text-5xl mb-3 block">💬</span>
-            <p className="text-slate-400">No messages yet. Start the conversation.</p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {messages.map((msg) => {
-              const senderName =
-                msg.profiles?.display_name ||
-                msg.profiles?.email?.split('@')[0] ||
-                'Member'
-              const isOwn = msg.sender_id === user?.id
-              return (
-                <div key={msg.id} className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[75%] rounded-xl px-3 py-2 text-sm ${
-                    isOwn ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-slate-200'
-                  }`}>
-                    {!isOwn && (
-                      <p className="text-xs text-slate-400 mb-1">{senderName}</p>
-                    )}
-                    <p className="whitespace-pre-line">{msg.content}</p>
-                    <p className="text-[10px] text-slate-300/70 mt-1">
-                      {new Date(msg.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-                    </p>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* Input Area */}
-      <div className="bg-slate-800 border border-slate-700 rounded-b-xl p-4">
-        {messageError && (
-          <div className="mb-2 text-xs text-red-300">{messageError}</div>
-        )}
-        <div className="flex items-center gap-3">
-          <input
-            type="text"
-            placeholder={isAuthenticated ? 'Send a message...' : 'Sign up to send messages...'}
-            value={messageInput}
-            onChange={(e) => setMessageInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-            disabled={!isAuthenticated || sending}
-            className={`flex-1 bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 placeholder-slate-500 ${
-              !isAuthenticated ? 'text-slate-400 cursor-not-allowed' : 'text-white'
-            }`}
-          />
+  const renderRoom = () => {
+    const iconName = roomIcons[activeRoom?.slug] || 'chat'
+    return (
+      <div className="flex flex-col h-[calc(100vh-200px)]">
+        <div className="glass-panel rounded-t-3xl p-4">
           <button
-            onClick={handleSendMessage}
-            disabled={!isAuthenticated || sending || !messageInput.trim()}
-            className="bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-600 text-white px-4 py-2 rounded-lg transition-colors"
+            onClick={() => setActiveView('main')}
+            className="text-slate-400 hover:text-white mb-3 text-sm flex items-center gap-2"
           >
-            {sending ? 'Sending...' : 'Send'}
+            <Icon name="arrowLeft" size={14} />
+            Back to Town Hall
           </button>
+
+          <div className="flex items-center gap-3">
+            <div className="glass-panel flex h-10 w-10 items-center justify-center rounded-xl">
+              <Icon name={iconName} size={18} className="text-slate-100" />
+            </div>
+            <div>
+              <h1 className="text-xl font-semibold text-white">{activeRoom?.title}</h1>
+              <p className="text-slate-400 text-sm">{activeRoom?.description || 'Live room'}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex-1 glass-panel border-x border-white/5 p-4 overflow-y-auto">
+          {messagesLoading ? (
+            <div className="text-center text-slate-400">Loading messages...</div>
+          ) : messages.length === 0 ? (
+            <div className="text-center">
+              <div className="glass-panel inline-flex h-14 w-14 items-center justify-center rounded-2xl mb-3">
+                <Icon name="chat" size={22} className="text-slate-100" />
+              </div>
+              <p className="text-slate-400">No messages yet. Start the conversation.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {messages.map((msg) => {
+                const senderName =
+                  msg.profiles?.display_name ||
+                  msg.profiles?.email?.split('@')[0] ||
+                  'Member'
+                const isOwn = msg.sender_id === user?.id
+                return (
+                  <div key={msg.id} className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`max-w-[75%] rounded-2xl px-3 py-2 text-sm ${
+                      isOwn ? 'bg-emerald-500/80 text-white' : 'glass-chip text-slate-200'
+                    }`}>
+                      {!isOwn && (
+                        <p className="text-xs text-slate-400 mb-1">{senderName}</p>
+                      )}
+                      <p className="whitespace-pre-line">{msg.content}</p>
+                      <p className="text-[10px] text-slate-300/70 mt-1">
+                        {new Date(msg.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+
+        <div className="glass-panel rounded-b-3xl p-4">
+          {messageError && (
+            <div className="mb-2 text-xs text-red-300">{messageError}</div>
+          )}
+          <div className="flex items-center gap-3">
+            <input
+              type="text"
+              placeholder={isAuthenticated ? 'Send a message...' : 'Sign up to send messages...'}
+              value={messageInput}
+              onChange={(e) => setMessageInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+              disabled={!isAuthenticated || sending}
+              className={`flex-1 bg-slate-900/60 border border-white/10 rounded-xl px-4 py-2 placeholder-slate-500 ${
+                !isAuthenticated ? 'text-slate-400 cursor-not-allowed' : 'text-white'
+              }`}
+            />
+            <button
+              onClick={handleSendMessage}
+              disabled={!isAuthenticated || sending || !messageInput.trim()}
+              className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/20 disabled:opacity-50"
+            >
+              {sending ? 'Sending...' : 'Send'}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  )
+    )
+  }
 
   return (
-    <div className="min-h-screen">
-      {/* Back Navigation - only show on main view */}
+    <div className="min-h-screen space-y-8">
       {activeView === 'main' && (
         <Link
           to="/"
-          className="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-6 transition-colors"
+          className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
         >
-          ← Back to Home
+          <Icon name="arrowLeft" size={16} />
+          Back to Home
         </Link>
       )}
 

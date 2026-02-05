@@ -1,11 +1,12 @@
-// src/components/Announcements.jsx
+﻿// src/components/Announcements.jsx
 // Smart announcements component - filters based on user context
 
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { getAnnouncements, getAnnouncementIcon, getAnnouncementColors } from '../services/announcements'
+import { getAnnouncements, getAnnouncementColors } from '../services/announcements'
 import { filterAnnouncementsForUser } from '../services/briefing'
+import Icon from './Icon'
 
 function Announcements() {
   const { profile } = useAuth()
@@ -42,9 +43,10 @@ function Announcements() {
         setError(err.message)
         setAnnouncements([])
       } finally {
-        if (!isActive) return
-        clearTimeout(timeoutId)
-        setLoading(false)
+        if (isActive) {
+          clearTimeout(timeoutId)
+          setLoading(false)
+        }
       }
     }
     fetchAnnouncements()
@@ -77,19 +79,27 @@ function Announcements() {
 
   const renderCard = (announcement) => {
     const colors = getAnnouncementColors(announcement.type)
-    const icon = getAnnouncementIcon(announcement.type)
+    const typeKey = (announcement.type || '').toLowerCase()
+    const iconMap = {
+      info: 'info',
+      warning: 'warning',
+      success: 'success',
+      alert: 'alert',
+      event: 'calendar',
+      update: 'bell',
+    }
+    const iconName = iconMap[typeKey] || 'info'
     return (
       <div
         key={announcement.id}
-        className="px-3 py-2.5 rounded-xl backdrop-blur-sm"
+        className="px-3 py-2.5 rounded-2xl glass-panel"
         style={{
-          background: colors.bg,
-          border: `1px solid ${colors.border}`,
+          borderColor: colors.border,
         }}
       >
         {/* Header */}
         <div className="flex items-start gap-2 mb-1.5">
-          <span className="text-base flex-shrink-0 mt-0.5">{icon}</span>
+          <Icon name={iconName} className="w-4 h-4 text-slate-200 mt-0.5" />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <h3 className="text-xs font-semibold uppercase tracking-wide" style={{ color: colors.text }}>
@@ -115,16 +125,17 @@ function Announcements() {
          announcement.link_url !== 'Null' &&
          announcement.link_url !== 'null' &&
          announcement.link_url.trim() !== '' && (
-          <a
+                    <a
             href={announcement.link_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block mt-1.5 ml-6 text-[11px] font-medium hover:underline"
+            className="inline-flex items-center gap-1.5 mt-1.5 ml-6 text-[11px] font-medium hover:underline"
             style={{ color: colors.text }}
           >
             {(announcement.link_text && announcement.link_text !== 'Null' && announcement.link_text !== 'null')
               ? announcement.link_text
-              : 'Learn more'} →
+              : 'Learn more'}
+            <Icon name="arrowRight" className="w-3 h-3" />
           </a>
         )}
       </div>
@@ -139,12 +150,12 @@ function Announcements() {
           <div className="flex flex-col gap-2">
             {loading && (
               <div className="px-3 py-2.5 rounded-xl border border-white/10 bg-white/5 text-xs text-slate-400">
-                Loading alerts…
+                Loading alerts...
               </div>
             )}
             {error && !loading && topAlerts.length === 0 && (
               <div className="px-3 py-2.5 rounded-xl border border-red-500/20 bg-red-500/10 text-xs text-red-200">
-                Couldn’t load alerts. Try again later.
+                Couldn't load alerts. Try again later.
               </div>
             )}
             {!loading && !error && topAlerts.length === 0 && (
@@ -172,17 +183,17 @@ function Announcements() {
           <div className="flex flex-col gap-2">
             {loading && (
               <div className="px-3 py-2.5 rounded-xl border border-white/10 bg-white/5 text-xs text-slate-400">
-                Loading opportunities…
+                Loading opportunities...
               </div>
             )}
             {error && !loading && topOpportunities.length === 0 && (
               <div className="px-3 py-2.5 rounded-xl border border-red-500/20 bg-red-500/10 text-xs text-red-200">
-                Couldn’t load opportunities. Try again later.
+                Couldn't load opportunities. Try again later.
               </div>
             )}
             {!loading && !error && topOpportunities.length === 0 && (
               <div className="px-3 py-2.5 rounded-xl border border-white/10 bg-white/5 text-xs text-slate-400">
-                No opportunities yet — we’ll surface perks and events here.
+                No opportunities yet - we'll surface perks and events here.
               </div>
             )}
             {topOpportunities.map(renderCard)}
@@ -195,7 +206,7 @@ function Announcements() {
           to="/alerts"
           className="text-[11px] text-slate-400 hover:text-white transition-colors px-1"
         >
-          View all updates →
+          View all updates
         </Link>
       )}
     </div>
@@ -203,3 +214,7 @@ function Announcements() {
 }
 
 export default Announcements
+
+
+
+

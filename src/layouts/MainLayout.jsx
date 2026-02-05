@@ -1,4 +1,4 @@
-// src/layouts/MainLayout.jsx
+﻿// src/layouts/MainLayout.jsx
 // EXPAT VILLAGE - Premium Layout with Glassmorphism Header
 // Handles redirect to onboarding for new users
 
@@ -7,6 +7,7 @@ import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import AuthModal from '../components/AuthModal'
 import BottomNav from '../components/BottomNav'
+import Icon from '../components/Icon'
 
 function MainLayout() {
   const navigate = useNavigate()
@@ -31,6 +32,7 @@ function MainLayout() {
   }, [])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setShowUserMenu(false)
   }, [location.pathname])
 
@@ -46,7 +48,7 @@ function MainLayout() {
 
   const avatarLetter = displayName.charAt(0).toUpperCase()
 
-  const handleProtectedClick = (e, path) => {
+  const handleProtectedClick = (e) => {
     if (!isAuthenticated) {
       e.preventDefault()
       openAuthModal('sign_up')
@@ -54,7 +56,7 @@ function MainLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex justify-center">
+    <div className="min-h-screen text-white flex justify-center">
       {/* Mobile container - constrain width on desktop to simulate mobile */}
       <div className="w-full max-w-md relative">
       <AuthModal />
@@ -63,7 +65,7 @@ function MainLayout() {
       <header 
         className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ${
           scrolled 
-            ? 'bg-slate-900/80 backdrop-blur-xl border-b border-slate-800/50 shadow-lg shadow-purple-500/5' 
+            ? 'glass-panel border-b border-white/10' 
             : 'bg-transparent'
         }`}
       >
@@ -73,16 +75,19 @@ function MainLayout() {
             {/* Logo */}
             <Link to="/" className="flex items-center gap-3 group">
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-amber-500 rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
-                <div className="relative w-10 h-10 md:w-12 md:h-12 rounded-xl shadow-lg overflow-hidden">
+                <div
+                  className="absolute inset-0 rounded-xl blur-lg opacity-40 transition-opacity"
+                  style={{ background: 'linear-gradient(135deg, rgba(154,163,255,0.35), rgba(194,177,217,0.25))' }}
+                />
+                <div className="relative w-10 h-10 md:w-12 md:h-12 rounded-xl overflow-hidden glass-3d">
                   <img src="/icon.svg" alt="Expat Village" className="w-full h-full object-cover" />
                 </div>
               </div>
               <div className="hidden sm:block">
-                <h1 className="text-lg md:text-xl font-bold text-white group-hover:text-purple-300 transition-colors">
+                <h1 className="text-lg md:text-xl font-semibold text-white tracking-wide">
                   Expat Village
                 </h1>
-                <p className="text-xs text-slate-500 -mt-0.5">Warsaw & Beyond</p>
+                <p className="text-xs text-slate-400 -mt-0.5">Warsaw & Beyond</p>
               </div>
             </Link>
 
@@ -94,15 +99,16 @@ function MainLayout() {
                 <div className="relative">
                   <button
                     onClick={() => setShowUserMenu(!showUserMenu)}
-                    className="flex items-center gap-2 bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700/50 rounded-full pl-1 pr-3 py-1 transition-all"
+                    className="flex items-center gap-2 glass-panel rounded-full pl-1 pr-3 py-1 transition-all hover:shadow-glass"
                   >
-                    <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-amber-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                    <div
+                      className="w-8 h-8 rounded-full flex items-center justify-center text-white font-semibold text-sm"
+                      style={{ background: 'linear-gradient(135deg, rgba(154,163,255,0.6), rgba(194,177,217,0.6))' }}
+                    >
                       {avatarLetter}
                     </div>
                     <span className="text-sm font-medium text-white hidden sm:block">{displayName}</span>
-                    <svg className={`w-4 h-4 text-slate-400 transition-transform ${showUserMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
+                    <Icon name="chevronDown" className={`w-4 h-4 text-slate-300 transition-transform ${showUserMenu ? 'rotate-180' : ''}`} />
                   </button>
 
                   {/* Dropdown Menu */}
@@ -112,54 +118,59 @@ function MainLayout() {
                         className="fixed inset-0 z-40"
                         onClick={() => setShowUserMenu(false)}
                       />
-                      <div className="absolute right-0 mt-2 w-56 bg-slate-800 border border-slate-700 rounded-xl shadow-xl shadow-black/20 py-2 z-50 animate-fadeIn">
-                        <div className="px-4 py-2 border-b border-slate-700">
+                      <div className="absolute right-0 mt-2 w-56 glass-strong rounded-2xl shadow-xl shadow-black/30 py-2 z-50 animate-fadeIn">
+                        <div className="px-4 py-2 border-b border-white/10">
                           <p className="text-sm font-medium text-white">{displayName}</p>
                           <p className="text-xs text-slate-500 truncate">{user?.email}</p>
                         </div>
                         <Link
                           to="/my-checklist"
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors"
+                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-white/5 transition-colors"
                           onClick={() => setShowUserMenu(false)}
                         >
-                          <span>📋</span> My Checklist
+                          <Icon name="checklist" className="w-4 h-4 text-slate-300" />
+                          My Checklist
                         </Link>
                         <Link
                           to="/rewards"
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors"
+                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-white/5 transition-colors"
                           onClick={() => setShowUserMenu(false)}
                         >
-                          <span>🏆</span> Rewards & Badges
+                          <Icon name="trophy" className="w-4 h-4 text-slate-300" />
+                          Rewards & Badges
                         </Link>
                         <Link
                           to="/alerts"
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors"
+                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-white/5 transition-colors"
                           onClick={() => setShowUserMenu(false)}
                         >
-                          <span>🔔</span> My Alerts
+                          <Icon name="bell" className="w-4 h-4 text-slate-300" />
+                          My Alerts
                         </Link>
                         <Link
                           to="/settings"
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors"
+                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-white/5 transition-colors"
                           onClick={() => setShowUserMenu(false)}
                         >
-                          <span>⚙️</span> Settings
+                          <Icon name="settings" className="w-4 h-4 text-slate-300" />
+                          Settings
                         </Link>
                         {profile?.is_admin && (
                           <Link
                             to="/admin"
-                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-purple-400 hover:text-purple-300 hover:bg-purple-500/10 transition-colors"
+                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-white/5 transition-colors"
                             onClick={() => setShowUserMenu(false)}
                           >
-                            <span>🛠️</span> Admin Dashboard
+                            <Icon name="shield" className="w-4 h-4 text-slate-300" />
+                            Admin Dashboard
                           </Link>
                         )}
-                        <div className="border-t border-slate-700 mt-2 pt-2">
+                        <div className="border-t border-white/10 mt-2 pt-2">
                           <button
                             onClick={handleSignOut}
-                            className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors"
+                            className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-300 hover:text-red-200 hover:bg-red-500/10 transition-colors"
                           >
-                            <span>🚪</span> Sign Out
+                            <Icon name="logout" className="w-4 h-4 text-red-300" /> Sign Out
                           </button>
                         </div>
                       </div>
@@ -170,16 +181,15 @@ function MainLayout() {
                 <>
                   <button
                     onClick={() => openAuthModal('sign_in')}
-                    className="text-sm font-medium text-slate-400 hover:text-white transition-colors px-3 py-2"
+                    className="text-sm font-medium text-slate-300 hover:text-white transition-colors px-3 py-2"
                   >
                     Sign In
                   </button>
                   <button
                     onClick={() => openAuthModal('sign_up')}
-                    className="relative group"
+                    className="relative"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-amber-500 rounded-full blur-md opacity-50 group-hover:opacity-75 transition-opacity" />
-                    <span className="relative flex items-center gap-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white text-sm font-semibold px-5 py-2.5 rounded-full transition-all">
+                    <span className="relative glass-3d px-5 py-2.5 rounded-full text-sm font-semibold text-white hover-tilt">
                       Join Free
                     </span>
                   </button>
@@ -199,7 +209,7 @@ function MainLayout() {
       <BottomNav />
 
       {/* ===== FOOTER ===== (Hidden - we use bottom nav for navigation) */}
-      <footer className="hidden bg-slate-900 border-t border-slate-800">
+      <footer className="hidden glass-panel border-t border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {/* Brand */}
@@ -222,8 +232,8 @@ function MainLayout() {
                 <li>
                   <Link 
                     to={isAuthenticated ? '/get-things-done' : '#'}
-                    onClick={(e) => handleProtectedClick(e, '/get-things-done')}
-                    className="text-slate-500 hover:text-purple-400 text-sm transition-colors"
+                    onClick={(e) => handleProtectedClick(e)}
+                    className="text-slate-400 hover:text-white text-sm transition-colors"
                   >
                     Get Things Done
                   </Link>
@@ -231,8 +241,8 @@ function MainLayout() {
                 <li>
                   <Link 
                     to={isAuthenticated ? '/housing' : '#'}
-                    onClick={(e) => handleProtectedClick(e, '/housing')}
-                    className="text-slate-500 hover:text-purple-400 text-sm transition-colors"
+                    onClick={(e) => handleProtectedClick(e)}
+                    className="text-slate-400 hover:text-white text-sm transition-colors"
                   >
                     Housing
                   </Link>
@@ -240,8 +250,8 @@ function MainLayout() {
                 <li>
                   <Link 
                     to={isAuthenticated ? '/jobs-careers' : '#'}
-                    onClick={(e) => handleProtectedClick(e, '/jobs-careers')}
-                    className="text-slate-500 hover:text-purple-400 text-sm transition-colors"
+                    onClick={(e) => handleProtectedClick(e)}
+                    className="text-slate-400 hover:text-white text-sm transition-colors"
                   >
                     Jobs & Careers
                   </Link>
@@ -249,8 +259,8 @@ function MainLayout() {
                 <li>
                   <Link 
                     to={isAuthenticated ? '/directory' : '#'}
-                    onClick={(e) => handleProtectedClick(e, '/directory')}
-                    className="text-slate-500 hover:text-purple-400 text-sm transition-colors"
+                    onClick={(e) => handleProtectedClick(e)}
+                    className="text-slate-400 hover:text-white text-sm transition-colors"
                   >
                     Directory
                   </Link>
@@ -265,8 +275,8 @@ function MainLayout() {
                 <li>
                   <Link 
                     to={isAuthenticated ? '/contract-analyzer' : '#'}
-                    onClick={(e) => handleProtectedClick(e, '/contract-analyzer')}
-                    className="text-slate-500 hover:text-purple-400 text-sm transition-colors"
+                    onClick={(e) => handleProtectedClick(e)}
+                    className="text-slate-400 hover:text-white text-sm transition-colors"
                   >
                     Contract Analyzer
                   </Link>
@@ -274,8 +284,8 @@ function MainLayout() {
                 <li>
                   <Link 
                     to={isAuthenticated ? '/document-analyzer' : '#'}
-                    onClick={(e) => handleProtectedClick(e, '/document-analyzer')}
-                    className="text-slate-500 hover:text-purple-400 text-sm transition-colors"
+                    onClick={(e) => handleProtectedClick(e)}
+                    className="text-slate-400 hover:text-white text-sm transition-colors"
                   >
                     Document Translator
                   </Link>
@@ -283,8 +293,8 @@ function MainLayout() {
                 <li>
                   <Link 
                     to={isAuthenticated ? '/my-checklist' : '#'}
-                    onClick={(e) => handleProtectedClick(e, '/my-checklist')}
-                    className="text-slate-500 hover:text-purple-400 text-sm transition-colors"
+                    onClick={(e) => handleProtectedClick(e)}
+                    className="text-slate-400 hover:text-white text-sm transition-colors"
                   >
                     Arrival Checklist
                   </Link>
@@ -297,17 +307,17 @@ function MainLayout() {
               <h4 className="font-semibold text-white mb-4">Company</h4>
               <ul className="space-y-2">
                 <li>
-                  <Link to="/about" className="text-slate-500 hover:text-purple-400 text-sm transition-colors">
+                  <Link to="/about" className="text-slate-400 hover:text-white text-sm transition-colors">
                     About Us
                   </Link>
                 </li>
                 <li>
-                  <Link to="/privacy" className="text-slate-500 hover:text-purple-400 text-sm transition-colors">
+                  <Link to="/privacy" className="text-slate-400 hover:text-white text-sm transition-colors">
                     Privacy Policy
                   </Link>
                 </li>
                 <li>
-                  <a href="mailto:hello@expatvillage.pl" className="text-slate-500 hover:text-purple-400 text-sm transition-colors">
+                  <a href="mailto:hello@expatvillage.pl" className="text-slate-400 hover:text-white text-sm transition-colors">
                     Contact
                   </a>
                 </li>
@@ -315,12 +325,12 @@ function MainLayout() {
             </div>
           </div>
 
-          <div className="border-t border-slate-800 mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <p className="text-slate-600 text-sm">
-              © 2025 Expat Village. Made with 💜 in Warsaw.
+          <div className="border-t border-white/10 mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <p className="text-slate-500 text-sm">
+              2025 Expat Village. Made in Warsaw.
             </p>
             <div className="flex items-center gap-4">
-              <span className="text-slate-600 text-sm">🇵🇱 Pomagamy obcokrajowcom</span>
+              <span className="text-slate-500 text-sm">Pomagamy obcokrajowcom</span>
             </div>
           </div>
         </div>
@@ -342,3 +352,8 @@ function MainLayout() {
 }
 
 export default MainLayout
+
+
+
+
+

@@ -146,14 +146,14 @@ export function clearAnnouncementsCache() {
  */
 export function getAnnouncementIcon(type) {
   const icons = {
-    info: 'ℹ️',
-    warning: '⚠️',
-    success: '✅',
-    alert: '🚨',
-    event: '📅',
-    update: '🔔'
+    info: 'info',
+    warning: 'warning',
+    success: 'success',
+    alert: 'alert',
+    event: 'calendar',
+    update: 'bell'
   }
-  return icons[type] || 'ℹ️'
+  return icons[type] || 'info'
 }
 
 /**

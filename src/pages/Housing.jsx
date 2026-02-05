@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
+import Icon from '../components/Icon'
 
 function Housing() {
   const [activeCategory, setActiveCategory] = useState(null)
@@ -7,12 +8,12 @@ function Housing() {
   const categories = [
     {
       id: 'finding-apartment',
-      icon: '🔍',
+      icon: 'home',
       title: 'Finding an Apartment',
       shortDesc: 'Where to search and what to expect',
       lastUpdated: 'January 2025',
       content: {
-        whatIsIt: 'Finding a rental apartment in Warsaw (and Poland) usually happens through online portals, agencies, or Facebook groups. The market moves FAST - good apartments get taken within hours. Knowing where to look and how to act quickly is essential.',
+        whatIsIt: 'Finding a rental apartment in Warsaw (and Poland) usually happens through online portals, agencies, or Facebook groups. The market moves fast - good apartments get taken within hours. Knowing where to look and how to act quickly is essential.',
         whyItMatters: 'Using the wrong platforms wastes time and exposes you to scams. The best apartments often never make it to the big portals - they get snapped up through agencies or word of mouth. Understanding the market helps you find better places faster.',
         howToDoIt: [
           {
@@ -23,12 +24,12 @@ function Housing() {
           {
             step: 2,
             title: 'Install NestQuest (our free tool)',
-            details: 'NestQuest is our Chrome extension that analyzes any Otodom listing instantly. It translates to English, calculates TRUE costs (rent + hidden fees), detects scams, and shows commute times to your workplace. One click and you know if a listing is worth your time.'
+            details: 'NestQuest is our Chrome extension that analyzes any Otodom listing instantly. It translates to English, calculates true costs (rent + hidden fees), detects scams, and shows commute times to your workplace. One click and you know if a listing is worth your time.'
           },
           {
             step: 3,
             title: 'Set up alerts immediately',
-            details: 'On Otodom and OLX, create saved searches with alerts. Set your criteria (district, price, size) and get email/app notifications. When a good place appears, contact within MINUTES not hours.'
+            details: 'On Otodom and OLX, create saved searches with alerts. Set your criteria (district, price, size) and get email/app notifications. When a good place appears, contact within minutes not hours.'
           },
           {
             step: 4,
@@ -53,7 +54,7 @@ function Housing() {
     },
     {
       id: 'scam-warnings',
-      icon: '🚨',
+      icon: 'warning',
       title: 'Scam Warnings',
       shortDesc: 'Red flags and how to protect yourself',
       lastUpdated: 'January 2025',
@@ -69,8 +70,8 @@ function Housing() {
           },
           {
             step: 2,
-            title: 'NEVER pay before viewing in person',
-            details: 'Scammer classic: "I am abroad, send deposit via Western Union/crypto and I will mail you the keys." This is ALWAYS a scam. No exceptions. Always view the apartment in person before any payment.'
+            title: 'Never pay before viewing in person',
+            details: 'Scammer classic: "I am abroad, send deposit via Western Union/crypto and I will mail you the keys." This is always a scam. No exceptions. Always view the apartment in person before any payment.'
           },
           {
             step: 3,
@@ -79,7 +80,7 @@ function Housing() {
           },
           {
             step: 4,
-            title: 'Watch for these RED FLAGS',
+            title: 'Watch for these red flags',
             details: 'Price too good to be true (30% below market = scam). Urgency and pressure ("many people interested, pay now"). Request for Western Union, crypto, or cash only. Landlord abroad and cannot meet. Poor Polish or English in listing (often foreign scammers). Stock photos or photos from multiple different apartments.'
           }
         ],
@@ -99,7 +100,7 @@ function Housing() {
     },
     {
       id: 'rental-agents',
-      icon: '🤝',
+      icon: 'briefcase',
       title: 'Rental Agents',
       shortDesc: 'English-speaking agents and what they cost',
       lastUpdated: 'January 2025',
@@ -144,7 +145,7 @@ function Housing() {
     },
     {
       id: 'rental-contracts',
-      icon: '📝',
+      icon: 'document',
       title: 'Rental Contracts',
       shortDesc: 'What to check before signing',
       lastUpdated: 'January 2025',
@@ -159,7 +160,7 @@ function Housing() {
           },
           {
             step: 2,
-            title: 'Check these CRITICAL clauses',
+            title: 'Check these critical clauses',
             details: 'Deposit amount (typical: 1-2 months), Notice period (typical: 1-3 months), Early termination conditions, Who pays for repairs, Utility payment structure (included? separate? capped?), Landlord entry rights (should require notice).'
           },
           {
@@ -176,7 +177,7 @@ function Housing() {
         whatNext: 'After signing, get a copy of the signed contract, take photos/video of apartment condition, and document any existing damage.',
         proTips: [
           'If contract is Polish-only, ask for English translation or use our analyzer',
-          'Take photos of EVERYTHING before moving in',
+          'Take photos of everything before moving in',
           'Protokol zdawczo-odbiorczy (handover protocol) documents apartment condition - insist on it',
           'Keep all receipts for rent and deposit payments',
           'Contracts can be modified by written annexes (aneks)'
@@ -188,8 +189,8 @@ function Housing() {
     },
     {
       id: 'flatshares',
-      icon: '👥',
-      title: 'Flatshares & Co-living',
+      icon: 'community',
+      title: 'Flatshares and Co-living',
       shortDesc: 'Sharing apartments and modern co-living options',
       lastUpdated: 'January 2025',
       content: {
@@ -233,12 +234,12 @@ function Housing() {
     },
     {
       id: 'rental-costs',
-      icon: '💰',
+      icon: 'chart',
       title: 'Rental Costs Explained',
       shortDesc: 'Understanding all the fees and typical prices',
       lastUpdated: 'January 2025',
       content: {
-        whatIsIt: 'Polish rental costs are confusing because "czynsz" can mean different things. Understanding the TRUE monthly cost prevents nasty surprises. NestQuest calculates this automatically for Otodom listings.',
+        whatIsIt: 'Polish rental costs are confusing because "czynsz" can mean different things. Understanding the true monthly cost prevents nasty surprises. NestQuest calculates this automatically for Otodom listings.',
         whyItMatters: 'An apartment listed at 2500 PLN might actually cost 3500 PLN monthly when you add administration fees, utilities, and internet. Knowing true costs helps you budget accurately.',
         howToDoIt: [
           {
@@ -249,17 +250,17 @@ function Housing() {
           {
             step: 2,
             title: 'Understand czynsz (the confusing part)',
-            details: 'Czynsz can mean: Just rent (czynsz najmu), OR rent + admin fee (czynsz całkowity). ALWAYS ask: "Is czynsz administracyjny included?" Admin fee covers: building maintenance, trash, water, heating (sometimes).'
+            details: 'Czynsz can mean: Just rent (czynsz najmu), or rent + admin fee (czynsz calkowity). Always ask: "Is czynsz administracyjny included?" Admin fee covers: building maintenance, trash, water, heating (sometimes).'
           },
           {
             step: 3,
             title: 'Budget for these additional costs',
-            details: 'Electricity (prąd): 100-300 PLN/month. Gas (gaz): 50-200 PLN/month if gas heating/cooking. Internet: 50-80 PLN/month. These are usually EXTRA unless explicitly included.'
+            details: 'Electricity (prad): 100-300 PLN/month. Gas (gaz): 50-200 PLN/month if gas heating/cooking. Internet: 50-80 PLN/month. These are usually extra unless explicitly included.'
           },
           {
             step: 4,
             title: 'Know typical Warsaw prices (2025)',
-            details: 'Studio (kawalerka): 2000-3500 PLN. 1-bedroom (2 pokoje): 2800-4500 PLN. 2-bedroom (3 pokoje): 3500-6000 PLN. Center is 20-40% more than outer districts. These are BASE rent - add 500-1000 for total costs.'
+            details: 'Studio (kawalerka): 2000-3500 PLN. 1-bedroom (2 pokoje): 2800-4500 PLN. 2-bedroom (3 pokoje): 3500-6000 PLN. Center is 20-40% more than outer districts. These are base rent - add 500-1000 for total costs.'
           }
         ],
         whatNext: 'Use the 30% rule: total housing cost should not exceed 30% of your net salary. NestQuest has a salary stress test feature for this.',
@@ -280,130 +281,123 @@ function Housing() {
   const activeContent = categories.find(c => c.id === activeCategory)
 
   const nestQuestFeatures = [
-    { icon: '💰', title: 'True Cost Breakdown', desc: 'Real monthly cost in PLN and EUR - no hidden fees' },
-    { icon: '🚨', title: 'Scam & Risk Detection', desc: '8-point trust score, automatic red flag alerts' },
-    { icon: '📊', title: 'Salary Stress Test', desc: 'Does this fit your budget? 30% rule check' },
-    { icon: '🚇', title: 'Commute Calculator', desc: 'Travel time to your workplace' },
-    { icon: '🏘️', title: 'Neighborhood Vibe', desc: 'District insights, expat density, price tier' },
-    { icon: '⚖️', title: 'Compare Apartments', desc: 'Side-by-side comparison with weighted scoring' }
+    { icon: 'chart', title: 'True Cost Breakdown', desc: 'Real monthly cost in PLN and EUR - no hidden fees' },
+    { icon: 'warning', title: 'Scam and Risk Detection', desc: '8-point trust score, automatic red flag alerts' },
+    { icon: 'badge', title: 'Salary Stress Test', desc: 'Does this fit your budget? 30% rule check' },
+    { icon: 'map', title: 'Commute Calculator', desc: 'Travel time to your workplace' },
+    { icon: 'globe', title: 'Neighborhood Vibe', desc: 'District insights, expat density, price tier' },
+    { icon: 'document', title: 'Compare Apartments', desc: 'Side-by-side comparison with weighted scoring' }
   ]
 
   return (
-    <div className="min-h-screen">
-      {/* Back Navigation */}
-      <Link 
-        to="/" 
-        className="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-6 transition-colors"
-      >
-        ← Back to Home
-      </Link>
-
-      {/* Breadcrumb when viewing article */}
-      {activeCategory && (
-        <button 
+    <div className="min-h-screen space-y-8">
+      {activeCategory ? (
+        <button
           onClick={() => setActiveCategory(null)}
-          className="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-6 transition-colors"
+          className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
         >
-          ← Back to Housing
+          <Icon name="arrowLeft" size={16} />
+          Back to Housing
         </button>
+      ) : (
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
+        >
+          <Icon name="arrowLeft" size={16} />
+          Back to Home
+        </Link>
       )}
 
       {!activeCategory ? (
         <>
-          {/* Header */}
-          <header className="mb-8">
-            <div className="flex items-center gap-3 mb-4">
-              <span className="text-4xl">🏠</span>
-              <h1 className="text-3xl font-bold text-white">Housing</h1>
+          <header className="glass-panel rounded-3xl p-6">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
+                <Icon name="home" size={22} className="text-slate-100" />
+              </div>
+              <h1 className="text-3xl font-semibold text-white">Housing</h1>
             </div>
             <p className="text-slate-400 text-lg">
-              Finding an apartment, avoiding scams, understanding contracts.
+              Finding an apartment, avoiding scams, and understanding contracts.
             </p>
           </header>
 
-          {/* NestQuest Hero Card */}
-          <div className="mb-6 p-5 bg-gradient-to-r from-blue-900/40 to-indigo-900/40 border border-blue-700/50 rounded-xl">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-              <span className="text-4xl">🏠</span>
+          <div className="glass-3d rounded-3xl p-6 hover-tilt">
+            <div className="flex flex-col md:flex-row md:items-center gap-5">
+              <div className="glass-panel flex h-14 w-14 items-center justify-center rounded-2xl">
+                <Icon name="home" size={24} className="text-slate-100" />
+              </div>
               <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-center gap-2 mb-2">
                   <h3 className="font-semibold text-white text-lg">NestQuest</h3>
-                  <span className="text-xs bg-blue-600 text-white px-2 py-0.5 rounded-full">Free Tool</span>
+                  <span className="glass-chip text-xs px-2 py-0.5 rounded-full text-slate-100">Free Tool</span>
                 </div>
-                <p className="text-slate-300 text-sm mb-3">
+                <p className="text-slate-300 text-sm mb-4">
                   One click on any Otodom listing and get instant English analysis with true cost breakdown, scam detection, and commute times.
                 </p>
                 <div className="flex flex-wrap gap-2 mb-4">
-                  <span className="text-xs bg-blue-800/50 text-blue-200 px-2 py-1 rounded">💰 True Cost Calculator</span>
-                  <span className="text-xs bg-blue-800/50 text-blue-200 px-2 py-1 rounded">🚨 Scam Detection</span>
-                  <span className="text-xs bg-blue-800/50 text-blue-200 px-2 py-1 rounded">🚇 Commute Times</span>
-                  <span className="text-xs bg-blue-800/50 text-blue-200 px-2 py-1 rounded">📊 Salary Stress Test</span>
+                  {['True Cost', 'Scam Detection', 'Commute Times', 'Salary Stress Test'].map((tag) => (
+                    <span key={tag} className="glass-chip text-xs px-2 py-1 rounded">
+                      {tag}
+                    </span>
+                  ))}
                 </div>
                 <a
                   href="https://chromewebstore.google.com/detail/polish-apartment-summariz/lmbkkgedjmcoackmbdkmdgmgenhlaako"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium"
+                  className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/20"
                 >
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 0C8.21 0 4.831 1.757 2.632 4.501l3.953 6.848A5.454 5.454 0 0 1 12 6.545h10.691A12 12 0 0 0 12 0zM1.931 5.47A11.943 11.943 0 0 0 0 12c0 6.012 4.42 10.991 10.189 11.864l3.953-6.847a5.45 5.45 0 0 1-6.865-2.29zm13.342 2.166a5.446 5.446 0 0 1 1.45 7.09l.002.001h-.002l-3.952 6.848A12.014 12.014 0 0 0 24 12c0-1.525-.284-2.986-.802-4.329z"/>
-                  </svg>
-                  Add to Chrome — It's Free
+                  <Icon name="download" size={16} />
+                  Add to Chrome - It is free
                 </a>
               </div>
             </div>
           </div>
 
-          {/* Alert Banner */}
-          <div className="mb-6 p-4 bg-amber-900/30 border border-amber-600/50 rounded-xl">
-            <div className="flex gap-3">
-              <span className="text-2xl">⚠️</span>
+          <div className="glass-panel rounded-2xl p-5 border border-red-500/30">
+            <div className="flex items-start gap-4">
+              <div className="glass-panel flex h-10 w-10 items-center justify-center rounded-xl">
+                <Icon name="warning" size={18} className="text-red-200" />
+              </div>
               <div>
-                <h3 className="font-semibold text-amber-200">Scam Alert</h3>
-                <p className="text-amber-100/80 text-sm">
+                <h3 className="font-semibold text-red-200">Scam Alert</h3>
+                <p className="text-slate-300 text-sm">
                   Rental scams targeting expats are common. NestQuest flags red flags automatically, but always read our scam warnings before sending any money.
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Category List */}
           <div className="space-y-3">
             {categories.map((category) => (
               <button
                 key={category.id}
                 onClick={() => setActiveCategory(category.id)}
-                className={`w-full text-left border rounded-xl p-5 transition-all group ${
-                  category.isAlert 
-                    ? 'bg-red-900/20 hover:bg-red-900/30 border-red-700/50 hover:border-red-600/50'
-                    : 'bg-slate-800 hover:bg-slate-750 border-slate-700 hover:border-slate-600'
+                className={`w-full text-left glass-panel hover-tilt rounded-2xl p-5 transition-all ${
+                  category.isAlert
+                    ? 'border border-red-500/30'
+                    : 'border border-white/10'
                 }`}
               >
                 <div className="flex items-center gap-4">
-                  <span className="text-2xl">{category.icon}</span>
+                  <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
+                    <Icon name={category.icon} size={20} className="text-slate-100" />
+                  </div>
                   <div className="flex-1">
-                    <h3 className={`text-lg font-semibold mb-1 transition-colors ${
-                      category.isAlert 
-                        ? 'text-red-200 group-hover:text-red-100'
-                        : 'text-white group-hover:text-emerald-400'
-                    }`}>
-                      {category.title}
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-lg font-semibold text-white">
+                        {category.title}
+                      </h3>
                       {category.isAlert && (
-                        <span className="ml-2 text-xs bg-red-600 text-white px-2 py-0.5 rounded-full">
-                          Important
-                        </span>
+                        <span className="glass-chip text-xs px-2 py-0.5 rounded-full text-red-100">Important</span>
                       )}
-                    </h3>
-                    <p className={`text-sm ${category.isAlert ? 'text-red-200/70' : 'text-slate-400'}`}>
-                      {category.shortDesc}
-                    </p>
+                    </div>
+                    <p className="text-slate-400 text-sm">{category.shortDesc}</p>
                   </div>
                   <div className="text-right">
-                    <span className={`transition-colors ${
-                      category.isAlert 
-                        ? 'text-red-400 group-hover:text-red-300'
-                        : 'text-slate-500 group-hover:text-slate-300'
-                    }`}>→</span>
+                    <Icon name="arrowRight" size={16} className="text-slate-400" />
                     <p className="text-xs text-slate-500 mt-1">Updated {category.lastUpdated}</p>
                   </div>
                 </div>
@@ -411,42 +405,40 @@ function Housing() {
             ))}
           </div>
 
-          {/* Contract Analyzer - NOW LIVE */}
-          <Link 
+          <Link
             to="/contract-analyzer"
-            className="block mt-8 p-5 bg-gradient-to-r from-emerald-900/30 to-slate-800 border border-emerald-700/50 hover:border-emerald-500 rounded-xl transition-all group"
+            className="glass-3d rounded-3xl p-6 hover-tilt"
           >
             <div className="flex items-start gap-4">
-              <span className="text-3xl">🤖</span>
+              <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
+                <Icon name="document" size={20} className="text-slate-100" />
+              </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-white mb-1 group-hover:text-emerald-400 transition-colors">
-                  Contract Analyzer
-                  <span className="ml-2 text-xs bg-emerald-600 text-white px-2 py-0.5 rounded-full">
-                    New!
-                  </span>
-                </h3>
-                <p className="text-slate-400 text-sm mb-3">
-                  Upload your rental contract and our AI will scan for red flags, unusual clauses, and potential issues - in seconds. Need a human review? Connect with our partner lawyers.
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="font-semibold text-white text-lg">Contract Analyzer</h3>
+                  <span className="glass-chip text-xs px-2 py-0.5 rounded-full text-emerald-100">New</span>
+                </div>
+                <p className="text-slate-300 text-sm mb-3">
+                  Upload your rental contract and our AI will scan for red flags, unusual clauses, and potential issues in seconds.
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  <span className="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded">AI-Powered</span>
-                  <span className="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded">Free Scan</span>
-                  <span className="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded">Lawyer Review Option</span>
+                  <span className="glass-chip text-xs px-2 py-1 rounded">AI-Powered</span>
+                  <span className="glass-chip text-xs px-2 py-1 rounded">Free Scan</span>
+                  <span className="glass-chip text-xs px-2 py-1 rounded">Lawyer Review Option</span>
                 </div>
-                <span className="text-emerald-400 text-sm mt-3 block group-hover:text-emerald-300">
-                  Analyze your contract →
+                <span className="text-emerald-200 text-sm mt-3 inline-flex items-center gap-2">
+                  Analyze your contract <Icon name="arrowRight" size={14} />
                 </span>
               </div>
             </div>
           </Link>
 
-          {/* NestQuest Features Grid */}
-          <div className="mt-8">
+          <div className="glass-panel rounded-2xl p-6">
             <h3 className="text-lg font-semibold text-white mb-4">What NestQuest Analyzes</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {nestQuestFeatures.map((feature, index) => (
-                <div key={index} className="flex items-start gap-3 p-4 bg-slate-800/50 rounded-lg">
-                  <span className="text-xl">{feature.icon}</span>
+                <div key={index} className="glass-chip rounded-2xl p-4 flex items-start gap-3">
+                  <Icon name={feature.icon} size={18} className="text-slate-100" />
                   <div>
                     <h4 className="font-medium text-white">{feature.title}</h4>
                     <p className="text-slate-400 text-sm">{feature.desc}</p>
@@ -457,35 +449,36 @@ function Housing() {
           </div>
         </>
       ) : (
-        /* Article Detail View */
-        <article>
-          <header className="mb-8">
-            <div className="flex items-center gap-3 mb-2">
-              <span className="text-3xl">{activeContent.icon}</span>
-              <h1 className="text-2xl font-bold text-white">{activeContent.title}</h1>
+        <article className="space-y-6">
+          <header className="glass-panel rounded-3xl p-6">
+            <div className="flex items-center gap-3">
+              <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
+                <Icon name={activeContent.icon} size={22} className="text-slate-100" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-semibold text-white">{activeContent.title}</h1>
+                <p className="text-slate-400 text-sm">Last updated: {activeContent.lastUpdated}</p>
+              </div>
             </div>
-            <p className="text-slate-500 text-sm">Last updated: {activeContent.lastUpdated}</p>
           </header>
 
-          <section className="mb-8">
-            <h2 className="text-lg font-semibold text-emerald-400 mb-3">What is it?</h2>
+          <section className="glass-panel rounded-2xl p-5">
+            <h2 className={`text-xl font-semibold mb-3 ${activeContent.isAlert ? 'text-red-200' : 'text-slate-100'}`}>What is it?</h2>
             <p className="text-slate-300 leading-relaxed">{activeContent.content.whatIsIt}</p>
           </section>
 
-          <section className="mb-8">
-            <h2 className="text-lg font-semibold text-emerald-400 mb-3">Why it matters</h2>
+          <section className="glass-panel rounded-2xl p-5">
+            <h2 className={`text-xl font-semibold mb-3 ${activeContent.isAlert ? 'text-red-200' : 'text-slate-100'}`}>Why it matters</h2>
             <p className="text-slate-300 leading-relaxed">{activeContent.content.whyItMatters}</p>
           </section>
 
-          <section className="mb-8">
-            <h2 className="text-lg font-semibold text-emerald-400 mb-3">How to do it</h2>
+          <section className="glass-panel rounded-2xl p-5">
+            <h2 className={`text-xl font-semibold mb-3 ${activeContent.isAlert ? 'text-red-200' : 'text-slate-100'}`}>How to do it</h2>
             <div className="space-y-4">
               {activeContent.content.howToDoIt.map((step) => (
-                <div key={step.step} className="bg-slate-800 border border-slate-700 rounded-lg p-4">
-                  <div className="flex gap-3">
-                    <span className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                      activeContent.isAlert ? 'bg-red-600 text-white' : 'bg-emerald-600 text-white'
-                    }`}>
+                <div key={step.step} className="glass-chip rounded-2xl p-4">
+                  <div className="flex gap-4">
+                    <span className={`w-8 h-8 ${activeContent.isAlert ? 'bg-red-500/70' : 'bg-slate-600/60'} text-white rounded-full flex items-center justify-center font-bold text-sm`}>
                       {step.step}
                     </span>
                     <div>
@@ -498,43 +491,25 @@ function Housing() {
             </div>
           </section>
 
-          <section className="mb-8 p-4 bg-slate-800 border border-slate-700 rounded-lg">
-            <h2 className="text-lg font-semibold text-white mb-2">What to do next</h2>
+          <section className="glass-panel rounded-2xl p-5">
+            <h2 className={`text-xl font-semibold mb-3 ${activeContent.isAlert ? 'text-red-200' : 'text-slate-100'}`}>What to do next</h2>
             <p className="text-slate-300">{activeContent.content.whatNext}</p>
           </section>
 
-          <section className="mb-8">
-            <h2 className="text-lg font-semibold text-emerald-400 mb-3">Pro Tips</h2>
+          <section className="glass-panel rounded-2xl p-5">
+            <h2 className={`text-xl font-semibold mb-3 ${activeContent.isAlert ? 'text-red-200' : 'text-slate-100'}`}>Pro Tips</h2>
             <ul className="space-y-2">
               {activeContent.content.proTips.map((tip, index) => (
                 <li key={index} className="flex gap-2 text-slate-300">
-                  <span className={activeContent.isAlert ? 'text-red-400' : 'text-emerald-400'}>•</span>
+                  <Icon name={activeContent.isAlert ? 'warning' : 'spark'} size={14} className="text-slate-400" />
                   <span>{tip}</span>
                 </li>
               ))}
             </ul>
           </section>
 
-          {/* NestQuest CTA in article view */}
-          <section className="mb-8 p-4 bg-blue-900/20 border border-blue-700/50 rounded-lg">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <p className="text-blue-200 font-medium">🏠 Make apartment hunting easier</p>
-                <p className="text-blue-300/70 text-sm">Use NestQuest to analyze any Otodom listing instantly</p>
-              </div>
-              <a
-                href="https://chromewebstore.google.com/detail/polish-apartment-summariz/lmbkkgedjmcoackmbdkmdgmgenhlaako"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium whitespace-nowrap text-center"
-              >
-                Get NestQuest
-              </a>
-            </div>
-          </section>
-
-          <section className="border-t border-slate-700 pt-6">
-            <h2 className="text-sm font-semibold text-slate-500 mb-3">Sources and Official Links</h2>
+          <section className="glass-panel rounded-2xl p-5">
+            <h2 className="text-sm font-semibold text-slate-400 mb-3">Sources and official links</h2>
             <div className="flex flex-wrap gap-3">
               {activeContent.content.sources.map((source, index) => (
                 <a
@@ -542,7 +517,7 @@ function Housing() {
                   href={source.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-emerald-400 hover:text-emerald-300 underline"
+                  className="text-sm text-slate-200 hover:text-white underline"
                 >
                   {source.name}
                 </a>

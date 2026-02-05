@@ -1,8 +1,9 @@
-// src/components/ExchangeRates.jsx
+﻿// src/components/ExchangeRates.jsx
 // Exchange rates card component
 
 import { useState, useEffect } from 'react'
 import { getExchangeRates, formatRate } from '../services/exchangeRates'
+import Icon from './Icon'
 
 function ExchangeRates() {
   const [rates, setRates] = useState(null)
@@ -24,10 +25,8 @@ function ExchangeRates() {
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 px-4 py-3 rounded-2xl" style={{
-        background: "rgba(30,27,75,0.5)",
-        border: "1px solid rgba(139,92,246,0.2)",
-      }}>
+      <div className="glass-panel flex items-center gap-2 rounded-2xl px-4 py-3">
+        <Icon name="update" size={14} className="text-slate-400" />
         <span className="text-sm text-slate-400">Loading rates...</span>
       </div>
     )
@@ -36,48 +35,38 @@ function ExchangeRates() {
   if (!rates) return null
 
   const currencies = [
-    { code: 'EUR', symbol: '€', value: rates.eur, flag: '🇪🇺' },
-    { code: 'USD', symbol: '$', value: rates.usd, flag: '🇺🇸' },
-    { code: 'GBP', symbol: '£', value: rates.gbp, flag: '🇬🇧' }
+    { code: 'EUR', value: rates.eur },
+    { code: 'USD', value: rates.usd },
+    { code: 'GBP', value: rates.gbp }
   ]
 
   return (
-    <div className="flex flex-col gap-2 px-4 py-3 rounded-2xl" style={{
-      background: "rgba(30,27,75,0.5)",
-      border: "1px solid rgba(139,92,246,0.2)",
-      backdropFilter: "blur(8px)",
-    }}>
-      {/* Header */}
+    <div className="glass-panel flex flex-col gap-2 rounded-2xl px-4 py-3">
       <div className="flex items-center gap-2 mb-1">
-        <span className="text-base">💱</span>
+        <Icon name="globe" size={16} className="text-slate-300" />
         <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
           Exchange Rates
         </span>
       </div>
 
-      {/* Rates */}
       <div className="flex flex-col gap-1.5">
         {currencies.map((currency) => (
           <div key={currency.code} className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-sm">{currency.flag}</span>
-              <span className="text-sm font-medium text-slate-300">
-                1 PLN
-              </span>
+              <span className="text-sm font-medium text-slate-300">1 PLN</span>
+              <span className="text-xs text-slate-500">to</span>
+              <span className="text-xs font-semibold text-slate-200">{currency.code}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <span className="text-sm font-bold text-white">
                 {formatRate(currency.value)}
               </span>
-              <span className="text-xs text-slate-400">
-                {currency.code}
-              </span>
+              <span className="text-[10px] text-slate-500">{currency.code}</span>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Updated time */}
       <div className="text-[10px] text-slate-500 text-right mt-1">
         Updated {getTimeAgo(rates.timestamp)}
       </div>
@@ -85,9 +74,6 @@ function ExchangeRates() {
   )
 }
 
-/**
- * Helper to show time ago
- */
 function getTimeAgo(timestamp) {
   const minutes = Math.floor((Date.now() - timestamp) / 60000)
 

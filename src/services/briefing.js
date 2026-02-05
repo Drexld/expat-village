@@ -1,4 +1,4 @@
-// src/services/briefing.js
+﻿// src/services/briefing.js
 // AI-powered personalized briefing service using Groq
 
 import { generateGroqResponse } from '../lib/groq'
@@ -36,7 +36,7 @@ export async function generatePersonalizedBriefing({ user, profile, weatherData 
 Context:
 - Today is ${dateStr}
 - User's name: ${displayName}
-- Weather in Warsaw: ${weatherData?.temp || 0}°C, ${weatherData?.condition || 'unknown'}
+- Weather in Warsaw: ${weatherData?.temp || 0}C, ${weatherData?.condition || 'unknown'}
 - User has been in Poland for: ${yearsInPoland} years
 - User's interests: ${interests.length > 0 ? interests.join(', ') : 'not specified'}
 ${trcDaysRemaining !== null ? `- TRC expires in: ${trcDaysRemaining} days` : ''}
@@ -49,8 +49,8 @@ Generate a JSON response with these fields:
 1. "greeting" - A warm, personalized greeting (1 sentence, include weather context like "perfect for a hot coffee" or "bundle up!")
 2. "todayInPoland" - An interesting historical fact or cultural tidbit about Poland related to today's date (1-2 sentences). Could be a historical event, a Polish tradition, a famous Polish person's birthday, etc.
 3. "tip" - ${isNewcomer ? 'A helpful tip for newcomers to Poland' : 'An insider tip or interesting fact about Polish life'} (1 sentence)
-4. "phraseOfTheDay" - A useful Polish phrase with translation (format: "Polish — English").
-5. "localHabit" - A smart local habit or etiquette tip (1 sentence, no clichés).
+4. "phraseOfTheDay" - A useful Polish phrase with translation (format: "Polish - English").
+5. "localHabit" - A smart local habit or etiquette tip (1 sentence, no cliches).
 6. "weekendRadar" - If today is Fri/Sat/Sun, a short note on what to watch for this weekend; otherwise a short "weekend prep" line (1 sentence).
 ${trcDaysRemaining !== null && trcDaysRemaining <= 60 ? `7. "trcAlert" - A reminder about their upcoming TRC expiry (1 sentence, be helpful not alarming)` : ''}
 
@@ -99,24 +99,24 @@ function generateFallbackBriefing({ displayName, weatherData, isNewcomer, trcDay
   else weatherTip = 'stay cool with some lody'
 
   const todayFacts = [
-    "Poland has the oldest restaurant in Europe - Piwnica Świdnicka in Wrocław, operating since 1275.",
+    "Poland has the oldest restaurant in Europe - Piwnica Swidnicka in Wroclaw, operating since 1275.",
     "Polish mathematicians broke the Enigma code before WWII, a crucial contribution to Allied victory.",
-    "Marie Curie (Maria Skłodowska) was born in Warsaw and is the only person to win Nobel Prizes in two different sciences.",
-    "Poland's Białowieża Forest is one of Europe's last primeval forests, home to wild European bison.",
+    "Marie Curie (Maria Sklodowska) was born in Warsaw and is the only person to win Nobel Prizes in two different sciences.",
+    "Poland's Bialowieza Forest is one of Europe's last primeval forests, home to wild European bison.",
     "The Polish Constitution of May 3, 1791 was the first modern constitution in Europe.",
   ]
 
   return {
     success: true,
-    greeting: `${timeGreeting}, ${displayName}! It's ${temp}°C outside — ${weatherTip}.`,
+    greeting: `${timeGreeting}, ${displayName}! It's ${temp}C outside - ${weatherTip}.`,
     todayInPoland: todayFacts[new Date().getDate() % todayFacts.length],
     tip: isNewcomer
-      ? "Pro tip: The 'Żabka' convenience stores are open late and perfect for quick groceries."
-      : "Did you know? Saying 'Dzień dobry' with a smile goes a long way in Poland.",
-    phraseOfTheDay: "Poproszę — I'll have / I would like",
+      ? "Pro tip: The 'Zabka' convenience stores are open late and perfect for quick groceries."
+      : "Did you know? Saying 'Dzien dobry' with a smile goes a long way in Poland.",
+    phraseOfTheDay: "Poprosze - I'll have / I would like",
     localHabit: isNewcomer
       ? "Keep small cash for bakeries and corner shops; card machines can be temperamental."
-      : "When you enter smaller shops, a quick 'Dzień dobry' is expected and appreciated.",
+      : "When you enter smaller shops, a quick 'Dzien dobry' is expected and appreciated.",
     weekendRadar: "Weekend prep: check Sunday trading rules and stock up if needed.",
     trcAlert: trcDaysRemaining !== null && trcDaysRemaining <= 60
       ? `Your TRC expires in ${trcDaysRemaining} days. Start your renewal process soon!`
@@ -186,7 +186,7 @@ export function getTrcReminder(profile) {
   if (daysRemaining <= 0) {
     return {
       type: 'expired',
-      message: 'Your TRC has expired! Contact your local urząd immediately.',
+      message: 'Your TRC has expired! Contact your local urzad immediately.',
       urgent: true
     }
   } else if (daysRemaining <= 30) {
@@ -211,3 +211,5 @@ export function getTrcReminder(profile) {
 
   return null
 }
+
+

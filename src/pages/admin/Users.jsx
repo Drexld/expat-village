@@ -1,7 +1,7 @@
-// src/pages/admin/Users.jsx
+﻿// src/pages/admin/Users.jsx
 // User directory page (read-only)
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { getUsers } from '../../services/admin'
 
 function Users() {
@@ -13,18 +13,19 @@ function Users() {
   const [search, setSearch] = useState('')
   const [searchInput, setSearchInput] = useState('')
 
-  useEffect(() => {
-    fetchUsers()
-  }, [page, search])
-
-  async function fetchUsers() {
+  const fetchUsers = useCallback(async () => {
     setLoading(true)
     const result = await getUsers(page, 20, search)
     setUsers(result.users)
     setTotal(result.total)
     setTotalPages(result.totalPages)
     setLoading(false)
-  }
+  }, [page, search])
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchUsers()
+  }, [fetchUsers])
 
   function handleSearch(e) {
     e.preventDefault()
@@ -131,13 +132,13 @@ function Users() {
                     <span>Joined {formatDate(user.created_at)}</span>
                     {user.years_in_poland !== null && (
                       <>
-                        <span>•</span>
+                        <span>-</span>
                         <span>{user.years_in_poland} year{user.years_in_poland !== 1 ? 's' : ''} in Poland</span>
                       </>
                     )}
                     {user.interests && user.interests.length > 0 && (
                       <>
-                        <span>•</span>
+                        <span>-</span>
                         <span>{user.interests.length} interest{user.interests.length !== 1 ? 's' : ''}</span>
                       </>
                     )}
@@ -200,3 +201,4 @@ function Users() {
 }
 
 export default Users
+

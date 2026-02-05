@@ -1,4 +1,4 @@
-// src/pages/Settings.jsx
+﻿// src/pages/Settings.jsx
 // User preferences and settings page
 
 import { useState, useEffect } from 'react'
@@ -7,30 +7,30 @@ import { useAuth } from '../contexts/AuthContext'
 import { useSubscription } from '../hooks/useSubscription'
 import { openCustomerPortal } from '../services/subscription'
 import SubscriptionBadge from '../components/SubscriptionBadge'
+import Icon from '../components/Icon'
 
 const INTEREST_OPTIONS = [
-  { id: 'events', label: 'Community Events', icon: '🎉' },
-  { id: 'housing', label: 'Housing & Rentals', icon: '🏠' },
-  { id: 'jobs', label: 'Jobs & Careers', icon: '💼' },
-  { id: 'legal', label: 'Legal & Visa', icon: '📋' },
-  { id: 'health', label: 'Healthcare', icon: '🏥' },
-  { id: 'education', label: 'Education & Schools', icon: '🎓' },
-  { id: 'social', label: 'Social & Meetups', icon: '👥' },
-  { id: 'food', label: 'Food & Restaurants', icon: '🍽️' },
-  { id: 'transport', label: 'Transport & Travel', icon: '🚇' },
-  { id: 'finance', label: 'Finance & Banking', icon: '💳' },
+  { id: 'events', label: 'Community Events', icon: 'calendar' },
+  { id: 'housing', label: 'Housing & Rentals', icon: 'home' },
+  { id: 'jobs', label: 'Jobs & Careers', icon: 'briefcase' },
+  { id: 'legal', label: 'Legal & Visa', icon: 'document' },
+  { id: 'health', label: 'Healthcare', icon: 'health' },
+  { id: 'education', label: 'Education & Schools', icon: 'graduation' },
+  { id: 'social', label: 'Social & Meetups', icon: 'community' },
+  { id: 'food', label: 'Food & Restaurants', icon: 'utensils' },
+  { id: 'transport', label: 'Transport & Travel', icon: 'train' },
+  { id: 'finance', label: 'Finance & Banking', icon: 'briefcase' },
 ]
 
 function Settings() {
   const navigate = useNavigate()
   const { user, profile, updateProfile, isAuthenticated } = useAuth()
-  const { subscription, plan, isPremium, loading: subLoading } = useSubscription()
+  const { subscription, plan, loading: subLoading } = useSubscription()
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState(null)
   const [portalLoading, setPortalLoading] = useState(false)
 
-  // Form state
   const [trcExpiryDate, setTrcExpiryDate] = useState('')
   const [yearsInPoland, setYearsInPoland] = useState('')
   const [interests, setInterests] = useState([])
@@ -40,9 +40,9 @@ function Settings() {
     weeklyDigest: false,
   })
 
-  // Load existing profile data
   useEffect(() => {
     if (profile) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTrcExpiryDate(profile.trc_expiry_date || '')
       setYearsInPoland(profile.years_in_poland?.toString() || '')
       setInterests(profile.interests || [])
@@ -54,7 +54,6 @@ function Settings() {
     }
   }, [profile])
 
-  // Redirect if not authenticated
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/')
@@ -102,16 +101,13 @@ function Settings() {
   }
 
   return (
-    <div className="max-w-lg mx-auto pb-8">
-      {/* Header */}
-      <div className="mb-8">
+    <div className="max-w-lg mx-auto pb-8 space-y-8">
+      <div>
         <button
           onClick={() => navigate(-1)}
           className="flex items-center gap-2 text-slate-400 hover:text-white mb-4 transition-colors"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
+          <Icon name="arrowLeft" size={16} />
           Back
         </button>
         <h1 className="text-2xl font-bold text-white">Settings</h1>
@@ -120,15 +116,11 @@ function Settings() {
         </p>
       </div>
 
-      {/* TRC Expiry Date */}
-      <section className="mb-8">
+      <section>
         <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-          <span>📋</span> Residence Permit (TRC)
+          <Icon name="document" size={14} className="text-slate-400" /> Residence Permit (TRC)
         </h2>
-        <div className="p-4 rounded-2xl" style={{
-          background: 'rgba(139,92,246,0.1)',
-          border: '1px solid rgba(139,92,246,0.2)',
-        }}>
+        <div className="glass-panel rounded-2xl p-4">
           <label className="block text-sm text-white mb-2">
             TRC Expiry Date
           </label>
@@ -136,37 +128,33 @@ function Settings() {
             type="date"
             value={trcExpiryDate}
             onChange={(e) => setTrcExpiryDate(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700 text-white focus:outline-none focus:border-purple-500 transition-colors"
+            className="w-full px-4 py-3 rounded-xl glass-panel border border-white/10 text-white focus:outline-none focus:border-slate-400 transition-colors"
           />
           <p className="text-xs text-slate-500 mt-2">
-            We'll remind you 60, 45, and 30 days before expiry
+            We will remind you 60, 45, and 30 days before expiry
           </p>
         </div>
       </section>
 
-      {/* Years in Poland */}
-      <section className="mb-8">
+      <section>
         <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-          <span>🇵🇱</span> Experience Level
+          <Icon name="globe" size={14} className="text-slate-400" /> Experience Level
         </h2>
-        <div className="p-4 rounded-2xl" style={{
-          background: 'rgba(255,255,255,0.05)',
-          border: '1px solid rgba(255,255,255,0.1)',
-        }}>
+        <div className="glass-panel rounded-2xl p-4">
           <label className="block text-sm text-white mb-2">
             How long have you been in Poland?
           </label>
           <select
             value={yearsInPoland}
             onChange={(e) => setYearsInPoland(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700 text-white focus:outline-none focus:border-purple-500 transition-colors"
+            className="w-full px-4 py-3 rounded-xl glass-panel border border-white/10 text-white focus:outline-none focus:border-slate-400 transition-colors"
           >
             <option value="">Select...</option>
             <option value="0">Just arrived (less than 1 year)</option>
             <option value="1">1-2 years</option>
             <option value="3">3-5 years</option>
             <option value="5">5+ years</option>
-            <option value="10">10+ years (veteran!)</option>
+            <option value="10">10+ years (veteran)</option>
           </select>
           <p className="text-xs text-slate-500 mt-2">
             This helps us show you relevant content
@@ -174,10 +162,9 @@ function Settings() {
         </div>
       </section>
 
-      {/* Interests */}
-      <section className="mb-8">
+      <section>
         <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-          <span>🎯</span> Your Interests
+          <Icon name="star" size={14} className="text-slate-400" /> Your Interests
         </h2>
         <p className="text-xs text-slate-500 mb-4">
           Select topics you want to see updates about
@@ -189,20 +176,16 @@ function Settings() {
               <button
                 key={option.id}
                 onClick={() => toggleInterest(option.id)}
-                className="flex items-center gap-2 px-3 py-3 rounded-xl transition-all text-left"
-                style={{
-                  background: isSelected ? 'rgba(139,92,246,0.2)' : 'rgba(255,255,255,0.05)',
-                  border: `1px solid ${isSelected ? 'rgba(139,92,246,0.4)' : 'rgba(255,255,255,0.1)'}`,
-                }}
+                className={`flex items-center gap-2 px-3 py-3 rounded-xl transition-all text-left ${
+                  isSelected ? 'glass-strong ring-1 ring-white/20' : 'glass-panel'
+                }`}
               >
-                <span className="text-lg">{option.icon}</span>
-                <span className={`text-sm ${isSelected ? 'text-purple-300' : 'text-slate-300'}`}>
+                <Icon name={option.icon} size={16} className="text-slate-200" />
+                <span className={`text-sm ${isSelected ? 'text-white' : 'text-slate-300'}`}>
                   {option.label}
                 </span>
                 {isSelected && (
-                  <svg className="w-4 h-4 text-purple-400 ml-auto" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
+                  <Icon name="success" size={14} className="text-emerald-200 ml-auto" />
                 )}
               </button>
             )
@@ -210,10 +193,9 @@ function Settings() {
         </div>
       </section>
 
-      {/* Notification Preferences */}
-      <section className="mb-8">
+      <section>
         <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-          <span>🔔</span> Notifications
+          <Icon name="bell" size={14} className="text-slate-400" /> Notifications
         </h2>
         <div className="space-y-3">
           {[
@@ -223,11 +205,7 @@ function Settings() {
           ].map((pref) => (
             <div
               key={pref.key}
-              className="flex items-center justify-between p-4 rounded-xl"
-              style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
-              }}
+              className="flex items-center justify-between p-4 rounded-xl glass-panel"
             >
               <div>
                 <p className="text-sm text-white">{pref.label}</p>
@@ -239,7 +217,7 @@ function Settings() {
                   [pref.key]: !prev[pref.key]
                 }))}
                 className={`w-12 h-7 rounded-full transition-colors relative ${
-                  reminderPrefs[pref.key] ? 'bg-purple-600' : 'bg-slate-700'
+                  reminderPrefs[pref.key] ? 'bg-slate-200/60' : 'bg-slate-700'
                 }`}
               >
                 <div
@@ -253,19 +231,11 @@ function Settings() {
         </div>
       </section>
 
-      {/* Subscription Section */}
-      <section className="mb-8">
+      <section>
         <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-          <span>💎</span> Subscription
+          <Icon name="crown" size={14} className="text-slate-400" /> Subscription
         </h2>
-        <div className="p-4 rounded-2xl" style={{
-          background: isPremium
-            ? 'linear-gradient(135deg, rgba(251,191,36,0.1), rgba(139,92,246,0.1))'
-            : 'rgba(255,255,255,0.05)',
-          border: isPremium
-            ? '1px solid rgba(251,191,36,0.3)'
-            : '1px solid rgba(255,255,255,0.1)',
-        }}>
+        <div className="glass-panel rounded-2xl p-4">
           <div className="flex items-center justify-between mb-3">
             <div>
               <div className="flex items-center gap-2">
@@ -285,7 +255,7 @@ function Settings() {
             {plan === 'free' ? (
               <Link
                 to="/pricing"
-                className="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium transition-colors"
+                className="glass-chip px-4 py-2 rounded-lg text-white text-sm font-medium transition-colors"
               >
                 Upgrade
               </Link>
@@ -303,7 +273,7 @@ function Settings() {
                   setPortalLoading(false)
                 }}
                 disabled={portalLoading || subLoading}
-                className="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-sm font-medium transition-colors disabled:opacity-50"
+                className="glass-chip px-4 py-2 rounded-lg text-white text-sm font-medium transition-colors disabled:opacity-50"
               >
                 {portalLoading ? 'Loading...' : 'Manage'}
               </button>
@@ -317,42 +287,32 @@ function Settings() {
         </div>
       </section>
 
-      {/* Save Button */}
       <div className="sticky bottom-20 pt-4">
         {error && (
-          <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+          <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-200 text-sm">
             {error}
           </div>
         )}
         {saved && (
-          <div className="mb-4 p-3 rounded-xl bg-green-500/10 border border-green-500/30 text-green-400 text-sm flex items-center gap-2">
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-            </svg>
-            Settings saved!
+          <div className="mb-4 p-3 rounded-xl glass-panel text-emerald-200 text-sm flex items-center gap-2">
+            <Icon name="success" size={16} className="text-emerald-200" />
+            Settings saved
           </div>
         )}
         <button
           onClick={handleSave}
           disabled={saving}
-          className="w-full py-4 rounded-2xl font-semibold text-white transition-all disabled:opacity-50"
-          style={{
-            background: 'linear-gradient(135deg, #8B5CF6, #7C3AED)',
-          }}
+          className="w-full py-4 rounded-2xl font-semibold text-white transition-all disabled:opacity-50 glass-strong"
         >
           {saving ? 'Saving...' : 'Save Settings'}
         </button>
       </div>
 
-      {/* Account Info */}
-      <section className="mt-8 pt-8 border-t border-slate-800">
+      <section className="mt-8 pt-8 border-t border-white/10">
         <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">
           Account
         </h2>
-        <div className="p-4 rounded-xl" style={{
-          background: 'rgba(255,255,255,0.05)',
-          border: '1px solid rgba(255,255,255,0.1)',
-        }}>
+        <div className="glass-panel rounded-xl p-4">
           <p className="text-sm text-slate-400">Signed in as</p>
           <p className="text-white">{user?.email}</p>
         </div>

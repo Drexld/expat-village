@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
+import Icon from '../components/Icon'
 
 function MyChecklist() {
   const { user, isAuthenticated, openAuthModal } = useAuth()
@@ -13,7 +14,7 @@ function MyChecklist() {
   const categories = [
     {
       id: 'first-week',
-      title: '🚀 First Week in Poland',
+      title: 'First Week in Poland',
       tasks: [
         { id: 'sim-card', label: 'Get a Polish SIM card', guide: '/get-things-done' },
         { id: 'bank-account', label: 'Open a bank account', guide: '/get-things-done' },
@@ -24,7 +25,7 @@ function MyChecklist() {
     },
     {
       id: 'first-month',
-      title: '📋 First Month Essentials',
+      title: 'First Month Essentials',
       tasks: [
         { id: 'pesel', label: 'Get your PESEL number', guide: '/get-things-done' },
         { id: 'zameldowanie', label: 'Register your address (Zameldowanie)', guide: '/get-things-done' },
@@ -36,7 +37,7 @@ function MyChecklist() {
     },
     {
       id: 'settling-in',
-      title: '🏠 Settling In',
+      title: 'Settling In',
       tasks: [
         { id: 'residence-permit', label: 'Apply for residence permit (if needed)', guide: '/get-things-done' },
         { id: 'tax-number', label: 'Get your NIP (tax number)', guide: '/get-things-done' },
@@ -48,33 +49,30 @@ function MyChecklist() {
     },
     {
       id: 'long-term',
-      title: '🎯 Long-term Goals',
+      title: 'Long-term Goals',
       tasks: [
         { id: 'polish-lessons', label: 'Start Polish language lessons', guide: null },
         { id: 'driving-license', label: 'Get Polish driving license (if needed)', guide: '/getting-around' },
         { id: 'apartment-own', label: 'Find your own apartment', guide: '/housing' },
         { id: 'build-network', label: 'Build professional network', guide: '/jobs-careers' },
-        { id: 'travel-poland', label: 'Explore Poland (Kraków, Gdańsk, etc.)', guide: null },
+        { id: 'travel-poland', label: 'Explore Poland (Krakow, Gdansk, etc.)', guide: null },
       ]
     }
   ]
 
-  // Load checklist - with proper error handling
   useEffect(() => {
     let isMounted = true
-    
+
     const loadData = async () => {
-      // Always start by loading from localStorage
       const saved = localStorage.getItem('expat-checklist')
       if (saved && isMounted) {
         try {
           setCheckedItems(JSON.parse(saved))
-        } catch (e) {
+        } catch {
           console.log('Could not parse localStorage checklist')
         }
       }
 
-      // If authenticated, try to load from database
       if (isAuthenticated && user) {
         try {
           const { data, error } = await supabase
@@ -90,11 +88,9 @@ function MyChecklist() {
               }
             })
             setCheckedItems(checked)
-            // Also save to localStorage as backup
             localStorage.setItem('expat-checklist', JSON.stringify(checked))
           }
-        } catch (error) {
-          // Silently fail - just use localStorage data
+        } catch {
           console.log('Using localStorage checklist (db unavailable)')
         }
       }
@@ -114,19 +110,16 @@ function MyChecklist() {
   const toggleTask = async (taskId) => {
     const newChecked = { ...checkedItems }
     const isNowChecked = !newChecked[taskId]
-    
+
     if (isNowChecked) {
       newChecked[taskId] = true
     } else {
       delete newChecked[taskId]
     }
-    
+
     setCheckedItems(newChecked)
-    
-    // Always save to localStorage first
     localStorage.setItem('expat-checklist', JSON.stringify(newChecked))
 
-    // If authenticated, also save to database
     if (isAuthenticated && user) {
       setSaving(true)
       try {
@@ -148,7 +141,7 @@ function MyChecklist() {
             .eq('user_id', user.id)
             .eq('task_id', taskId)
         }
-      } catch (error) {
+      } catch {
         console.log('Saved to localStorage only')
       } finally {
         setSaving(false)
@@ -156,7 +149,6 @@ function MyChecklist() {
     }
   }
 
-  // Calculate progress
   const totalTasks = categories.reduce((sum, cat) => sum + cat.tasks.length, 0)
   const completedTasks = Object.keys(checkedItems).length
   const progressPercent = Math.round((completedTasks / totalTasks) * 100)
@@ -170,18 +162,19 @@ function MyChecklist() {
   }
 
   return (
-    <div>
-      <nav className="mb-6">
-        <Link to="/" className="text-slate-400 hover:text-white transition-colors">
-          ← Back to Home
-        </Link>
-      </nav>
+    <div className="min-h-screen space-y-8">
+      <Link to="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
+        <Icon name="arrowLeft" size={16} />
+        Back to Home
+      </Link>
 
-      <header className="mb-8">
-        <div className="flex items-center gap-3 mb-4">
-          <span className="text-4xl">✅</span>
-          <h1 className="text-3xl font-bold text-white">My Checklist</h1>
-          {saving && <span className="text-emerald-400 text-sm animate-pulse">Saving...</span>}
+      <header className="glass-panel rounded-3xl p-6">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
+            <Icon name="checklist" size={22} className="text-slate-100" />
+          </div>
+          <h1 className="text-3xl font-semibold text-white">My Checklist</h1>
+          {saving && <span className="text-emerald-200 text-sm animate-pulse">Saving...</span>}
         </div>
         <p className="text-slate-400 text-lg">
           Track your expat journey. Check off tasks as you complete them.
@@ -189,17 +182,19 @@ function MyChecklist() {
       </header>
 
       {!isAuthenticated && (
-        <div className="bg-amber-900/30 border border-amber-700/50 rounded-xl p-4 mb-6">
+        <div className="glass-panel rounded-2xl p-4 border border-amber-500/30">
           <div className="flex items-start gap-3">
-            <span className="text-xl">💡</span>
+            <div className="glass-panel flex h-10 w-10 items-center justify-center rounded-xl">
+              <Icon name="warning" size={18} className="text-amber-200" />
+            </div>
             <div>
-              <p className="text-amber-200 font-medium">Sign in to save your progress!</p>
+              <p className="text-amber-200 font-medium">Sign in to save your progress</p>
               <p className="text-slate-400 text-sm mt-1">
                 Your checklist is saved locally, but signing in syncs it across devices.
               </p>
               <button
                 onClick={() => openAuthModal('sign_up')}
-                className="mt-2 bg-amber-600 hover:bg-amber-500 text-white px-4 py-1.5 rounded-lg text-sm transition-colors"
+                className="mt-3 rounded-full border border-amber-400/40 bg-amber-500/20 px-4 py-1.5 text-sm text-amber-100 hover:bg-amber-500/30"
               >
                 Sign Up Free
               </button>
@@ -208,14 +203,13 @@ function MyChecklist() {
         </div>
       )}
 
-      {/* Progress Bar */}
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 mb-8">
+      <div className="glass-3d rounded-3xl p-6 hover-tilt">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-lg font-semibold text-white">Your Progress</h3>
-          <span className="text-2xl font-bold text-emerald-400">{progressPercent}%</span>
+          <span className="text-2xl font-semibold text-emerald-200">{progressPercent}%</span>
         </div>
-        <div className="h-4 bg-slate-700 rounded-full overflow-hidden">
-          <div 
+        <div className="h-4 bg-slate-900 rounded-full overflow-hidden">
+          <div
             className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 transition-all duration-500"
             style={{ width: `${progressPercent}%` }}
           />
@@ -225,27 +219,26 @@ function MyChecklist() {
         </p>
       </div>
 
-      {/* Categories */}
       <div className="space-y-6">
         {categories.map((category) => {
           const categoryCompleted = category.tasks.filter(t => checkedItems[t.id]).length
           const categoryTotal = category.tasks.length
 
           return (
-            <div key={category.id} className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
-              <div className="p-4 border-b border-slate-700 flex items-center justify-between">
+            <div key={category.id} className="glass-panel rounded-2xl overflow-hidden border border-white/10">
+              <div className="p-4 border-b border-white/10 flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-white">{category.title}</h2>
                 <span className="text-sm text-slate-400">
                   {categoryCompleted}/{categoryTotal}
                 </span>
               </div>
 
-              <div className="divide-y divide-slate-700/50">
+              <div className="divide-y divide-white/5">
                 {category.tasks.map((task) => (
-                  <div 
+                  <div
                     key={task.id}
                     className={`p-4 flex items-center gap-4 transition-colors ${
-                      checkedItems[task.id] ? 'bg-emerald-900/10' : 'hover:bg-slate-700/30'
+                      checkedItems[task.id] ? 'bg-emerald-900/10' : 'hover:bg-white/5'
                     }`}
                   >
                     <button
@@ -272,9 +265,9 @@ function MyChecklist() {
                     {task.guide && (
                       <Link
                         to={task.guide}
-                        className="text-emerald-400 hover:text-emerald-300 text-sm transition-colors"
+                        className="text-emerald-200 hover:text-emerald-100 text-sm transition-colors inline-flex items-center gap-1"
                       >
-                        Guide →
+                        Guide <Icon name="arrowRight" size={12} />
                       </Link>
                     )}
                   </div>
@@ -285,8 +278,8 @@ function MyChecklist() {
         })}
       </div>
 
-      <div className="mt-8 text-center text-slate-500 text-sm">
-        <p>Every checked box is a step toward feeling at home. 💪</p>
+      <div className="text-center text-slate-500 text-sm">
+        Every checked box is a step toward feeling at home.
       </div>
     </div>
   )

@@ -1,16 +1,17 @@
-// src/layouts/AdminLayout.jsx
+﻿// src/layouts/AdminLayout.jsx
 // Admin dashboard layout with sidebar navigation
 
 import { useState } from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import Icon from '../components/Icon'
 
 const navItems = [
-  { path: '/admin', label: 'Dashboard', icon: '📊', exact: true },
-  { path: '/admin/announcements', label: 'Announcements', icon: '📢' },
-  { path: '/admin/alerts', label: 'System Alerts', icon: '🚨' },
-  { path: '/admin/listings', label: 'Featured Listings', icon: '⭐' },
-  { path: '/admin/users', label: 'Users', icon: '👥' },
+  { path: '/admin', label: 'Dashboard', icon: 'badge', exact: true },
+  { path: '/admin/announcements', label: 'Announcements', icon: 'bell' },
+  { path: '/admin/alerts', label: 'System Alerts', icon: 'alert' },
+  { path: '/admin/listings', label: 'Featured Listings', icon: 'star' },
+  { path: '/admin/users', label: 'Users', icon: 'user' },
 ]
 
 function AdminLayout() {
@@ -28,9 +29,9 @@ function AdminLayout() {
   const displayName = profile?.display_name || user?.email?.split('@')[0] || 'Admin'
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
+    <div className="min-h-screen text-white">
       {/* Mobile header */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-xl border-b border-slate-800">
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 glass-panel border-b border-white/10">
         <div className="flex items-center justify-between px-4 h-14">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -40,7 +41,7 @@ function AdminLayout() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
-          <span className="text-sm font-semibold text-purple-400">Admin Dashboard</span>
+          <span className="text-sm font-semibold text-slate-200">Admin Dashboard</span>
           <Link to="/" className="p-2 text-slate-400 hover:text-white">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -59,23 +60,26 @@ function AdminLayout() {
 
       {/* Sidebar */}
       <aside className={`
-        fixed top-0 left-0 z-50 h-full w-64 bg-slate-900 border-r border-slate-800
+        fixed top-0 left-0 z-50 h-full w-64 glass-strong border-r border-white/10
         transform transition-transform duration-300 ease-in-out
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         lg:translate-x-0
       `}>
         {/* Sidebar header */}
-        <div className="p-4 border-b border-slate-800">
+        <div className="p-4 border-b border-white/10">
           <Link to="/" className="flex items-center gap-3 group">
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-amber-500 rounded-lg blur opacity-50 group-hover:opacity-75 transition-opacity" />
-              <div className="relative w-10 h-10 rounded-lg overflow-hidden">
+              <div
+                className="absolute inset-0 rounded-lg blur opacity-40 group-hover:opacity-70 transition-opacity"
+                style={{ background: 'linear-gradient(135deg, rgba(154,163,255,0.45), rgba(194,177,217,0.35))' }}
+              />
+              <div className="relative w-10 h-10 rounded-lg overflow-hidden glass-3d">
                 <img src="/icon.svg" alt="Expat Village" className="w-full h-full object-cover" />
               </div>
             </div>
             <div>
               <h1 className="text-sm font-bold text-white">Expat Village</h1>
-              <p className="text-xs text-purple-400">Admin Panel</p>
+              <p className="text-xs text-slate-400">Admin Panel</p>
             </div>
           </Link>
         </div>
@@ -90,12 +94,12 @@ function AdminLayout() {
               className={`
                 flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all
                 ${isActive(item)
-                  ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                  ? 'glass-panel text-white border border-white/10'
+                  : 'text-slate-400 hover:text-white hover:bg-white/5'
                 }
               `}
             >
-              <span className="text-lg">{item.icon}</span>
+              <Icon name={item.icon} className="w-5 h-5" />
               {item.label}
             </Link>
           ))}
@@ -103,24 +107,27 @@ function AdminLayout() {
 
         {/* Divider */}
         <div className="px-4 my-4">
-          <div className="border-t border-slate-800" />
+          <div className="border-t border-white/10" />
         </div>
 
         {/* Back to app link */}
         <div className="px-4">
           <Link
             to="/"
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/50 transition-all"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all"
           >
-            <span className="text-lg">🏠</span>
+            <Icon name="home" className="w-5 h-5" />
             Back to App
           </Link>
         </div>
 
         {/* User info at bottom */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-800 bg-slate-900">
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10 glass-strong">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-gradient-to-br from-purple-500 to-amber-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+            <div
+              className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm"
+              style={{ background: 'linear-gradient(135deg, rgba(154,163,255,0.6), rgba(194,177,217,0.6))' }}
+            >
               {displayName.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
@@ -151,3 +158,5 @@ function AdminLayout() {
 }
 
 export default AdminLayout
+
+

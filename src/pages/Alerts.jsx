@@ -1,17 +1,18 @@
-import { Link } from 'react-router-dom'
+﻿import { Link } from 'react-router-dom'
 import { useState } from 'react'
+import Icon from '../components/Icon'
 
 function Alerts() {
-  const [activeFilter, setActiveFilter] = useState('all') // all, immigration, tax, health, housing, transport
+  const [activeFilter, setActiveFilter] = useState('all')
   const [subscribedTopics, setSubscribedTopics] = useState(['immigration', 'tax'])
 
   const filters = [
-    { id: 'all', name: 'All Alerts', icon: '📢' },
-    { id: 'immigration', name: 'Immigration', icon: '🛂' },
-    { id: 'tax', name: 'Tax & Finance', icon: '💰' },
-    { id: 'health', name: 'Health', icon: '🏥' },
-    { id: 'housing', name: 'Housing', icon: '🏠' },
-    { id: 'transport', name: 'Transport', icon: '🚇' },
+    { id: 'all', name: 'All Alerts', icon: 'bell' },
+    { id: 'immigration', name: 'Immigration', icon: 'document' },
+    { id: 'tax', name: 'Tax & Finance', icon: 'briefcase' },
+    { id: 'health', name: 'Health', icon: 'health' },
+    { id: 'housing', name: 'Housing', icon: 'home' },
+    { id: 'transport', name: 'Transport', icon: 'train' },
   ]
 
   const alerts = [
@@ -33,7 +34,7 @@ function Alerts() {
       type: 'important',
       category: 'tax',
       title: 'PIT-37 Deadline Extended to May 15',
-      summary: 'Good news! The deadline for filing PIT-37 tax returns has been extended from April 30 to May 15, 2026.',
+      summary: 'The deadline for filing PIT-37 tax returns has been extended from April 30 to May 15, 2026.',
       fullContent: 'The Ministry of Finance announced an extension for the 2025 tax year PIT-37 filing deadline. The new deadline is May 15, 2026. This applies to employees and contractors filing standard tax returns. B2B taxpayers filing PIT-36 are not affected.',
       date: '1 day ago',
       source: 'Ministry of Finance',
@@ -46,7 +47,7 @@ function Alerts() {
       type: 'info',
       category: 'immigration',
       title: 'New Online Appointment System for Foreigners Office',
-      summary: 'Warsaw Foreigners Office launches new online booking system. Old system will be discontinued Feb 1.',
+      summary: 'Warsaw Foreigners Office launches a new online booking system. The old system is discontinued Feb 1.',
       fullContent: 'Starting February 1, 2026, all appointments at the Warsaw Foreigners Office must be booked through the new online system at cudzoziemcy.um.warszawa.pl. The old phone booking system will be discontinued. Users must create a new account even if they had one in the old system.',
       date: '3 days ago',
       source: 'Warsaw City Hall',
@@ -72,7 +73,7 @@ function Alerts() {
       type: 'info',
       category: 'housing',
       title: 'Rent Prices Stabilizing in Warsaw',
-      summary: 'After 2 years of increases, Warsaw rent prices show signs of stabilization according to latest data.',
+      summary: 'After two years of increases, Warsaw rent prices show signs of stabilization.',
       fullContent: 'Data from Otodom and Morizon shows Warsaw rental prices have stabilized after significant increases in 2024-2025. Average prices remain high but month-over-month growth has slowed to under 1%. Experts suggest this could be a good time for expats looking to negotiate longer lease terms.',
       date: '1 week ago',
       source: 'Otodom Market Report',
@@ -98,7 +99,7 @@ function Alerts() {
       type: 'urgent',
       category: 'immigration',
       title: 'Temporary Protection Status Extended for Ukrainians',
-      summary: 'EU extends temporary protection for Ukrainian refugees until March 2027.',
+      summary: 'The EU extends temporary protection for Ukrainian refugees until March 2027.',
       fullContent: 'The European Council has extended the Temporary Protection Directive for Ukrainian refugees until March 4, 2027. This means Ukrainians in Poland under this status do not need to take immediate action. PESEL UKR holders should check their documentation is up to date.',
       date: '2 weeks ago',
       source: 'European Council',
@@ -112,7 +113,7 @@ function Alerts() {
       category: 'tax',
       title: 'New ZUS Contributions for 2026',
       summary: 'ZUS contribution amounts have changed for 2026. B2B freelancers take note.',
-      fullContent: 'ZUS contributions for 2026 have been updated. Large ZUS (duży ZUS) is now approximately 1,600 PLN/month. Small ZUS (mały ZUS) for new businesses remains available for the first 24 months. Health insurance (składka zdrowotna) calculations remain at 9% of income for B2B.',
+      fullContent: 'ZUS contributions for 2026 have been updated. Large ZUS (duzy ZUS) is now approximately 1,600 PLN/month. Small ZUS (maly ZUS) for new businesses remains available for the first 24 months. Health insurance (skladka zdrowotna) calculations remain at 9% of income for B2B.',
       date: '3 weeks ago',
       source: 'ZUS',
       verified: true,
@@ -121,13 +122,13 @@ function Alerts() {
     },
   ]
 
-  const filteredAlerts = activeFilter === 'all' 
-    ? alerts 
+  const filteredAlerts = activeFilter === 'all'
+    ? alerts
     : alerts.filter(a => a.category === activeFilter)
 
   const toggleSubscription = (topic) => {
-    setSubscribedTopics(prev => 
-      prev.includes(topic) 
+    setSubscribedTopics(prev =>
+      prev.includes(topic)
         ? prev.filter(t => t !== topic)
         : [...prev, topic]
     )
@@ -137,137 +138,140 @@ function Alerts() {
     switch (type) {
       case 'urgent':
         return {
-          border: 'border-red-700/50',
-          bg: 'bg-red-900/20',
-          badge: 'bg-red-600',
-          icon: '🚨'
+          border: 'border-red-500/30',
+          badge: 'bg-red-500/80',
+          accent: 'text-red-200',
+          icon: 'alert',
+          panel: 'glass-3d'
         }
       case 'important':
         return {
-          border: 'border-yellow-700/50',
-          bg: 'bg-yellow-900/20',
-          badge: 'bg-yellow-600',
-          icon: '⚠️'
+          border: 'border-amber-400/30',
+          badge: 'bg-amber-400/80',
+          accent: 'text-amber-200',
+          icon: 'warning',
+          panel: 'glass-panel'
         }
       default:
         return {
-          border: 'border-slate-700',
-          bg: 'bg-slate-800',
-          badge: 'bg-blue-600',
-          icon: 'ℹ️'
+          border: 'border-white/10',
+          badge: 'bg-slate-500/70',
+          accent: 'text-slate-200',
+          icon: 'info',
+          panel: 'glass-panel'
         }
     }
   }
 
   const getCategoryIcon = (category) => {
-    return filters.find(f => f.id === category)?.icon || '📢'
+    return filters.find(f => f.id === category)?.icon || 'info'
   }
 
   return (
-    <div className="min-h-screen">
-      {/* Back Navigation */}
-      <Link 
-        to="/" 
-        className="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-6 transition-colors"
+    <div className="min-h-screen space-y-8">
+      <Link
+        to="/"
+        className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
       >
-        ← Back to Home
+        <Icon name="arrowLeft" size={16} />
+        Back to Home
       </Link>
 
-      {/* Header */}
-      <header className="mb-8">
-        <div className="flex items-center gap-3 mb-4">
-          <span className="text-4xl">🔔</span>
+      <header className="glass-panel rounded-3xl p-6">
+        <div className="flex items-center gap-4">
+          <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
+            <Icon name="bell" size={22} className="text-slate-100" />
+          </div>
           <div>
-            <h1 className="text-3xl font-bold text-white">Alerts</h1>
-            <p className="text-slate-400">Policy updates, deadlines & important news for expats</p>
+            <h1 className="text-3xl font-semibold text-white">Alerts</h1>
+            <p className="text-slate-400">Policy updates, deadlines, and important news for expats</p>
           </div>
         </div>
       </header>
 
-      {/* Subscription Banner */}
-      <div className="bg-gradient-to-r from-blue-900/40 to-indigo-900/40 border border-blue-700/50 rounded-xl p-5 mb-8">
-        <div className="flex items-center justify-between mb-4">
+      <section className="glass-strong rounded-3xl p-6">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
           <div>
             <h2 className="text-lg font-semibold text-white">Get Alerts That Matter</h2>
             <p className="text-slate-400 text-sm">Subscribe to topics and never miss important updates</p>
           </div>
-          <span className="text-2xl">📬</span>
+          <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
+            <Icon name="update" size={20} className="text-slate-200" />
+          </div>
         </div>
         <div className="flex flex-wrap gap-2">
           {filters.filter(f => f.id !== 'all').map((filter) => (
             <button
               key={filter.id}
               onClick={() => toggleSubscription(filter.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              className={`glass-chip flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
                 subscribedTopics.includes(filter.id)
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                  ? 'text-white ring-1 ring-white/20'
+                  : 'text-slate-300 hover:text-white'
               }`}
             >
-              <span>{filter.icon}</span>
+              <Icon name={filter.icon} size={14} className="text-slate-200" />
               <span>{filter.name}</span>
-              {subscribedTopics.includes(filter.id) && <span>✓</span>}
+              {subscribedTopics.includes(filter.id) && <Icon name="success" size={12} className="text-emerald-300" />}
             </button>
           ))}
         </div>
         <p className="text-slate-500 text-xs mt-3">
-          📧 Subscribed topics will be sent to your email • 
-          <button className="text-blue-400 hover:underline ml-1">Manage notification settings</button>
+          Subscribed topics will be sent to your email.
+          <button className="text-slate-300 hover:underline ml-1">Manage notification settings</button>
         </p>
-      </div>
+      </section>
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-red-400">{alerts.filter(a => a.type === 'urgent').length}</p>
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="glass-panel rounded-2xl p-4 text-center">
+          <p className="text-2xl font-semibold text-red-200">{alerts.filter(a => a.type === 'urgent').length}</p>
           <p className="text-slate-400 text-sm">Urgent Alerts</p>
         </div>
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-white">{alerts.length}</p>
+        <div className="glass-panel rounded-2xl p-4 text-center">
+          <p className="text-2xl font-semibold text-white">{alerts.length}</p>
           <p className="text-slate-400 text-sm">This Month</p>
         </div>
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-emerald-400">{subscribedTopics.length}</p>
+        <div className="glass-panel rounded-2xl p-4 text-center">
+          <p className="text-2xl font-semibold text-emerald-200">{subscribedTopics.length}</p>
           <p className="text-slate-400 text-sm">Subscribed Topics</p>
         </div>
-      </div>
+      </section>
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-2 mb-6">
+      <section className="flex flex-wrap gap-2">
         {filters.map((filter) => (
           <button
             key={filter.id}
             onClick={() => setActiveFilter(filter.id)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+            className={`glass-chip flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
               activeFilter === filter.id
-                ? 'bg-emerald-600 text-white'
-                : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'
+                ? 'text-white ring-1 ring-white/20'
+                : 'text-slate-400 hover:text-white'
             }`}
           >
-            <span>{filter.icon}</span>
+            <Icon name={filter.icon} size={14} className="text-slate-200" />
             <span className="text-sm">{filter.name}</span>
             {filter.id !== 'all' && (
-              <span className="text-xs bg-slate-700 px-1.5 py-0.5 rounded">
+              <span className="text-xs bg-white/10 px-1.5 py-0.5 rounded">
                 {alerts.filter(a => a.category === filter.id).length}
               </span>
             )}
           </button>
         ))}
-      </div>
+      </section>
 
-      {/* Alerts List */}
-      <div className="space-y-4">
+      <section className="space-y-4">
         {filteredAlerts.map((alert) => {
           const styles = getAlertTypeStyles(alert.type)
           return (
-            <div 
+            <div
               key={alert.id}
-              className={`${styles.bg} border ${styles.border} rounded-xl p-5 transition-all hover:border-opacity-100`}
+              className={`${styles.panel} ${styles.border} rounded-2xl p-5 hover-tilt transition-all`}
             >
-              {/* Header */}
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">{styles.icon}</span>
+              <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
+                <div className="flex items-start gap-3">
+                  <div className="glass-panel flex h-10 w-10 items-center justify-center rounded-xl">
+                    <Icon name={styles.icon} size={18} className="text-slate-200" />
+                  </div>
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
                       <h3 className="font-semibold text-white">{alert.title}</h3>
@@ -275,128 +279,143 @@ function Alerts() {
                         {alert.type}
                       </span>
                       {alert.actionRequired && (
-                        <span className="text-xs bg-red-600 text-white px-2 py-0.5 rounded-full">
+                        <span className="text-xs bg-red-600/80 text-white px-2 py-0.5 rounded-full">
                           Action Required
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-slate-500 text-sm">{getCategoryIcon(alert.category)} {filters.find(f => f.id === alert.category)?.name}</span>
-                      <span className="text-slate-600">•</span>
-                      <span className="text-slate-500 text-sm">{alert.date}</span>
+                    <div className="flex items-center gap-2 mt-1 text-xs text-slate-500">
+                      <Icon name={getCategoryIcon(alert.category)} size={12} className="text-slate-400" />
+                      <span>{filters.find(f => f.id === alert.category)?.name}</span>
+                      <span>|</span>
+                      <span>{alert.date}</span>
                     </div>
                   </div>
                 </div>
                 {alert.verified && (
-                  <span className="text-xs bg-emerald-600 text-white px-2 py-1 rounded-full flex items-center gap-1">
-                    ✓ Verified
+                  <span className="text-xs bg-emerald-500/80 text-white px-2 py-1 rounded-full flex items-center gap-1">
+                    <Icon name="success" size={12} className="text-white" />
+                    Verified
                   </span>
                 )}
               </div>
 
-              {/* Content */}
               <p className="text-slate-300 mb-4">{alert.summary}</p>
 
-              {/* Footer */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4 text-sm">
-                  <span className="text-slate-500">📋 Source: {alert.source}</span>
-                  <span className="text-slate-500">👥 {alert.affectedUsers}</span>
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500">
+                  <span className="flex items-center gap-1">
+                    <Icon name="document" size={12} className="text-slate-500" />
+                    Source: {alert.source}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Icon name="community" size={12} className="text-slate-500" />
+                    {alert.affectedUsers}
+                  </span>
                 </div>
-                <button className="text-emerald-400 hover:text-emerald-300 text-sm font-medium">
-                  Read more →
+                <button className="text-slate-200 hover:text-white text-sm font-medium inline-flex items-center gap-2">
+                  Read more
+                  <Icon name="arrowRight" size={14} className="text-slate-300" />
                 </button>
               </div>
             </div>
           )
         })}
-      </div>
+      </section>
 
-      {/* No Alerts */}
       {filteredAlerts.length === 0 && (
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-8 text-center">
-          <span className="text-4xl mb-4 block">🔕</span>
+        <div className="glass-panel rounded-2xl p-8 text-center">
+          <Icon name="info" size={28} className="text-slate-300 mx-auto mb-3" />
           <p className="text-slate-400">No alerts in this category right now.</p>
         </div>
       )}
 
-      {/* Contribute CTA */}
-      <div className="mt-8 bg-slate-800/50 border border-dashed border-slate-700 rounded-xl p-6 text-center">
-        <span className="text-3xl mb-3 block">💡</span>
+      <section className="glass-panel rounded-2xl p-6 text-center">
+        <div className="glass-panel mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl">
+          <Icon name="spark" size={20} className="text-slate-100" />
+        </div>
         <h3 className="text-white font-semibold mb-2">Know about an important update?</h3>
-        <p className="text-slate-400 text-sm mb-4">Help the community by submitting alerts. Our team verifies all submissions.</p>
-        <button className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-lg transition-colors">
+        <p className="text-slate-400 text-sm mb-4">
+          Help the community by submitting alerts. Our team verifies all submissions.
+        </p>
+        <button className="glass-chip text-white px-6 py-2 rounded-lg transition-colors">
           Submit an Alert
         </button>
-      </div>
+      </section>
 
-      {/* Premium Alerts Promo */}
-      <div className="mt-6 bg-gradient-to-r from-purple-900/30 to-pink-900/30 border border-purple-700/50 rounded-xl p-6">
+      <section className="glass-strong rounded-2xl p-6">
         <div className="flex items-start gap-4">
-          <span className="text-3xl">⚡</span>
+          <div className="glass-panel flex h-12 w-12 items-center justify-center rounded-2xl">
+            <Icon name="bolt" size={20} className="text-slate-100" />
+          </div>
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
               <h3 className="text-white font-semibold">Premium Alerts</h3>
-              <span className="text-xs bg-purple-600 text-white px-2 py-0.5 rounded-full">Coming Soon</span>
+              <span className="text-xs bg-white/10 text-slate-100 px-2 py-0.5 rounded-full">Coming Soon</span>
             </div>
             <p className="text-slate-300 text-sm mb-3">
-              Get instant SMS alerts for urgent immigration updates, personalized deadline reminders, 
+              Get instant SMS alerts for urgent immigration updates, personalized deadline reminders,
               and early warnings about policy changes that affect you.
             </p>
-            <button className="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg transition-colors text-sm">
-              Join Waitlist →
+            <button className="glass-chip text-white px-4 py-2 rounded-lg transition-colors text-sm">
+              Join Waitlist
             </button>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Upcoming Deadlines */}
-      <div className="mt-8">
-        <h3 className="text-lg font-semibold text-white mb-4">📅 Upcoming Deadlines</h3>
+      <section className="space-y-4">
+        <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+          <Icon name="calendar" size={18} className="text-slate-200" />
+          Upcoming Deadlines
+        </h3>
         <div className="space-y-3">
-          <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="bg-red-600 text-white text-center rounded-lg p-2 w-14">
-                <p className="text-xs">FEB</p>
-                <p className="text-xl font-bold">1</p>
+          {[
+            {
+              month: 'FEB',
+              day: '1',
+              title: 'New Appointment System Launch',
+              desc: 'Old booking system discontinued',
+              timeLeft: '9 days left',
+              tone: 'text-red-200',
+              badge: 'bg-red-500/80'
+            },
+            {
+              month: 'MAR',
+              day: '1',
+              title: 'ZTM Ticket Price Increase',
+              desc: 'Monthly tickets +10%',
+              timeLeft: '37 days left',
+              tone: 'text-amber-200',
+              badge: 'bg-amber-500/80'
+            },
+            {
+              month: 'MAY',
+              day: '15',
+              title: 'PIT-37 Tax Filing Deadline',
+              desc: 'Extended from April 30',
+              timeLeft: '112 days left',
+              tone: 'text-slate-300',
+              badge: 'bg-slate-500/70'
+            }
+          ].map((item) => (
+            <div key={`${item.month}-${item.day}`} className="glass-panel rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className={`${item.badge} text-white text-center rounded-lg p-2 w-14`}
+                >
+                  <p className="text-xs">{item.month}</p>
+                  <p className="text-xl font-bold">{item.day}</p>
+                </div>
+                <div>
+                  <p className="text-white font-medium">{item.title}</p>
+                  <p className="text-slate-500 text-sm">{item.desc}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-white font-medium">New Appointment System Launch</p>
-                <p className="text-slate-500 text-sm">Old booking system discontinued</p>
-              </div>
+              <span className={`${item.tone} text-sm`}>{item.timeLeft}</span>
             </div>
-            <span className="text-red-400 text-sm">9 days left</span>
-          </div>
-          
-          <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="bg-yellow-600 text-white text-center rounded-lg p-2 w-14">
-                <p className="text-xs">MAR</p>
-                <p className="text-xl font-bold">1</p>
-              </div>
-              <div>
-                <p className="text-white font-medium">ZTM Ticket Price Increase</p>
-                <p className="text-slate-500 text-sm">Monthly tickets +10%</p>
-              </div>
-            </div>
-            <span className="text-yellow-400 text-sm">37 days left</span>
-          </div>
-          
-          <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="bg-blue-600 text-white text-center rounded-lg p-2 w-14">
-                <p className="text-xs">MAY</p>
-                <p className="text-xl font-bold">15</p>
-              </div>
-              <div>
-                <p className="text-white font-medium">PIT-37 Tax Filing Deadline</p>
-                <p className="text-slate-500 text-sm">Extended from April 30</p>
-              </div>
-            </div>
-            <span className="text-slate-400 text-sm">112 days left</span>
-          </div>
+          ))}
         </div>
-      </div>
+      </section>
     </div>
   )
 }

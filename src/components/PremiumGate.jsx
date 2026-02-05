@@ -1,9 +1,10 @@
-// src/components/PremiumGate.jsx
+﻿// src/components/PremiumGate.jsx
 // Component for gating premium features
 
 import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useSubscription } from '../hooks/useSubscription'
+import Icon from './Icon'
 
 /**
  * PremiumGate - Wraps content that requires a specific plan
@@ -22,85 +23,71 @@ function PremiumGate({
   const { isAuthenticated, openAuthModal } = useAuth()
   const { plan, loading } = useSubscription()
 
-  // Show loading state
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-slate-500/40 border-t-slate-200 rounded-full animate-spin" />
       </div>
     )
   }
 
-  // Check if user has required plan
   const planOrder = ['free', 'basic', 'premium']
   const hasAccess = planOrder.indexOf(plan) >= planOrder.indexOf(requiredPlan)
 
-  // User has access - render children
   if (hasAccess) {
     return children
   }
 
-  // Custom fallback provided
   if (fallback) {
     return fallback
   }
 
-  // Default upgrade prompt
+  const isPremium = requiredPlan === 'premium'
+
   return (
-    <div className="relative overflow-hidden rounded-3xl p-6 text-center"
-      style={{
-        background: 'linear-gradient(135deg, rgba(139,92,246,0.15), rgba(30,27,75,0.8))',
-        border: '1px solid rgba(139,92,246,0.3)',
-      }}
-    >
-      {/* Decorative gradient */}
-      <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full opacity-20"
-        style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.8), transparent)' }}
+    <div className="relative overflow-hidden rounded-3xl p-6 text-center glass-3d">
+      <div
+        className="absolute -top-16 -right-10 h-40 w-40 rounded-full opacity-25"
+        style={{
+          background: isPremium
+            ? 'radial-gradient(circle, rgba(194,177,217,0.7), transparent 70%)'
+            : 'radial-gradient(circle, rgba(154,163,255,0.6), transparent 70%)',
+        }}
       />
 
-      <div className="relative">
-        <span className="text-5xl mb-4 block">
-          {requiredPlan === 'premium' ? '👑' : '⭐'}
-        </span>
+      <div className="relative flex flex-col items-center gap-3">
+        <div className="glass-panel flex h-14 w-14 items-center justify-center rounded-2xl">
+          <Icon name={isPremium ? 'crown' : 'star'} size={26} className="text-slate-100" />
+        </div>
 
-        <h3 className="text-xl font-bold text-white mb-2">
-          {requiredPlan === 'premium' ? 'Premium Feature' : 'Basic Feature'}
+        <h3 className="text-xl font-semibold text-white">
+          {isPremium ? 'Premium Feature' : 'Basic Feature'}
         </h3>
 
-        <p className="text-slate-300 mb-4">
-          {feature} requires a {requiredPlan === 'premium' ? 'Premium' : 'Basic'} subscription.
+        <p className="text-sm text-slate-300">
+          {feature} requires a {isPremium ? 'Premium' : 'Basic'} subscription.
         </p>
 
         {isAuthenticated ? (
           <Link
             to="/pricing"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white transition-all"
-            style={{
-              background: 'linear-gradient(135deg, #8B5CF6, #7C3AED)',
-            }}
+            className="glass-chip inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white transition hover:text-white"
           >
-            Upgrade to {requiredPlan === 'premium' ? 'Premium' : 'Basic'}
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+            Upgrade to {isPremium ? 'Premium' : 'Basic'}
+            <Icon name="arrowRight" size={16} className="text-slate-200" />
           </Link>
         ) : (
           <button
             onClick={() => openAuthModal('sign_up')}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white transition-all"
-            style={{
-              background: 'linear-gradient(135deg, #8B5CF6, #7C3AED)',
-            }}
+            className="glass-chip inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white transition hover:text-white"
           >
-            Sign Up to Unlock
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+            Sign up to unlock
+            <Icon name="arrowRight" size={16} className="text-slate-200" />
           </button>
         )}
 
-        <p className="text-slate-500 text-xs mt-4">
-          Starting at €9/month. Cancel anytime.
+        <p className="text-xs text-slate-400">
+          Starting at EUR 9/month. Cancel anytime.
         </p>
       </div>
     </div>

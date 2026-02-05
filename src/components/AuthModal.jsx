@@ -1,9 +1,10 @@
-// src/components/AuthModal.jsx
+﻿// src/components/AuthModal.jsx
 // EXPAT VILLAGE - Premium Auth Modal
 // Redirect to onboarding is handled by AuthContext/MainLayout
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
+import Icon from './Icon'
 
 function AuthModal() {
   const { authModal, closeAuthModal, signIn, signUp, signInWithGoogle } = useAuth()
@@ -19,6 +20,7 @@ function AuthModal() {
   // Reset when modal opens
   useEffect(() => {
     if (authModal?.isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setError('')
       setSuccess('')
       setActiveTab(authModal.view || 'sign_in')
@@ -105,56 +107,23 @@ function AuthModal() {
           className="relative w-full max-w-md pointer-events-auto"
           style={{ animation: 'scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)' }}
         >
-          {/* Animated Glow Border */}
-          <div className="absolute -inset-1 bg-gradient-to-r from-violet-600 via-amber-500 to-violet-600 rounded-3xl blur-xl opacity-50 animate-pulse" />
+          {/* Soft Glow Border */}
+          <div
+            className="absolute -inset-1 rounded-3xl blur-xl opacity-40"
+            style={{ background: 'linear-gradient(135deg, rgba(154,163,255,0.45), rgba(194,177,217,0.35))' }}
+          />
           
           {/* Modal Content */}
-          <div className="relative bg-gradient-to-b from-slate-800 to-slate-900 border border-violet-500/40 rounded-3xl overflow-hidden shadow-2xl">
+          <div className="relative glass-strong border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
             
-            {/* ===== ANIMATED SCENE BACKGROUND ===== */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-              <div className="absolute inset-0 bg-gradient-to-b from-slate-900 via-violet-950/50 to-slate-900" />
-              
-              {/* Stars */}
-              {[...Array(12)].map((_, i) => (
-                <div
-                  key={`star-${i}`}
-                  className="absolute w-1 h-1 bg-white rounded-full animate-pulse"
-                  style={{
-                    top: `${10 + Math.random() * 30}%`,
-                    left: `${5 + Math.random() * 90}%`,
-                    animationDelay: `${Math.random() * 2}s`,
-                    opacity: 0.3 + Math.random() * 0.7
-                  }}
-                />
-              ))}
-
-              {/* Warsaw Skyline */}
-              <div className="absolute bottom-0 left-0 right-0 h-32">
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-16 h-28 bg-slate-800/90">
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-6 bg-slate-800/90" />
-                  <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-4 h-5 bg-slate-800/90" />
-                  <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-2 h-5 bg-slate-800/90" />
-                  <div className="absolute -top-14 left-1/2 -translate-x-1/2 w-1 h-3 bg-amber-500/80" />
-                </div>
-                <div className="absolute bottom-0 left-[10%] w-10 h-16 bg-slate-800/80" />
-                <div className="absolute bottom-0 left-[18%] w-8 h-20 bg-slate-800/70" />
-                <div className="absolute bottom-0 left-[25%] w-12 h-14 bg-slate-800/80" />
-                <div className="absolute bottom-0 right-[10%] w-10 h-18 bg-slate-800/80" />
-                <div className="absolute bottom-0 right-[18%] w-8 h-22 bg-slate-800/70" />
-                <div className="absolute bottom-0 right-[25%] w-14 h-12 bg-slate-800/80" />
-              </div>
-
-              {/* Walking Villagers */}
-              <div className="absolute bottom-8 left-0 right-0 h-8 overflow-hidden">
-                <div style={{ animation: 'walkRight 12s linear infinite' }}>
-                  <span className="text-lg">🚶</span>
-                </div>
-                <div style={{ animation: 'walkRight 15s linear infinite', animationDelay: '3s' }}>
-                  <span className="text-lg">🚶‍♀️</span>
-                </div>
-              </div>
-            </div>
+          {/* ===== GLASS BACKDROP ===== */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute inset-0" style={{
+              background: 'linear-gradient(180deg, rgba(11,12,18,0.65) 0%, rgba(17,20,34,0.9) 55%, rgba(11,12,18,0.75) 100%)'
+            }} />
+            <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full blur-3xl opacity-40" style={{ background: 'rgba(154,163,255,0.25)' }} />
+            <div className="absolute -bottom-28 -left-24 w-80 h-80 rounded-full blur-3xl opacity-30" style={{ background: 'rgba(194,177,217,0.2)' }} />
+          </div>
 
             {/* ===== MODAL HEADER ===== */}
             <div className="relative pt-8 pb-4 px-6 text-center">
@@ -171,17 +140,17 @@ function AuthModal() {
                 {activeTab === 'sign_in' ? 'Welcome Back!' : 'Join the Village'}
               </h2>
               <p className="text-slate-400 text-sm">
-                {activeTab === 'sign_in' ? 'Your village missed you 💜' : 'Your Poland journey starts here ✨'}
+                {activeTab === 'sign_in' ? 'Your village missed you' : 'Your Poland journey starts here'}
               </p>
             </div>
 
             {/* ===== TAB SWITCHER ===== */}
-            <div className="relative flex mx-6 mb-4 bg-slate-800/50 rounded-xl p-1">
+            <div className="relative flex mx-6 mb-4 glass-panel rounded-xl p-1">
               <button
                 onClick={() => handleTabChange('sign_in')}
                 className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all duration-300 ${
                   activeTab === 'sign_in'
-                    ? 'bg-violet-600 text-white shadow-lg'
+                    ? 'bg-white/10 text-white shadow-glass'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
@@ -191,7 +160,7 @@ function AuthModal() {
                 onClick={() => handleTabChange('sign_up')}
                 className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all duration-300 ${
                   activeTab === 'sign_up'
-                    ? 'bg-violet-600 text-white shadow-lg'
+                    ? 'bg-white/10 text-white shadow-glass'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
@@ -230,9 +199,9 @@ function AuthModal() {
               </button>
 
               <div className="flex items-center gap-4 mb-5">
-                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-violet-500/30 to-transparent" />
+                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
                 <span className="text-slate-500 text-sm">or</span>
-                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-violet-500/30 to-transparent" />
+                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
               </div>
 
               {/* Sign In Form */}
@@ -245,7 +214,7 @@ function AuthModal() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="w-full bg-slate-900/80 border border-violet-500/30 focus:border-violet-500 rounded-xl px-4 py-3.5 text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/30"
+                      className="w-full bg-white/5 border border-white/10 focus:border-white/30 rounded-xl px-4 py-3.5 text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-white/20"
                       placeholder="you@example.com"
                     />
                   </div>
@@ -256,14 +225,14 @@ function AuthModal() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="w-full bg-slate-900/80 border border-violet-500/30 focus:border-violet-500 rounded-xl px-4 py-3.5 text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/30"
-                      placeholder="••••••••"
+                      className="w-full bg-white/5 border border-white/10 focus:border-white/30 rounded-xl px-4 py-3.5 text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-white/20"
+                      placeholder="********"
                     />
                   </div>
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-gradient-to-r from-violet-600 to-violet-700 hover:from-violet-500 hover:to-violet-600 text-white font-bold py-4 rounded-xl transition-all duration-300 hover:scale-[1.02] disabled:opacity-50"
+                    className="w-full glass-3d text-white font-bold py-4 rounded-xl transition-all duration-300 hover:scale-[1.02] disabled:opacity-50"
                   >
                     {loading ? 'Signing in...' : 'Sign In'}
                   </button>
@@ -280,7 +249,7 @@ function AuthModal() {
                       value={displayName}
                       onChange={(e) => setDisplayName(e.target.value)}
                       required
-                      className="w-full bg-slate-900/80 border border-violet-500/30 focus:border-violet-500 rounded-xl px-4 py-3.5 text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/30"
+                      className="w-full bg-white/5 border border-white/10 focus:border-white/30 rounded-xl px-4 py-3.5 text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-white/20"
                       placeholder="Your name or nickname"
                     />
                   </div>
@@ -291,7 +260,7 @@ function AuthModal() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="w-full bg-slate-900/80 border border-violet-500/30 focus:border-violet-500 rounded-xl px-4 py-3.5 text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/30"
+                      className="w-full bg-white/5 border border-white/10 focus:border-white/30 rounded-xl px-4 py-3.5 text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-white/20"
                       placeholder="you@example.com"
                     />
                   </div>
@@ -303,16 +272,16 @@ function AuthModal() {
                       onChange={(e) => setPassword(e.target.value)}
                       required
                       minLength={6}
-                      className="w-full bg-slate-900/80 border border-violet-500/30 focus:border-violet-500 rounded-xl px-4 py-3.5 text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-violet-500/30"
+                      className="w-full bg-white/5 border border-white/10 focus:border-white/30 rounded-xl px-4 py-3.5 text-white placeholder-slate-600 outline-none transition-all focus:ring-2 focus:ring-white/20"
                       placeholder="At least 6 characters"
                     />
                   </div>
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-900 font-bold py-4 rounded-xl transition-all duration-300 hover:scale-[1.02] disabled:opacity-50"
+                    className="w-full glass-3d text-white font-bold py-4 rounded-xl transition-all duration-300 hover:scale-[1.02] disabled:opacity-50"
                   >
-                    {loading ? 'Creating account...' : 'Join the Village 🏘️'}
+                    {loading ? 'Creating account...' : 'Join the Village'}
                   </button>
                 </form>
               )}
@@ -320,8 +289,8 @@ function AuthModal() {
               {/* Success state */}
               {activeTab === 'sign_up' && success && (
                 <div className="text-center py-4">
-                  <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-3xl">🎉</span>
+                  <div className="w-16 h-16 glass-panel rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Icon name="spark" className="w-7 h-7 text-slate-200" />
                   </div>
                   <p className="text-white font-medium">{success}</p>
                 </div>
@@ -350,3 +319,6 @@ function AuthModal() {
 }
 
 export default AuthModal
+
+
+
