@@ -80,8 +80,16 @@ export const AuthProvider = ({ children }) => {
             setShouldRedirectToOnboarding(true)
           }
         } else if (event === 'TOKEN_REFRESHED' && session?.user) {
-          // Keep user updated with fresh token, but don't touch profile
           setUser(session.user)
+          // If profile wasn't loaded yet (e.g. initial fetch failed with stale token), retry now
+          if (!profileFetched) {
+            const p = await fetchProfile(session.user.id)
+            if (!isMounted) return
+            if (p) {
+              setProfile(p)
+              profileFetched = true
+            }
+          }
         } else if (event === 'SIGNED_OUT') {
           setUser(null)
           setProfile(null)
