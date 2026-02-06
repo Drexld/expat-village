@@ -88,14 +88,41 @@ function BottomNav() {
     setMenuOpen(false)
   }
 
+  // Smart search routing - maps queries to the right page
+  const SEARCH_ROUTES = [
+    { keywords: ['pesel', 'nip', 'regon', 'tax', 'pit', 'vat', 'zus', 'social security'], path: '/get-things-done' },
+    { keywords: ['residence', 'residency', 'visa', 'permit', 'karta pobytu', 'immigration'], path: '/get-things-done' },
+    { keywords: ['bank', 'account', 'money', 'transfer', 'currency', 'exchange'], path: '/get-things-done' },
+    { keywords: ['contract', 'rental', 'lease', 'umowa'], path: '/contract-analyzer' },
+    { keywords: ['document', 'translate', 'letter', 'urzad', 'office'], path: '/document-analyzer' },
+    { keywords: ['apartment', 'flat', 'housing', 'rent', 'room', 'roommate', 'accommodation'], path: '/housing' },
+    { keywords: ['job', 'work', 'career', 'cv', 'resume', 'interview', 'salary', 'freelance'], path: '/jobs-careers' },
+    { keywords: ['insurance', 'health', 'nfz', 'doctor', 'hospital', 'dentist', 'medical', 'mental'], path: '/insurance-health' },
+    { keywords: ['transport', 'bus', 'tram', 'metro', 'train', 'uber', 'bolt', 'bike', 'driving', 'license'], path: '/getting-around' },
+    { keywords: ['gym', 'restaurant', 'cafe', 'salon', 'barber', 'entertainment', 'nightlife'], path: '/live-your-life' },
+    { keywords: ['chat', 'talk', 'community', 'meet', 'people', 'friends', 'social'], path: '/town-hall' },
+    { keywords: ['student', 'university', 'college', 'scholarship', 'erasmus'], path: '/student-hub' },
+    { keywords: ['polish', 'language', 'lesson', 'course', 'learn'], path: '/getting-around' },
+  ]
+
   const handleSearch = (e) => {
     e.preventDefault()
-    if (searchQuery.trim()) {
-      // For now, navigate to directory with search query
-      navigate(`/directory?q=${encodeURIComponent(searchQuery)}`)
-      setSearchOpen(false)
-      setSearchQuery('')
+    const query = searchQuery.trim().toLowerCase()
+    if (!query) return
+
+    // Find best matching route
+    const match = SEARCH_ROUTES.find(route =>
+      route.keywords.some(kw => query.includes(kw))
+    )
+
+    if (match) {
+      navigate(match.path)
+    } else {
+      // Default to directory search for place-related queries
+      navigate(`/directory`)
     }
+    setSearchOpen(false)
+    setSearchQuery('')
   }
 
   const isActive = (path) => {
@@ -138,17 +165,27 @@ function BottomNav() {
                 <span className="text-xs text-terra-ink-soft">Ask the Village</span>
               </div>
               <div className="flex flex-wrap gap-2">
-                {['PESEL', 'Residence Permit', 'Bank Account', 'Health Insurance', 'Polish Lessons', 'Coworking'].map((term) => (
+                {[
+                  { label: 'PESEL', path: '/get-things-done' },
+                  { label: 'Residence Permit', path: '/get-things-done' },
+                  { label: 'Bank Account', path: '/get-things-done' },
+                  { label: 'Health Insurance', path: '/insurance-health' },
+                  { label: 'Find Housing', path: '/housing' },
+                  { label: 'Jobs', path: '/jobs-careers' },
+                ].map((item) => (
                   <button
-                    key={term}
+                    key={item.label}
                     onClick={() => {
-                      setSearchQuery(term)
-                      navigate(`/directory?q=${encodeURIComponent(term)}`)
+                      if (!isAuthenticated) {
+                        openAuthModal('sign_up')
+                      } else {
+                        navigate(item.path)
+                      }
                       setSearchOpen(false)
                     }}
                     className="px-3 py-2 rounded-full text-sm text-terra-ink-soft glass-chip hover:bg-terra-bg transition-colors"
                   >
-                    {term}
+                    {item.label}
                   </button>
                 ))}
               </div>

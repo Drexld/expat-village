@@ -177,20 +177,40 @@ function TownHall() {
               Tax tips, apartment hunting stories, language exchange - anything goes.
             </p>
             <div className="flex flex-wrap gap-3">
-              <button className="rounded-full px-4 py-2 text-sm font-medium text-terra-bg hover-tilt"
+              <button
+                onClick={() => {
+                  if (!isAuthenticated) {
+                    openAuthModal('sign_up')
+                    return
+                  }
+                  // Jump into the first active room
+                  const activeRoom = rooms.find(r => r.activity_level === 'very_active' || r.activity_level === 'active') || rooms[0]
+                  if (activeRoom) handleJoinRoom(activeRoom)
+                }}
+                className="rounded-full px-4 py-2 text-sm font-medium text-terra-bg hover-tilt"
                 style={{ background: 'linear-gradient(135deg, #C76B55, #D07C63)' }}
               >
                 Start Live Now
               </button>
-              <button className="rounded-full border border-black/10 bg-terra-cream px-4 py-2 text-sm text-terra-ink-soft transition-colors hover:bg-terra-bg">
-                Schedule for Later
+              <button
+                onClick={() => {
+                  if (!isAuthenticated) {
+                    openAuthModal('sign_up')
+                    return
+                  }
+                  // Scroll to rooms list
+                  document.getElementById('community-rooms')?.scrollIntoView({ behavior: 'smooth' })
+                }}
+                className="rounded-full border border-black/10 bg-terra-cream px-4 py-2 text-sm text-terra-ink-soft transition-colors hover:bg-terra-bg"
+              >
+                Browse Rooms
               </button>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="space-y-3">
+      <section id="community-rooms" className="space-y-3">
         <h2 className="text-sm font-semibold text-terra-ink">Community Rooms</h2>
 
         {joinError && (
@@ -247,18 +267,24 @@ function TownHall() {
         )}
       </section>
 
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {[
-          { label: 'Community Members', value: '8.2k+' },
-          { label: 'Sessions This Month', value: '156', accent: true },
-          { label: 'Active Community', value: '24/7' }
-        ].map((stat) => (
-          <div key={stat.label} className="action-card texture-layer texture-paper text-center">
-            <p className={`text-2xl font-semibold ${stat.accent ? 'text-terra-primary' : 'text-terra-ink'}`}>{stat.value}</p>
-            <p className="text-terra-taupe text-sm">{stat.label}</p>
+      {rooms.length > 0 && (
+        <section className="grid grid-cols-3 gap-3">
+          <div className="action-card texture-layer texture-paper text-center">
+            <p className="text-2xl font-semibold text-terra-ink">{rooms.length}</p>
+            <p className="text-terra-taupe text-sm">Active Rooms</p>
           </div>
-        ))}
-      </section>
+          <div className="action-card texture-layer texture-paper text-center">
+            <p className="text-2xl font-semibold text-terra-primary">
+              {rooms.filter(r => r.activity_level === 'very_active' || r.activity_level === 'active').length}
+            </p>
+            <p className="text-terra-taupe text-sm">Buzzing Now</p>
+          </div>
+          <div className="action-card texture-layer texture-paper text-center">
+            <p className="text-2xl font-semibold text-terra-ink">Live</p>
+            <p className="text-terra-taupe text-sm">Always Open</p>
+          </div>
+        </section>
+      )}
     </>
   )
 
