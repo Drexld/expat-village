@@ -26,39 +26,15 @@ function MorningBriefing({ weatherData, onClose }) {
     || user?.email?.split('@')[0]
     || 'friend'
 
-  // Fetch AI-powered briefing on mount
+  // Fetch announcements first, then generate AI briefing with that context
   useEffect(() => {
-    async function fetchBriefing() {
-      try {
-        const data = await generatePersonalizedBriefing({
-          user,
-          profile,
-          weatherData
-        })
-        setBriefing(data)
-      } catch (error) {
-        console.error('Failed to fetch briefing:', error)
-        // Use fallback
-        setBriefing({
-          greeting: `Good morning, ${displayName}! It's ${weatherData?.temp || 0}C outside.`,
-          todayInPoland: "Poland has over 9,000 lakes, making it one of the most lake-rich countries in Europe.",
-          tip: "Remember: most shops are closed on Sundays in Poland, except the last Sunday of each month.",
-          isFallback: true
-        })
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchBriefing()
-  }, [user, profile, weatherData, displayName])
-
-  // Fetch announcements for City Pulse strip
-  useEffect(() => {
-    async function fetchPulse() {
+    async function fetchData() {
+      // 1. Fetch announcements
+      let announcementData = []
       try {
         const data = await getAnnouncements()
-        const filtered = filterAnnouncementsForUser(data, profile)
-        const cityOnly = (filtered || []).filter(a => (a.scope || '').toLowerCase() === 'city')
+        announcementData = filterAnnouncementsForUser(data, profile) || []
+        const cityOnly = announcementData.filter(a => (a.scope || '').toLowerCase() === 'city')
         const items = cityOnly.slice(0, 4).map((a) => ({
           id: a.id,
           title: a.title,
@@ -70,9 +46,30 @@ function MorningBriefing({ weatherData, onClose }) {
         console.error('Failed to fetch announcements for pulse:', error)
         setPulseItems([])
       }
+
+      // 2. Generate AI briefing with announcements context
+      try {
+        const data = await generatePersonalizedBriefing({
+          user,
+          profile,
+          weatherData,
+          announcements: announcementData
+        })
+        setBriefing(data)
+      } catch (error) {
+        console.error('Failed to fetch briefing:', error)
+        setBriefing({
+          greeting: `Good morning, ${displayName}! It's ${weatherData?.temp || 0}C outside.`,
+          todayInPoland: "Poland has over 9,000 lakes, making it one of the most lake-rich countries in Europe.",
+          tip: "Remember: most shops are closed on Sundays in Poland, except the last Sunday of each month.",
+          isFallback: true
+        })
+      } finally {
+        setLoading(false)
+      }
     }
-    fetchPulse()
-  }, [profile])
+    fetchData()
+  }, [user, profile, weatherData, displayName])
 
   // Get TRC reminder if applicable
   const trcReminder = getTrcReminder(profile)
@@ -86,11 +83,26 @@ function MorningBriefing({ weatherData, onClose }) {
   })
 
   const transportStatus = useMemo(() => {
+    // Check pulse items for transport-related warnings
+    const transportKeywords = ['metro', 'tram', 'bus', 'ztm', 'transport', 'transit', 'train', 'commute', 'traffic', 'road', 'construction']
+    const transportAlert = pulseItems.find(item => {
+      const text = `${item.title} ${item.message}`.toLowerCase()
+      return transportKeywords.some(k => text.includes(k))
+    })
+    if (transportAlert) {
+      const isWarning = transportAlert.type === 'warning'
+      return {
+        level: isWarning ? 'busy' : 'info',
+        label: transportAlert.title,
+        color: isWarning ? '#C76B55' : '#D2A073',
+      }
+    }
+    // Fallback to time-of-day heuristic
     const hour = new Date().getHours()
     if (hour >= 7 && hour <= 9) return { level: 'busy', label: 'Morning commute', color: '#C76B55' }
     if (hour >= 16 && hour <= 18) return { level: 'busy', label: 'Evening commute', color: '#C76B55' }
     return { level: 'clear', label: 'Smooth rides', color: '#75997C' }
-  }, [])
+  }, [pulseItems])
 
   const dayMood = useMemo(() => {
     const temp = weatherData?.temp ?? 0

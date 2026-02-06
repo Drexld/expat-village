@@ -8,6 +8,7 @@ const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
 const WARSAW_API_KEY = process.env.WARSAW_API_KEY
 const GROQ_API_KEY = process.env.GROQ_API_KEY
 const CRON_SECRET = process.env.CRON_SECRET
+const WEATHER_API_KEY = process.env.OPENWEATHER_API_KEY || process.env.VITE_WEATHER_API_KEY
 const REQUEST_TIMEOUT_MS = 8000
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
 
@@ -162,6 +163,103 @@ async function insertAnnouncements(supabase, source, items) {
   return { inserted: toInsert.length, rows: insertedRows || [] }
 }
 
+// ============================================
+// AI CITY INTELLIGENCE GENERATION
+// ============================================
+
+async function fetchWeatherContext() {
+  if (!WEATHER_API_KEY) return 'Weather data unavailable'
+  try {
+    const res = await withTimeout(
+      fetch(`https://api.openweathermap.org/data/2.5/weather?q=Warsaw,PL&units=metric&appid=${WEATHER_API_KEY}`),
+      REQUEST_TIMEOUT_MS
+    )
+    if (!res.ok) return 'Weather data unavailable'
+    const w = await res.json()
+    return `${Math.round(w.main.temp)}°C, ${w.weather[0].description}, wind ${w.wind.speed}m/s, humidity ${w.main.humidity}%`
+  } catch {
+    return 'Weather data unavailable'
+  }
+}
+
+async function generateCityIntelligence(weatherContext) {
+  if (!GROQ_API_KEY) return []
+
+  const today = new Date()
+  const dateStr = today.toLocaleDateString('en-US', {
+    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
+  })
+  const month = today.getMonth() + 1
+  const dayOfWeek = today.getDay()
+  const isWeekend = dayOfWeek === 0 || dayOfWeek === 6
+  const isSunday = dayOfWeek === 0
+
+  const prompt = `You are a Warsaw city intelligence assistant for English-speaking expats.
+Generate 4 timely, actionable city updates for Warsaw, Poland.
+
+Today: ${dateStr}
+Weather: ${weatherContext}
+Weekend: ${isWeekend ? 'Yes' : 'No'}
+Sunday: ${isSunday ? 'Yes (most shops closed)' : 'No'}
+Month: ${month}
+Season: ${month <= 2 || month === 12 ? 'Winter' : month <= 5 ? 'Spring' : month <= 8 ? 'Summer' : 'Autumn'}
+
+Generate updates about these topics (pick the most relevant 4):
+- Current traffic patterns and known construction zones in Warsaw
+- Public transport status (ZTM buses/trams, Metro lines M1/M2)
+- Notable events or activities happening in Warsaw today/this week
+- Seasonal advisories (icy sidewalks in winter, road works in summer, heating season, etc.)
+- Sunday/weekend trading rules and what's open
+- Practical expat tips relevant to the current season/date
+
+Rules:
+- ALL text MUST be in English
+- Be specific to Warsaw neighborhoods, streets, metro lines
+- Each item needs a short "title" (max 8 words) and a "message" (1-2 sentences, actionable)
+- Include concrete details, not generic advice
+- Assign each a type: "warning" for disruptions/hazards, "update" for general info, "event" for events
+
+Return ONLY a valid JSON array, no markdown:
+[{"title":"...","message":"...","type":"warning|update|event"}]`
+
+  try {
+    const response = await withTimeout(
+      fetch(GROQ_API_URL, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${GROQ_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'llama-3.3-70b-versatile',
+          messages: [
+            { role: 'system', content: prompt },
+            { role: 'user', content: 'Generate today\'s Warsaw city intelligence.' },
+          ],
+          temperature: 0.5,
+          max_tokens: 1000,
+        }),
+      }),
+      15000
+    )
+
+    if (!response.ok) {
+      console.error('Groq city intel failed:', response.status)
+      return []
+    }
+
+    const data = await response.json()
+    const content = data?.choices?.[0]?.message?.content || ''
+    const jsonMatch = content.match(/\[[\s\S]*\]/)
+    if (!jsonMatch) return []
+
+    return JSON.parse(jsonMatch[0])
+  } catch (err) {
+    console.error('City intelligence generation error:', err)
+    return []
+  }
+}
+
 export default async function handler(req, res) {
   if (CRON_SECRET && req.headers['x-cron-secret'] !== CRON_SECRET) {
     return res.status(401).json({ error: 'Unauthorized' })
@@ -171,19 +269,28 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Supabase env not configured' })
   }
 
-  if (!CITY_PULSE_SOURCES || CITY_PULSE_SOURCES.length === 0) {
-    return res.status(200).json({ ok: true, message: 'No sources configured yet.' })
+  const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
+  const results = []
+
+  // 1. Deactivate old AI-generated items (older than 24 hours)
+  try {
+    const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+    await supabase
+      .from('announcements')
+      .update({ active: false })
+      .eq('category', 'ai-city-intel')
+      .lt('created_at', cutoff)
+    results.push({ step: 'cleanup', ok: true })
+  } catch (err) {
+    results.push({ step: 'cleanup', error: err.message })
   }
 
-  const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
-
-  const results = []
+  // 2. Process external sources (if any configured)
   for (const source of CITY_PULSE_SOURCES) {
     try {
       const items = await fetchSource(source)
       const inserted = await insertAnnouncements(supabase, source, items)
 
-      // Translate newly inserted Polish items and store in announcement_translations
       const polishRows = (inserted.rows || []).filter((r) => r.language === 'pl')
       for (const row of polishRows) {
         try {
@@ -213,6 +320,35 @@ export default async function handler(req, res) {
     } catch (error) {
       results.push({ id: source.id, error: error.message })
     }
+  }
+
+  // 3. Generate AI city intelligence (always English)
+  try {
+    const weatherContext = await fetchWeatherContext()
+    const cityIntel = await generateCityIntelligence(weatherContext)
+
+    let inserted = 0
+    for (const item of cityIntel) {
+      if (!item.title || !item.message) continue
+      const { error } = await supabase.from('announcements').insert({
+        title: item.title,
+        message: item.message,
+        type: item.type || 'update',
+        priority: item.type === 'warning' ? 1 : 0,
+        active: true,
+        scope: 'city',
+        category: 'ai-city-intel',
+        target_audience: 'all',
+        language: 'en',
+        link_url: null,
+        link_text: null,
+      })
+      if (!error) inserted++
+    }
+
+    results.push({ step: 'ai-city-intel', generated: cityIntel.length, inserted })
+  } catch (err) {
+    results.push({ step: 'ai-city-intel', error: err.message })
   }
 
   return res.status(200).json({ ok: true, results })

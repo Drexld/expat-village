@@ -7,7 +7,7 @@ import { generateGroqResponse } from '../lib/groq'
  * Generate a personalized morning briefing using AI
  * Takes into account user profile, weather, and date context
  */
-export async function generatePersonalizedBriefing({ user, profile, weatherData }) {
+export async function generatePersonalizedBriefing({ user, profile, weatherData, announcements }) {
   const today = new Date()
   const dateStr = today.toLocaleDateString('en-US', {
     weekday: 'long',
@@ -30,6 +30,13 @@ export async function generatePersonalizedBriefing({ user, profile, weatherData 
     trcDaysRemaining = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
   }
 
+  // Build announcements context for the AI
+  const cityUpdates = (announcements || [])
+    .filter(a => a.scope === 'city' && a.title)
+    .slice(0, 5)
+    .map(a => `- [${a.type || 'info'}] ${a.title}: ${a.message}`)
+    .join('\n')
+
   // Build the prompt for AI
   const prompt = `You are a helpful assistant for Expat Village, an app for expats living in Poland. Generate a brief, friendly morning briefing.
 
@@ -40,13 +47,14 @@ Context:
 - User has been in Poland for: ${yearsInPoland} years
 - User's interests: ${interests.length > 0 ? interests.join(', ') : 'not specified'}
 ${trcDaysRemaining !== null ? `- TRC expires in: ${trcDaysRemaining} days` : ''}
+${cityUpdates ? `\nCurrent city updates:\n${cityUpdates}` : ''}
 
 Language rules:
 - ALL fields must be written in English.
 - The ONLY Polish text should be the Polish part of "phraseOfTheDay".
 
 Generate a JSON response with these fields:
-1. "greeting" - A warm, personalized greeting (1 sentence, include weather context like "perfect for a hot coffee" or "bundle up!")
+1. "greeting" - A warm, personalized greeting (1 sentence, include weather context like "perfect for a hot coffee" or "bundle up!"). If there are relevant city updates above (transport disruptions, events), briefly mention the most important one.
 2. "todayInPoland" - An interesting historical fact or cultural tidbit about Poland related to today's date (1-2 sentences). Could be a historical event, a Polish tradition, a famous Polish person's birthday, etc.
 3. "tip" - ${isNewcomer ? 'A helpful tip for newcomers to Poland' : 'An insider tip or interesting fact about Polish life'} (1 sentence)
 4. "phraseOfTheDay" - A useful Polish phrase with translation (format: "Polish - English").
