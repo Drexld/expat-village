@@ -30,12 +30,20 @@ export const AuthProvider = ({ children }) => {
   }
 
   useEffect(() => {
+    let isMounted = true
+    let profileFetched = false
+
     // Get initial session
     supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!isMounted) return
       if (session?.user) {
         setUser(session.user)
         const p = await fetchProfile(session.user.id)
-        setProfile(p)
+        if (!isMounted) return
+        if (p) {
+          setProfile(p)
+          profileFetched = true
+        }
       }
       setLoading(false)
     })
@@ -43,12 +51,22 @@ export const AuthProvider = ({ children }) => {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        
+        if (!isMounted) return
+
         if (event === 'SIGNED_IN' && session?.user) {
           setUser(session.user)
-          const p = await fetchProfile(session.user.id)
-          setProfile(p)
-          
+
+          // Only fetch profile if we don't have one yet
+          // Prevents profile wipe when SIGNED_IN re-fires on token refresh
+          if (!profileFetched) {
+            const p = await fetchProfile(session.user.id)
+            if (!isMounted) return
+            if (p) {
+              setProfile(p)
+              profileFetched = true
+            }
+          }
+
           // Check if this is a NEW user (created within last 60 seconds)
           const createdAt = new Date(session.user.created_at)
           const now = new Date()
@@ -61,15 +79,22 @@ export const AuthProvider = ({ children }) => {
           if (isNewUser && !hasCompletedOnboarding) {
             setShouldRedirectToOnboarding(true)
           }
+        } else if (event === 'TOKEN_REFRESHED' && session?.user) {
+          // Keep user updated with fresh token, but don't touch profile
+          setUser(session.user)
         } else if (event === 'SIGNED_OUT') {
           setUser(null)
           setProfile(null)
+          profileFetched = false
         }
         setLoading(false)
       }
     )
 
-    return () => subscription.unsubscribe()
+    return () => {
+      isMounted = false
+      subscription.unsubscribe()
+    }
   }, [])
 
   const signUp = async (email, password, displayName) => {
@@ -167,7 +192,8 @@ export const AuthProvider = ({ children }) => {
   const refreshProfile = async () => {
     if (!user) return
     const p = await fetchProfile(user.id)
-    setProfile(p)
+    // Only update if fetch succeeded - don't wipe existing profile on failure
+    if (p) setProfile(p)
   }
 
   const openAuthModal = (view = 'sign_in') => setAuthModal({ isOpen: true, view })
