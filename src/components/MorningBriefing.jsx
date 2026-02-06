@@ -2,6 +2,7 @@
 // AI-powered personalized morning briefing overlay
 
 import { useState, useEffect, useRef, useMemo } from 'react'
+import { createPortal } from 'react-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { generatePersonalizedBriefing, getTrcReminder } from '../services/briefing'
 import { getAnnouncements } from '../services/announcements'
@@ -169,15 +170,22 @@ function MorningBriefing({ weatherData, onClose }) {
 
   if (!isVisible) return null
 
-  return (
+  return createPortal(
     <div
       ref={containerRef}
-      className="fixed inset-0 z-50 flex flex-col texture-layer texture-paper texture-amber"
       style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 9999,
+        display: 'flex',
+        flexDirection: 'column',
         background: 'linear-gradient(180deg, rgba(253,251,248,0.98) 0%, rgba(246,241,234,0.98) 50%, rgba(253,251,248,0.98) 100%)',
         backdropFilter: 'blur(18px)',
         WebkitBackdropFilter: 'blur(18px)',
-        transform: `translateY(${dragY}px)`,
+        transform: dragY !== 0 ? `translateY(${dragY}px)` : undefined,
         opacity: Math.max(0, 1 - Math.abs(dragY) / 400),
         transition: isDragging ? 'none' : 'transform 0.3s ease-out, opacity 0.3s ease-out',
       }}
@@ -393,7 +401,8 @@ function MorningBriefing({ weatherData, onClose }) {
           animation: floatUp 2.2s ease-in-out infinite;
         }
       `}</style>
-    </div>
+    </div>,
+    document.body
   )
 }
 
