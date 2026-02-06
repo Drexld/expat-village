@@ -5,6 +5,8 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { getWarsawWeather } from '../services/weather'
+import { getTownHallRooms } from '../services/townhall'
+import { getDirectoryListings } from '../services/directory'
 import MorningBriefing from '../components/MorningBriefing'
 import Announcements from '../components/Announcements'
 import Icon from '../components/Icon'
@@ -21,25 +23,82 @@ const QUICK_ACTIONS = [
   { icon: 'pin', label: 'Directory', cta: 'Explore', path: '/directory' },
 ]
 
-const COMMUNITY_SPARKS = [
-  { icon: 'alert', label: 'Tax Q&A live now', helper: 'Drop in and ask' },
-  { icon: 'home', label: 'New listing in Mokotow', helper: '12 min ago' },
-  { icon: 'spark', label: 'Warsaw Daily mood', helper: '68% say brutal' },
-]
+const TOTAL_CHECKLIST_TASKS = 23
 
 function Home() {
   const { isAuthenticated, openAuthModal, profile } = useAuth()
   const navigate = useNavigate()
   const [weatherData, setWeatherData] = useState({ state: 'cloudy', temp: 8, condition: 'Partly cloudy', icon: 'cloud' })
   const [showMorningBriefing, setShowMorningBriefing] = useState(false)
-  const points = profile?.points || profile?.reward_points || 1280
+  const [communitySparks, setCommunitySparks] = useState([])
+  const [checklistDone, setChecklistDone] = useState(0)
+  const [featuredListings, setFeaturedListings] = useState([])
+  const points = profile?.points || profile?.reward_points || 0
 
   useEffect(() => {
-    async function fetchWeather() {
-      const data = await getWarsawWeather()
-      setWeatherData(data)
+    async function fetchHomeData() {
+      const weather = await getWarsawWeather()
+      setWeatherData(weather)
+
+      // Fetch real community data
+      const [roomsResult, listingsResult] = await Promise.all([
+        getTownHallRooms(),
+        getDirectoryListings('all')
+      ])
+
+      const sparks = []
+
+      // Add active TownHall rooms
+      if (roomsResult.data?.length > 0) {
+        const topRooms = roomsResult.data.slice(0, 2)
+        topRooms.forEach(room => {
+          sparks.push({
+            icon: 'community',
+            label: room.title || room.name,
+            helper: room.description?.substring(0, 30) || 'Join the conversation',
+            path: '/town-hall',
+            live: true
+          })
+        })
+      }
+
+      // Add latest directory listing
+      if (listingsResult.data?.length > 0) {
+        const latest = listingsResult.data[0]
+        sparks.push({
+          icon: 'pin',
+          label: latest.name,
+          helper: `${Number(latest.rating_average || 0).toFixed(1)} rating - ${latest.review_count || 0} reviews`,
+          path: '/directory'
+        })
+      }
+
+      // Fallback if no data
+      if (sparks.length === 0) {
+        sparks.push(
+          { icon: 'community', label: 'Town Hall', helper: 'Join a conversation', path: '/town-hall' },
+          { icon: 'pin', label: 'Directory', helper: 'Explore local places', path: '/directory' },
+        )
+      }
+
+      if (listingsResult.data?.length > 0) {
+        setFeaturedListings(listingsResult.data.slice(0, 3))
+      }
+
+      setCommunitySparks(sparks)
     }
-    fetchWeather()
+    fetchHomeData()
+
+    // Load checklist progress
+    try {
+      const saved = localStorage.getItem('expat-checklist')
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        setChecklistDone(Object.values(parsed).filter(Boolean).length)
+      }
+    } catch {
+      // ignore
+    }
   }, [])
 
   useEffect(() => {
@@ -112,11 +171,11 @@ function Home() {
             </p>
             <div className="mt-4">
               <div className="flex items-center justify-between text-xs text-terra-taupe mb-2">
-                <span>Weekly momentum</span>
-                <span>2 of 5 done</span>
+                <span>Your progress</span>
+                <span>{checklistDone} of {TOTAL_CHECKLIST_TASKS} done</span>
               </div>
               <div className="h-2 rounded-full bg-terra-cream">
-                <div className="h-2 rounded-full" style={{ width: '40%', background: '#C76B55' }} />
+                <div className="h-2 rounded-full" style={{ width: `${Math.round((checklistDone / TOTAL_CHECKLIST_TASKS) * 100)}%`, background: '#C76B55' }} />
               </div>
             </div>
             <button
@@ -148,10 +207,10 @@ function Home() {
               </button>
             </div>
             <div className="grid gap-3">
-              {COMMUNITY_SPARKS.map((item, index) => (
+              {communitySparks.map((item, index) => (
                 <button
                   key={item.label}
-                  onClick={() => navigate('/town-hall')}
+                  onClick={() => navigate(item.path || '/town-hall')}
                   className="action-card texture-layer texture-paper texture-brick hover-tilt text-left motion-rise"
                   style={{ '--rise-delay': `${0.05 + index * 0.06}s` }}
                 >
@@ -163,7 +222,7 @@ function Home() {
                       <p className="text-sm font-semibold text-terra-ink">{item.label}</p>
                       <p className="text-xs text-terra-taupe">{item.helper}</p>
                     </div>
-                    {index === 0 && (
+                    {item.live && (
                       <span className="ml-auto text-xs font-semibold text-terra-primary">Live</span>
                     )}
                   </div>
@@ -223,6 +282,41 @@ function Home() {
               <Icon name="arrowRight" className="w-4 h-4 text-terra-bg" />
             </button>
           </section>
+
+          {featuredListings.length > 0 && (
+            <section className="space-y-3 motion-rise" style={{ '--rise-delay': '0.06s' }}>
+              <div className="flex items-center justify-between px-1">
+                <h3 className="text-sm font-semibold text-terra-ink accent-sweep">Expat-approved places</h3>
+                <button onClick={() => openAuthModal('sign_up')} className="text-xs text-terra-primary font-semibold">See all</button>
+              </div>
+              <div className="grid gap-3">
+                {featuredListings.map((listing, index) => (
+                  <button
+                    key={listing.id}
+                    onClick={() => openAuthModal('sign_up')}
+                    className="action-card texture-layer texture-paper hover-tilt text-left motion-rise"
+                    style={{ '--rise-delay': `${0.08 + index * 0.06}s` }}
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="glass-panel flex h-10 w-10 items-center justify-center rounded-2xl">
+                          <Icon name="pin" className="w-5 h-5 text-terra-ink" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-terra-ink">{listing.name}</p>
+                          <p className="text-xs text-terra-taupe">{listing.description?.substring(0, 40)}...</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-bold text-terra-ink">{Number(listing.rating_average || 0).toFixed(1)}</p>
+                        <p className="text-[10px] text-terra-taupe">{listing.review_count || 0} reviews</p>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
 
           <section className="space-y-3 section-backdrop motion-rise" style={{ '--rise-delay': '0.08s' }}>
             <div className="flex items-center justify-between px-1">

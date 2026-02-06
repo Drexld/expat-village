@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { analyzeContract } from '../lib/groq'
+import { extractTextFromPDF } from '../lib/pdfExtractor'
 import Icon from '../components/Icon'
 
 function ContractAnalyzer() {
@@ -12,21 +13,41 @@ function ContractAnalyzer() {
   const [error, setError] = useState(null)
   const [inputMethod, setInputMethod] = useState('paste') // 'paste' or 'upload'
 
-  const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0]
-    if (selectedFile) {
-      setFile(selectedFile)
-      setError(null)
+  const [fileLoading, setFileLoading] = useState(false)
 
-      const reader = new FileReader()
-      reader.onload = (event) => {
-        setContractText(event.target.result)
+  const handleFileChange = async (e) => {
+    const selectedFile = e.target.files[0]
+    if (!selectedFile) return
+
+    setFile(selectedFile)
+    setError(null)
+    setFileLoading(true)
+
+    try {
+      if (selectedFile.name.toLowerCase().endsWith('.pdf')) {
+        const text = await extractTextFromPDF(selectedFile)
+        if (!text.trim()) {
+          setError('Could not extract text from this PDF. It may be a scanned image. Try pasting the text instead.')
+          setFileLoading(false)
+          return
+        }
+        setContractText(text)
+      } else {
+        const reader = new FileReader()
+        reader.onload = (event) => {
+          setContractText(event.target.result)
+        }
+        reader.onerror = () => {
+          setError('Could not read file. Please try pasting the text instead.')
+        }
+        reader.readAsText(selectedFile)
       }
-      reader.onerror = () => {
-        setError('Could not read file. Please try pasting the text instead.')
-      }
-      reader.readAsText(selectedFile)
+    } catch (err) {
+      console.error('File read error:', err)
+      setError('Could not read file. Please try pasting the text instead.')
     }
+
+    setFileLoading(false)
   }
 
   const handleAnalyze = async () => {
@@ -314,7 +335,7 @@ function ContractAnalyzer() {
               <div className="border-2 border-dashed border-terra-taupe/40 hover:border-terra-primary/40 rounded-2xl p-8 text-center transition-colors glass-panel">
                 <input
                   type="file"
-                  accept=".txt,.doc,.docx"
+                  accept=".pdf,.txt,.doc,.docx"
                   onChange={handleFileChange}
                   className="hidden"
                   id="file-upload"
@@ -324,14 +345,20 @@ function ContractAnalyzer() {
                     <Icon name="upload" size={20} className="text-terra-ink" />
                   </div>
                   <p className="text-terra-ink font-medium mb-2">
-                    {file ? file.name : 'Click to upload or drag and drop'}
+                    {fileLoading ? 'Extracting text...' : file ? file.name : 'Click to upload or drag and drop'}
                   </p>
                   <p className="text-terra-taupe text-sm">
-                    TXT or DOC files (PDF support coming soon)
+                    PDF, TXT, or DOC files
                   </p>
                 </label>
               </div>
-              {file && contractText && (
+              {fileLoading && (
+                <p className="text-terra-ink-soft text-sm mt-2 flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-terra-primary border-t-transparent rounded-full animate-spin"></div>
+                  Extracting text from PDF...
+                </p>
+              )}
+              {file && contractText && !fileLoading && (
                 <p className="text-emerald-700 text-sm mt-2 flex items-center gap-2">
                   <Icon name="success" size={14} className="text-emerald-600" />
                   File loaded - {contractText.length} characters extracted

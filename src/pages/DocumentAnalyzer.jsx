@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { analyzeDocument } from '../lib/groq'
+import { extractTextFromPDF } from '../lib/pdfExtractor'
 import Icon from '../components/Icon'
 
 function DocumentAnalyzer() {
@@ -9,6 +10,9 @@ function DocumentAnalyzer() {
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [results, setResults] = useState(null)
   const [error, setError] = useState(null)
+  const [inputMethod, setInputMethod] = useState('paste')
+  const [file, setFile] = useState(null)
+  const [fileLoading, setFileLoading] = useState(false)
 
   const commonDocTypes = [
     { icon: 'document', name: 'ZUS Letter', desc: 'Social security documents' },
@@ -18,6 +22,41 @@ function DocumentAnalyzer() {
     { icon: 'bolt', name: 'Utility Bill', desc: 'Electricity, gas, water' },
     { icon: 'chart', name: 'Bank Document', desc: 'Account statements, notices' },
   ]
+
+  const handleFileChange = async (e) => {
+    const selectedFile = e.target.files[0]
+    if (!selectedFile) return
+
+    setFile(selectedFile)
+    setError(null)
+    setFileLoading(true)
+
+    try {
+      if (selectedFile.name.toLowerCase().endsWith('.pdf')) {
+        const text = await extractTextFromPDF(selectedFile)
+        if (!text.trim()) {
+          setError('Could not extract text from this PDF. It may be a scanned image. Try pasting the text instead.')
+          setFileLoading(false)
+          return
+        }
+        setDocumentText(text)
+      } else {
+        const reader = new FileReader()
+        reader.onload = (event) => {
+          setDocumentText(event.target.result)
+        }
+        reader.onerror = () => {
+          setError('Could not read file. Please try pasting the text instead.')
+        }
+        reader.readAsText(selectedFile)
+      }
+    } catch (err) {
+      console.error('File read error:', err)
+      setError('Could not read file. Please try pasting the text instead.')
+    }
+
+    setFileLoading(false)
+  }
 
   const handleAnalyze = async () => {
     if (!documentText.trim()) {
@@ -260,21 +299,83 @@ function DocumentAnalyzer() {
             </div>
           </div>
 
-          <div>
-            <label className="block text-terra-ink-soft text-sm mb-2">
-              Paste the document text below (Polish or English)
-            </label>
-            <textarea
-              value={documentText}
-              onChange={(e) => setDocumentText(e.target.value)}
-              placeholder="Paste the full document text here...\n\nTip: The more complete the document, the better the explanation."
-              rows={12}
-              className="w-full glass-panel border border-terra-taupe/40 rounded-2xl px-4 py-3 text-terra-ink placeholder-terra-taupe resize-none focus:outline-none focus:border-terra-primary/50"
-            />
-            <p className="text-terra-taupe text-sm mt-2">
-              {documentText.length} characters
-            </p>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setInputMethod('paste')}
+              className={`glass-chip px-4 py-2 rounded-lg font-medium transition-colors ${
+                inputMethod === 'paste'
+                  ? 'text-terra-ink ring-1 ring-terra-primary/30 bg-terra-primary/10'
+                  : 'text-terra-ink-soft hover:text-terra-ink'
+              }`}
+            >
+              Paste Text
+            </button>
+            <button
+              onClick={() => setInputMethod('upload')}
+              className={`glass-chip px-4 py-2 rounded-lg font-medium transition-colors ${
+                inputMethod === 'upload'
+                  ? 'text-terra-ink ring-1 ring-terra-primary/30 bg-terra-primary/10'
+                  : 'text-terra-ink-soft hover:text-terra-ink'
+              }`}
+            >
+              Upload File
+            </button>
           </div>
+
+          {inputMethod === 'paste' && (
+            <div>
+              <label className="block text-terra-ink-soft text-sm mb-2">
+                Paste the document text below (Polish or English)
+              </label>
+              <textarea
+                value={documentText}
+                onChange={(e) => setDocumentText(e.target.value)}
+                placeholder="Paste the full document text here...\n\nTip: The more complete the document, the better the explanation."
+                rows={12}
+                className="w-full glass-panel border border-terra-taupe/40 rounded-2xl px-4 py-3 text-terra-ink placeholder-terra-taupe resize-none focus:outline-none focus:border-terra-primary/50"
+              />
+              <p className="text-terra-taupe text-sm mt-2">
+                {documentText.length} characters
+              </p>
+            </div>
+          )}
+
+          {inputMethod === 'upload' && (
+            <div>
+              <div className="border-2 border-dashed border-terra-taupe/40 hover:border-terra-primary/40 rounded-2xl p-8 text-center transition-colors glass-panel">
+                <input
+                  type="file"
+                  accept=".pdf,.txt,.doc,.docx"
+                  onChange={handleFileChange}
+                  className="hidden"
+                  id="doc-file-upload"
+                />
+                <label htmlFor="doc-file-upload" className="cursor-pointer">
+                  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl glass-panel">
+                    <Icon name="upload" size={20} className="text-terra-ink" />
+                  </div>
+                  <p className="text-terra-ink font-medium mb-2">
+                    {fileLoading ? 'Extracting text...' : file ? file.name : 'Click to upload or drag and drop'}
+                  </p>
+                  <p className="text-terra-taupe text-sm">
+                    PDF, TXT, or DOC files
+                  </p>
+                </label>
+              </div>
+              {fileLoading && (
+                <p className="text-terra-ink-soft text-sm mt-2 flex items-center gap-2">
+                  <span className="w-4 h-4 border-2 border-terra-primary border-t-transparent rounded-full animate-spin inline-block"></span>
+                  Extracting text from PDF...
+                </p>
+              )}
+              {file && documentText && !fileLoading && (
+                <p className="text-emerald-700 text-sm mt-2 flex items-center gap-2">
+                  <Icon name="success" size={14} className="text-emerald-600" />
+                  File loaded - {documentText.length} characters extracted
+                </p>
+              )}
+            </div>
+          )}
 
           {error && (
             <div className="glass-panel border border-rose-300/60 rounded-2xl p-4">
