@@ -101,23 +101,10 @@ function Home() {
     }
   }, [])
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      const todayKey = new Date().toLocaleDateString('en-CA')
-      const storageKey = `expat_morning_briefing_seen_${todayKey}`
-      const hasSeenBriefing = localStorage.getItem(storageKey)
-      if (!hasSeenBriefing) {
-        const timer = setTimeout(() => setShowMorningBriefing(true), 600)
-        return () => clearTimeout(timer)
-      }
-    }
-  }, [isAuthenticated])
+  // Morning briefing opens only via the "Open briefing" button
 
   const handleCloseMorningBriefing = () => {
     setShowMorningBriefing(false)
-    const todayKey = new Date().toLocaleDateString('en-CA')
-    const storageKey = `expat_morning_briefing_seen_${todayKey}`
-    localStorage.setItem(storageKey, 'true')
   }
 
   return (

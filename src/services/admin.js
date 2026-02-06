@@ -103,7 +103,7 @@ export async function getUsers(page = 1, limit = 20, search = '') {
 export async function getAllAnnouncements() {
   try {
     const { data, error } = await supabase
-      .from('announcements')
+      .from('announcements_en')
       .select('*')
       .order('created_at', { ascending: false })
 
@@ -118,20 +118,12 @@ export async function getAllAnnouncements() {
 export async function createAnnouncement(announcement) {
   try {
     const { data, error } = await supabase
-      .from('announcements')
+      .from('announcements_en')
       .insert([announcement])
       .select()
       .single()
 
     if (error) throw error
-    // Trigger server-side translation (Edge Function)
-    try {
-      await supabase.functions.invoke('translate_announcement', {
-        body: { announcement_id: data.id }
-      })
-    } catch (invokeError) {
-      console.error('Translate announcement invoke error:', invokeError)
-    }
     return { data, error: null }
   } catch (error) {
     console.error('Error creating announcement:', error)
@@ -142,21 +134,13 @@ export async function createAnnouncement(announcement) {
 export async function updateAnnouncement(id, updates) {
   try {
     const { data, error } = await supabase
-      .from('announcements')
+      .from('announcements_en')
       .update(updates)
       .eq('id', id)
       .select()
       .single()
 
     if (error) throw error
-    // Trigger server-side translation (Edge Function)
-    try {
-      await supabase.functions.invoke('translate_announcement', {
-        body: { announcement_id: data.id }
-      })
-    } catch (invokeError) {
-      console.error('Translate announcement invoke error:', invokeError)
-    }
     return { data, error: null }
   } catch (error) {
     console.error('Error updating announcement:', error)
@@ -167,7 +151,7 @@ export async function updateAnnouncement(id, updates) {
 export async function deleteAnnouncement(id) {
   try {
     const { error } = await supabase
-      .from('announcements')
+      .from('announcements_en')
       .delete()
       .eq('id', id)
 
