@@ -34,16 +34,18 @@ export const AuthProvider = ({ children }) => {
     let profileFetched = false
 
     // Get initial session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
       if (!isMounted) return
       if (session?.user) {
         setUser(session.user)
-        const p = await fetchProfile(session.user.id)
-        if (!isMounted) return
-        if (p) {
-          setProfile(p)
-          profileFetched = true
-        }
+        // Fetch profile in background - don't block loading on it
+        fetchProfile(session.user.id).then(p => {
+          if (!isMounted) return
+          if (p) {
+            setProfile(p)
+            profileFetched = true
+          }
+        })
       }
       setLoading(false)
     })
