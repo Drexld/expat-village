@@ -7,6 +7,17 @@ const AuthContext = createContext({})
 
 export const useAuth = () => useContext(AuthContext)
 
+// Race a promise against a timeout
+function withTimeout(promise, ms) {
+  let timer
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => {
+      timer = setTimeout(() => reject(new Error('timeout')), ms)
+    })
+  ]).finally(() => clearTimeout(timer))
+}
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const [profile, setProfile] = useState(null)
@@ -16,11 +27,10 @@ export const AuthProvider = ({ children }) => {
 
   const fetchProfile = async (userId) => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single()
+      const { data, error } = await withTimeout(
+        supabase.from('profiles').select('*').eq('id', userId).single(),
+        5000
+      )
       if (error) console.error('Profile fetch error:', error)
       return data
     } catch (err) {
@@ -33,22 +43,58 @@ export const AuthProvider = ({ children }) => {
     let isMounted = true
     let profileFetched = false
 
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    async function initAuth() {
+      // 1. Get stored session
+      let session = null
+      try {
+        const result = await withTimeout(supabase.auth.getSession(), 5000)
+        session = result.data?.session
+      } catch {
+        // getSession timed out
+      }
+
       if (!isMounted) return
-      if (session?.user) {
-        setUser(session.user)
-        // Fetch profile in background - don't block loading on it
-        fetchProfile(session.user.id).then(p => {
+
+      if (!session?.user) {
+        setLoading(false)
+        return
+      }
+
+      setUser(session.user)
+      setLoading(false) // Auth resolved - don't block on profile
+
+      // 2. Try to load profile
+      let p = await fetchProfile(session.user.id)
+      if (!isMounted) return
+
+      if (p) {
+        setProfile(p)
+        profileFetched = true
+        return
+      }
+
+      // 3. Profile failed (stale token) - force refresh and retry
+      try {
+        const { data: { session: fresh } } = await withTimeout(
+          supabase.auth.refreshSession(),
+          5000
+        )
+        if (!isMounted) return
+        if (fresh?.user) {
+          setUser(fresh.user)
+          p = await fetchProfile(fresh.user.id)
           if (!isMounted) return
           if (p) {
             setProfile(p)
             profileFetched = true
           }
-        })
+        }
+      } catch (err) {
+        console.error('Session refresh failed:', err)
       }
-      setLoading(false)
-    })
+    }
+
+    initAuth()
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -58,8 +104,6 @@ export const AuthProvider = ({ children }) => {
         if (event === 'SIGNED_IN' && session?.user) {
           setUser(session.user)
 
-          // Only fetch profile if we don't have one yet
-          // Prevents profile wipe when SIGNED_IN re-fires on token refresh
           if (!profileFetched) {
             const p = await fetchProfile(session.user.id)
             if (!isMounted) return
@@ -75,7 +119,6 @@ export const AuthProvider = ({ children }) => {
           const secondsSinceCreation = (now - createdAt) / 1000
           const isNewUser = secondsSinceCreation < 60
 
-          // Check if they've already completed onboarding
           const hasCompletedOnboarding = localStorage.getItem('expat-village-tribe')
 
           if (isNewUser && !hasCompletedOnboarding) {
@@ -83,7 +126,6 @@ export const AuthProvider = ({ children }) => {
           }
         } else if (event === 'TOKEN_REFRESHED' && session?.user) {
           setUser(session.user)
-          // If profile wasn't loaded yet (e.g. initial fetch failed with stale token), retry now
           if (!profileFetched) {
             const p = await fetchProfile(session.user.id)
             if (!isMounted) return
@@ -108,9 +150,8 @@ export const AuthProvider = ({ children }) => {
   }, [])
 
   const signUp = async (email, password, displayName) => {
-    // Store display name for onboarding page to use
     localStorage.setItem('expat-village-pending-name', displayName)
-    
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -151,14 +192,12 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
-      // Stop auto-refresh to avoid token refresh after sign out
       supabase.auth.stopAutoRefresh()
     } catch (err) {
       console.error('Stop auto refresh error:', err)
     }
 
     try {
-      // Clear all Supabase auth keys from localStorage
       Object.keys(localStorage).forEach(key => {
         if (key.startsWith('sb-') || key.includes('supabase')) {
           localStorage.removeItem(key)
@@ -168,7 +207,6 @@ export const AuthProvider = ({ children }) => {
       console.error('LocalStorage clear error:', err)
     }
 
-    // Clear state
     setUser(null)
     setProfile(null)
 
@@ -178,7 +216,6 @@ export const AuthProvider = ({ children }) => {
       console.warn('Sign-out completed with errors; forcing redirect.')
     }
 
-    // Redirect to home (hard reload)
     window.location.replace('/')
   }
 
@@ -202,14 +239,12 @@ export const AuthProvider = ({ children }) => {
   const refreshProfile = async () => {
     if (!user) return
     const p = await fetchProfile(user.id)
-    // Only update if fetch succeeded - don't wipe existing profile on failure
     if (p) setProfile(p)
   }
 
   const openAuthModal = (view = 'sign_in') => setAuthModal({ isOpen: true, view })
   const closeAuthModal = () => setAuthModal({ isOpen: false, view: 'sign_in' })
-  
-  // Clear the redirect flag after it's been used
+
   const clearOnboardingRedirect = () => setShouldRedirectToOnboarding(false)
 
   return (
