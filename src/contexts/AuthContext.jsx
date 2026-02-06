@@ -7,17 +7,6 @@ const AuthContext = createContext({})
 
 export const useAuth = () => useContext(AuthContext)
 
-// Race a promise against a timeout
-function withTimeout(promise, ms) {
-  let timer
-  return Promise.race([
-    promise,
-    new Promise((_, reject) => {
-      timer = setTimeout(() => reject(new Error('timeout')), ms)
-    })
-  ]).finally(() => clearTimeout(timer))
-}
-
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const [profile, setProfile] = useState(null)
@@ -25,127 +14,84 @@ export const AuthProvider = ({ children }) => {
   const [authModal, setAuthModal] = useState({ isOpen: false, view: 'sign_in' })
   const [shouldRedirectToOnboarding, setShouldRedirectToOnboarding] = useState(false)
 
-  const fetchProfile = async (userId) => {
-    try {
-      const { data, error } = await withTimeout(
-        supabase.from('profiles').select('*').eq('id', userId).single(),
-        5000
-      )
-      if (error) console.error('Profile fetch error:', error)
-      return data
-    } catch (err) {
-      console.error('fetchProfile error:', err)
-      return null
-    }
-  }
-
   useEffect(() => {
     let isMounted = true
-    let profileFetched = false
+    let profileLoaded = false
 
-    async function initAuth() {
-      // 1. Get stored session
-      let session = null
+    // Fetch profile - no aggressive timeout; let Supabase handle token refresh internally
+    const loadProfile = async (userId) => {
+      if (profileLoaded) return
       try {
-        const result = await withTimeout(supabase.auth.getSession(), 5000)
-        session = result.data?.session
-      } catch {
-        // getSession timed out
-      }
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .single()
 
-      if (!isMounted) return
-
-      if (!session?.user) {
-        setLoading(false)
-        return
-      }
-
-      setUser(session.user)
-      setLoading(false) // Auth resolved - don't block on profile
-
-      // 2. Try to load profile
-      let p = await fetchProfile(session.user.id)
-      if (!isMounted) return
-
-      if (p) {
-        setProfile(p)
-        profileFetched = true
-        return
-      }
-
-      // 3. Profile failed (stale token) - force refresh and retry
-      try {
-        const { data: { session: fresh } } = await withTimeout(
-          supabase.auth.refreshSession(),
-          5000
-        )
         if (!isMounted) return
-        if (fresh?.user) {
-          setUser(fresh.user)
-          p = await fetchProfile(fresh.user.id)
-          if (!isMounted) return
-          if (p) {
-            setProfile(p)
-            profileFetched = true
-          }
+        if (error) {
+          console.error('Profile fetch error:', error)
+          return
+        }
+        if (data) {
+          setProfile(data)
+          profileLoaded = true
         }
       } catch (err) {
-        console.error('Session refresh failed:', err)
+        console.error('loadProfile error:', err)
       }
     }
 
-    initAuth()
-
-    // Listen for auth changes
+    // Single source of truth: onAuthStateChange fires INITIAL_SESSION on subscribe
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         if (!isMounted) return
 
-        if (event === 'SIGNED_IN' && session?.user) {
-          setUser(session.user)
-
-          if (!profileFetched) {
-            const p = await fetchProfile(session.user.id)
-            if (!isMounted) return
-            if (p) {
-              setProfile(p)
-              profileFetched = true
-            }
-          }
-
-          // Check if this is a NEW user (created within last 60 seconds)
-          const createdAt = new Date(session.user.created_at)
-          const now = new Date()
-          const secondsSinceCreation = (now - createdAt) / 1000
-          const isNewUser = secondsSinceCreation < 60
-
-          const hasCompletedOnboarding = localStorage.getItem('expat-village-tribe')
-
-          if (isNewUser && !hasCompletedOnboarding) {
-            setShouldRedirectToOnboarding(true)
-          }
-        } else if (event === 'TOKEN_REFRESHED' && session?.user) {
-          setUser(session.user)
-          if (!profileFetched) {
-            const p = await fetchProfile(session.user.id)
-            if (!isMounted) return
-            if (p) {
-              setProfile(p)
-              profileFetched = true
-            }
-          }
-        } else if (event === 'SIGNED_OUT') {
+        if (!session?.user) {
           setUser(null)
           setProfile(null)
-          profileFetched = false
+          profileLoaded = false
+          setLoading(false)
+          return
         }
+
+        // Synchronous state updates (no async in callback to avoid blocking events)
+        setUser(session.user)
         setLoading(false)
+
+        // Fire-and-forget profile load - doesn't block subsequent auth events
+        if (!profileLoaded) {
+          loadProfile(session.user.id)
+        }
+
+        // New user onboarding check
+        if (event === 'SIGNED_IN') {
+          const createdAt = new Date(session.user.created_at)
+          const isNewUser = (new Date() - createdAt) / 1000 < 60
+          if (isNewUser && !localStorage.getItem('expat-village-tribe')) {
+            setShouldRedirectToOnboarding(true)
+          }
+        }
       }
     )
+
+    // Safety net: if profile still hasn't loaded after 4s, force a session refresh
+    const safetyTimer = setTimeout(async () => {
+      if (!isMounted || profileLoaded) return
+      try {
+        const { data: { session } } = await supabase.auth.refreshSession()
+        if (!isMounted || profileLoaded || !session?.user) return
+        setUser(session.user)
+        loadProfile(session.user.id)
+      } catch (err) {
+        console.error('Safety refresh failed:', err)
+      }
+    }, 4000)
 
     return () => {
       isMounted = false
       subscription.unsubscribe()
+      clearTimeout(safetyTimer)
     }
   }, [])
 
@@ -238,8 +184,16 @@ export const AuthProvider = ({ children }) => {
 
   const refreshProfile = async () => {
     if (!user) return
-    const p = await fetchProfile(user.id)
-    if (p) setProfile(p)
+    try {
+      const { data } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single()
+      if (data) setProfile(data)
+    } catch (err) {
+      console.error('refreshProfile error:', err)
+    }
   }
 
   const openAuthModal = (view = 'sign_in') => setAuthModal({ isOpen: true, view })
