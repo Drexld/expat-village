@@ -103,7 +103,7 @@ export async function getUsers(page = 1, limit = 20, search = '') {
 export async function getAllAnnouncements() {
   try {
     const { data, error } = await supabase
-      .from('announcements_en')
+      .from('announcements')
       .select('*')
       .order('created_at', { ascending: false })
 
@@ -118,7 +118,7 @@ export async function getAllAnnouncements() {
 export async function createAnnouncement(announcement) {
   try {
     const { data, error } = await supabase
-      .from('announcements_en')
+      .from('announcements')
       .insert([announcement])
       .select()
       .single()
@@ -134,7 +134,7 @@ export async function createAnnouncement(announcement) {
 export async function updateAnnouncement(id, updates) {
   try {
     const { data, error } = await supabase
-      .from('announcements_en')
+      .from('announcements')
       .update(updates)
       .eq('id', id)
       .select()
@@ -151,7 +151,7 @@ export async function updateAnnouncement(id, updates) {
 export async function deleteAnnouncement(id) {
   try {
     const { error } = await supabase
-      .from('announcements_en')
+      .from('announcements')
       .delete()
       .eq('id', id)
 
