@@ -4,6 +4,6 @@
     { "source": "/(.*)", "destination": "/" }
   ],
   "crons": [
-    { "path": "/api/ingest-city-pulse", "schedule": "0 */6 * * *" }
+    { "path": "/api/ingest-city-pulse", "schedule": "0 0 * * *" }
   ]
 }
