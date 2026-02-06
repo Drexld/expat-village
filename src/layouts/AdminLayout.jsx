@@ -11,6 +11,7 @@ const navItems = [
   { path: '/admin/announcements', label: 'Announcements', icon: 'bell' },
   { path: '/admin/alerts', label: 'System Alerts', icon: 'alert' },
   { path: '/admin/listings', label: 'Featured Listings', icon: 'star' },
+  { path: '/admin/directory', label: 'Directory', icon: 'pin' },
   { path: '/admin/users', label: 'Users', icon: 'user' },
 ]
 

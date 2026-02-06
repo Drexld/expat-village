@@ -44,6 +44,7 @@ import AdminDashboard from './pages/admin/Dashboard'
 import AdminAnnouncements from './pages/admin/Announcements'
 import AdminAlerts from './pages/admin/Alerts'
 import AdminListings from './pages/admin/Listings'
+import AdminDirectoryListings from './pages/admin/DirectoryListings'
 import AdminUsers from './pages/admin/Users'
 
 import './App.css'
@@ -87,6 +88,7 @@ function App() {
             <Route path="announcements" element={<AdminAnnouncements />} />
             <Route path="alerts" element={<AdminAlerts />} />
             <Route path="listings" element={<AdminListings />} />
+            <Route path="directory" element={<AdminDirectoryListings />} />
             <Route path="users" element={<AdminUsers />} />
           </Route>
 
