@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import Icon from '../components/Icon'
 import './ExpatOnboarding.css'
 
@@ -11,40 +11,45 @@ const STAGES = [
   {
     id: 'arrival',
     label: 'Arrival',
-    navTarget: 'arrival',
+    start: 0,
+    end: 3,
+    image: '/images/expat-onboarding/hero-bg.jpg',
     title: 'Expat Village - Warsaw and Beyond',
     subtitle: 'Your soft landing in Poland',
-    tagline: "From paperwork to Polish sunsets - we've got you",
-    image: '/images/expat-onboarding/hero-bg.jpg',
+    copy: "From paperwork to Polish sunsets - we've got you",
   },
   {
     id: 'promise',
     label: 'Promise',
-    navTarget: 'promise',
-    title: 'A calmer way to begin life in Warsaw',
+    start: 3,
+    end: 6,
     image: '/images/expat-onboarding/oldtown.jpg',
+    title: 'A calmer way to begin life in Warsaw',
     copy: 'Relocation can feel intense. We turn uncertainty into clear next actions, trusted local context, and a community that truly understands this transition.',
   },
   {
     id: 'path',
     label: 'Path',
-    navTarget: 'path',
-    title: 'Handle the hard stuff, step by step',
+    start: 6,
+    end: 9,
     image: '/images/expat-onboarding/oldtown.jpg',
+    title: 'Handle the hard stuff, step by step',
     copy: 'One practical path from arrival pressure to everyday confidence.',
   },
   {
     id: 'village',
     label: 'Village',
-    navTarget: 'village',
-    title: 'Daily city pulse, curated for expats',
+    start: 9,
+    end: 12,
     image: '/images/expat-onboarding/riverside.jpg',
+    title: 'Daily city pulse, curated for expats',
     copy: 'Discover trusted recommendations, local events, real stories from people building a life here. Practical updates meet human warmth so your days feel connected.',
   },
   {
     id: 'final',
     label: 'Start',
-    navTarget: 'final',
+    start: 12,
+    end: 14,
     title: 'Ready to make Warsaw feel like home?',
   },
 ]
@@ -88,52 +93,34 @@ const STEP_CARDS = [
   },
 ]
 
-const revealVariants = {
-  hidden: { opacity: 0, y: 60 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.95, ease: CINEMATIC_EASE },
-  },
-}
-
-const staggerContainer = {
-  hidden: {},
-  visible: {
-    transition: {
-      delayChildren: 0.1,
-      staggerChildren: 0.14,
-    },
-  },
-}
-
-const lineVariants = {
-  hidden: { opacity: 0, y: 32 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.8, ease: CINEMATIC_EASE },
-  },
-}
-
-const _MOTION_COMPONENT_REFERENCE = motion.div
-
 function clamp(value, min = 0, max = 1) {
   return Math.min(max, Math.max(min, value))
 }
 
+function smoothstep(edge0, edge1, value) {
+  const t = clamp((value - edge0) / (edge1 - edge0))
+  return t * t * (3 - 2 * t)
+}
+
+function mix(a, b, t) {
+  return a + (b - a) * clamp(t)
+}
+
+function fadeWindow(time, start, end, fadeIn = 0.36, fadeOut = 0.4) {
+  const enter = smoothstep(start - fadeIn, start + 0.01, time)
+  const leave = 1 - smoothstep(end - 0.01, end + fadeOut, time)
+  return clamp(Math.min(enter, leave))
+}
+
+function getActiveStageIndex(time) {
+  for (let idx = STAGES.length - 1; idx >= 0; idx -= 1) {
+    if (time >= STAGES[idx].start) return idx
+  }
+  return 0
+}
+
 function ExpatOnboarding() {
   const shouldReduceMotion = Boolean(useReducedMotion())
-  const stageRefs = useRef([])
-  const ratioMapRef = useRef(new Map())
-  const heroStageRef = useRef(null)
-  const villageStageRef = useRef(null)
-  const [activeStageIndex, setActiveStageIndex] = useState(0)
-  const [selectedStepCard, setSelectedStepCard] = useState(STEP_CARDS[0].id)
-  const [isMobile, setIsMobile] = useState(() => {
-    if (typeof window === 'undefined') return false
-    return window.innerWidth < 768
-  })
 
   const exportMode = useMemo(() => {
     if (typeof window === 'undefined') return false
@@ -142,122 +129,53 @@ function ExpatOnboarding() {
 
   const initialTime = useMemo(() => {
     if (typeof window === 'undefined') return 0
-    const rawTime = Number.parseFloat(new URLSearchParams(window.location.search).get('t') || '0')
-    return clamp(Number.isFinite(rawTime) ? rawTime : 0, 0, TOTAL_DURATION)
+    const parsed = Number.parseFloat(new URLSearchParams(window.location.search).get('t') || '0')
+    return clamp(Number.isFinite(parsed) ? parsed : 0, 0, TOTAL_DURATION)
   }, [])
 
-  const sectionRevealProps = exportMode
-    ? { initial: false, animate: 'visible' }
-    : { initial: 'hidden', whileInView: 'visible', viewport: { once: true, amount: 0.28 } }
+  const timeRef = useRef(initialTime)
+  const [time, setTime] = useState(initialTime)
+  const [isPlaying, setIsPlaying] = useState(() => !exportMode)
+  const [playbackSeed, setPlaybackSeed] = useState(0)
+  const _MOTION_COMPONENT_REFERENCE = motion.div
 
-  const { scrollYProgress: heroProgress } = useScroll({
-    target: heroStageRef,
-    offset: ['start start', 'end start'],
-  })
-
-  const { scrollYProgress: villageProgress } = useScroll({
-    target: villageStageRef,
-    offset: ['start end', 'end start'],
-  })
-
-  const heroParallaxY = useTransform(heroProgress, [0, 1], [0, shouldReduceMotion ? 0 : 110])
-  const villageParallaxY = useTransform(villageProgress, [0, 1], [shouldReduceMotion ? 0 : 26, shouldReduceMotion ? 0 : -36])
-
-  const registerStageRef = useCallback(
-    (index) => (node) => {
-      stageRefs.current[index] = node
-      if (index === 0) heroStageRef.current = node
-      if (index === 3) villageStageRef.current = node
-    },
-    []
-  )
-
-  const updateActiveStage = useCallback(() => {
-    if (typeof window === 'undefined') return
-
-    let bestIndex = -1
-    let bestRatio = 0
-
-    stageRefs.current.forEach((node, index) => {
-      if (!node) return
-      const ratio = ratioMapRef.current.get(node) ?? 0
-      if (ratio > bestRatio) {
-        bestRatio = ratio
-        bestIndex = index
+  const jumpToTime = useCallback(
+    (nextTime) => {
+      const clamped = clamp(nextTime, 0, TOTAL_DURATION)
+      timeRef.current = clamped
+      setTime(clamped)
+      if (!exportMode && isPlaying) {
+        setPlaybackSeed((prev) => prev + 1)
       }
-    })
-
-    if (bestIndex === -1 || bestRatio < 0.2) {
-      const viewportAnchor = window.scrollY + window.innerHeight * 0.42
-      let closestIndex = 0
-      let closestDistance = Number.POSITIVE_INFINITY
-
-      stageRefs.current.forEach((node, index) => {
-        if (!node) return
-        const rect = node.getBoundingClientRect()
-        const sectionCenter = window.scrollY + rect.top + rect.height / 2
-        const distance = Math.abs(sectionCenter - viewportAnchor)
-        if (distance < closestDistance) {
-          closestDistance = distance
-          closestIndex = index
-        }
-      })
-
-      bestIndex = closestIndex
-    }
-
-    setActiveStageIndex((prev) => (prev === bestIndex ? prev : bestIndex))
-  }, [])
+    },
+    [exportMode, isPlaying]
+  )
 
   const goToStage = useCallback(
     (index) => {
-      const target = stageRefs.current[index]
-      if (!target) return
-      target.scrollIntoView({
-        behavior: shouldReduceMotion || exportMode ? 'auto' : 'smooth',
-        block: 'start',
-      })
+      const stage = STAGES[index]
+      if (!stage) return
+      jumpToTime(stage.start + 0.001)
     },
-    [exportMode, shouldReduceMotion]
+    [jumpToTime]
   )
 
   useEffect(() => {
-    if (typeof window === 'undefined') return undefined
+    if (exportMode || !isPlaying) return undefined
 
-    const onResize = () => {
-      setIsMobile(window.innerWidth < 768)
-      updateActiveStage()
+    let rafId = 0
+    const start = performance.now() - timeRef.current * 1000
+
+    const tick = (now) => {
+      const elapsed = ((now - start) / 1000) % TOTAL_DURATION
+      timeRef.current = elapsed
+      setTime(elapsed)
+      rafId = window.requestAnimationFrame(tick)
     }
 
-    window.addEventListener('resize', onResize)
-    return () => window.removeEventListener('resize', onResize)
-  }, [updateActiveStage])
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return undefined
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          ratioMapRef.current.set(entry.target, entry.intersectionRatio)
-        })
-        updateActiveStage()
-      },
-      { threshold: [0, 0.15, 0.3, 0.45, 0.6, 0.75, 0.9] }
-    )
-
-    stageRefs.current.forEach((node) => {
-      if (node) observer.observe(node)
-    })
-
-    const onScroll = () => updateActiveStage()
-    window.addEventListener('scroll', onScroll, { passive: true })
-
-    return () => {
-      observer.disconnect()
-      window.removeEventListener('scroll', onScroll)
-    }
-  }, [updateActiveStage])
+    rafId = window.requestAnimationFrame(tick)
+    return () => window.cancelAnimationFrame(rafId)
+  }, [exportMode, isPlaying, playbackSeed])
 
   useEffect(() => {
     if (!exportMode || typeof window === 'undefined') return undefined
@@ -265,13 +183,7 @@ function ExpatOnboarding() {
     const setExportTime = (value) => {
       const parsed = Number.parseFloat(value)
       if (!Number.isFinite(parsed)) return
-
-      const progress = clamp(parsed / TOTAL_DURATION)
-      const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight)
-      const nextScroll = progress * maxScroll
-
-      window.scrollTo({ top: nextScroll, behavior: 'auto' })
-      updateActiveStage()
+      jumpToTime(parsed)
     }
 
     window.__setExpatOnboardingTime = setExportTime
@@ -282,11 +194,168 @@ function ExpatOnboarding() {
       delete window.__setExpatOnboardingTime
       delete window.__expatOnboardingDuration
     }
-  }, [exportMode, initialTime, updateActiveStage])
+  }, [exportMode, initialTime, jumpToTime])
+
+  const activeStageIndex = getActiveStageIndex(time)
+  const progressRatio = clamp(time / TOTAL_DURATION)
+  const stageState = STAGES.map((stage) => {
+    const duration = stage.end - stage.start
+    const progress = clamp((time - stage.start) / duration)
+    const opacity = fadeWindow(time, stage.start, stage.end)
+    return { progress, opacity }
+  })
+
+  const arrival = stageState[0]
+  const promise = stageState[1]
+  const pathStage = stageState[2]
+  const village = stageState[3]
+  const final = stageState[4]
+
+  const ambientDrift = shouldReduceMotion ? 0 : Math.sin(time * 0.9) * 8
+  const heroScale = mix(1.05, 1, arrival.progress)
+  const heroY = shouldReduceMotion ? 0 : mix(-10, 18, arrival.progress) + ambientDrift
+  const promiseY = shouldReduceMotion ? 0 : mix(16, -12, promise.progress) + ambientDrift * 0.4
+  const villageY = shouldReduceMotion ? 0 : mix(16, -18, village.progress) - ambientDrift * 0.5
+
+  const timeLabel = `${String(Math.floor(time)).padStart(2, '0')}:${String(Math.floor((time % 1) * 10)).padStart(1, '0')}`
 
   return (
-    <main className={`expat-cinematic-flow${exportMode ? ' is-export' : ''}`}>
+    <main className={`expat-cinematic-player${exportMode ? ' is-export' : ''}`}>
+      <div className="expat-film-canvas">
+        <motion.section
+          className="expat-scene-layer"
+          style={{ opacity: arrival.opacity, pointerEvents: arrival.opacity > 0.52 ? 'auto' : 'none' }}
+          transition={{ duration: shouldReduceMotion ? 0 : 0.55, ease: CINEMATIC_EASE }}
+        >
+          <motion.div className="expat-scene-media" style={{ transform: `translateY(${heroY}px) scale(${heroScale})` }}>
+            <img src={STAGES[0].image} alt="Palace of Culture and Science tower in Warsaw at dusk" loading="eager" className="expat-scene-image" />
+            <div className="expat-scene-overlay expat-scene-overlay-hero" />
+            <div className="expat-scene-vignette" />
+            <span className="expat-blob expat-blob-a" aria-hidden />
+            <span className="expat-blob expat-blob-b" aria-hidden />
+          </motion.div>
+          <div className="expat-scene-content expat-arrival-content">
+            <p className="expat-overline">Expat Village</p>
+            <h1>{STAGES[0].title}</h1>
+            <h2>{STAGES[0].subtitle}</h2>
+            <p className="expat-copy">{STAGES[0].copy}</p>
+            <Link to="/onboarding" className="expat-cta-primary" aria-label="Begin your onboarding journey">
+              Begin Your Journey
+              <span aria-hidden>{'->'}</span>
+            </Link>
+          </div>
+        </motion.section>
+
+        <motion.section
+          className="expat-scene-layer"
+          style={{ opacity: promise.opacity, pointerEvents: promise.opacity > 0.5 ? 'auto' : 'none' }}
+          transition={{ duration: shouldReduceMotion ? 0 : 0.5, ease: CINEMATIC_EASE }}
+        >
+          <div className="expat-scene-media" style={{ transform: `translateY(${promiseY}px)` }}>
+            <img src={STAGES[1].image} alt="Warm Old Town square evening lights in Warsaw" loading="lazy" className="expat-scene-image" />
+            <div className="expat-scene-overlay expat-scene-overlay-warm" />
+          </div>
+          <div className="expat-scene-content expat-panel-content">
+            <div className="expat-panel">
+              <p className="expat-overline">The Promise</p>
+              <h3>{STAGES[1].title}</h3>
+              <p className="expat-copy">{STAGES[1].copy}</p>
+            </div>
+          </div>
+        </motion.section>
+
+        <motion.section
+          className="expat-scene-layer"
+          style={{ opacity: pathStage.opacity, pointerEvents: pathStage.opacity > 0.5 ? 'auto' : 'none' }}
+          transition={{ duration: shouldReduceMotion ? 0 : 0.5, ease: CINEMATIC_EASE }}
+        >
+          <div className="expat-scene-media">
+            <img src={STAGES[2].image} alt="Old Town details in Warsaw at dusk" loading="lazy" className="expat-scene-image" />
+            <div className="expat-scene-overlay expat-scene-overlay-path" />
+          </div>
+          <div className="expat-scene-content expat-path-content">
+            <div className="expat-path-header">
+              <p className="expat-overline">The Path</p>
+              <h3>{STAGES[2].title}</h3>
+              <p className="expat-copy">{STAGES[2].copy}</p>
+            </div>
+            <div className="expat-path-grid">
+              {STEP_CARDS.map((step, index) => {
+                const cardProgress = smoothstep(0.12 + index * 0.07, 0.45 + index * 0.07, pathStage.progress)
+                const opacity = pathStage.opacity * cardProgress
+                const y = mix(34, 0, cardProgress)
+                return (
+                  <article key={step.id} className="expat-step-card" style={{ opacity, transform: `translateY(${y}px)` }}>
+                    <div className="expat-step-head">
+                      <span className="expat-step-icon">
+                        <Icon name={step.icon} size={16} />
+                      </span>
+                      <span className="expat-step-title">{step.title}</span>
+                    </div>
+                    <p>{step.description}</p>
+                    <Link to={`/onboarding?step=${step.id}`} className="expat-step-link" aria-label={`Learn more about ${step.title}`}>
+                      Learn More
+                      <span aria-hidden>{'->'}</span>
+                    </Link>
+                  </article>
+                )
+              })}
+            </div>
+          </div>
+        </motion.section>
+
+        <motion.section
+          className="expat-scene-layer"
+          style={{ opacity: village.opacity, pointerEvents: village.opacity > 0.5 ? 'auto' : 'none' }}
+          transition={{ duration: shouldReduceMotion ? 0 : 0.5, ease: CINEMATIC_EASE }}
+        >
+          <div className="expat-scene-media" style={{ transform: `translateY(${villageY}px)` }}>
+            <img src={STAGES[3].image} alt="Vistula promenade and Warsaw skyline at golden hour" loading="lazy" className="expat-scene-image" />
+            <div className="expat-scene-overlay expat-scene-overlay-village" />
+          </div>
+          <div className="expat-scene-content expat-panel-content">
+            <div className="expat-panel">
+              <p className="expat-overline">The Village</p>
+              <h3>{STAGES[3].title}</h3>
+              <p className="expat-copy">{STAGES[3].copy}</p>
+            </div>
+          </div>
+        </motion.section>
+
+        <motion.section
+          className="expat-scene-layer"
+          style={{ opacity: final.opacity, pointerEvents: final.opacity > 0.45 ? 'auto' : 'none' }}
+          transition={{ duration: shouldReduceMotion ? 0 : 0.45, ease: CINEMATIC_EASE }}
+        >
+          <div className="expat-scene-media expat-scene-media-final">
+            <div className="expat-scene-overlay expat-scene-overlay-final" />
+            <div className="expat-burst" style={{ transform: `scale(${mix(0.65, 1.08, final.progress)})` }} />
+          </div>
+          <div className="expat-scene-content expat-panel-content">
+            <div className="expat-panel expat-panel-final">
+              <p className="expat-overline">Final Step</p>
+              <h3>{STAGES[4].title}</h3>
+              <div className="expat-final-actions">
+                <Link to="/onboarding" className="expat-cta-primary" aria-label="Start onboarding">
+                  Start Onboarding
+                </Link>
+                <Link to="/explore" className="expat-cta-secondary" aria-label="Explore first">
+                  Explore First
+                </Link>
+              </div>
+            </div>
+          </div>
+        </motion.section>
+      </div>
+
       <nav className="expat-stage-nav" aria-label="Onboarding stage navigation">
+        <div className="expat-stage-head">
+          <span>Cinematic Flow</span>
+          <span>{timeLabel}</span>
+        </div>
+        <div className="expat-stage-progress">
+          <span style={{ width: `${progressRatio * 100}%` }} />
+        </div>
         <ol className="expat-stage-nav-list">
           {STAGES.map((stage, index) => (
             <li key={stage.id}>
@@ -294,7 +363,7 @@ function ExpatOnboarding() {
                 type="button"
                 className={`expat-stage-nav-item${activeStageIndex === index ? ' is-active' : ''}`}
                 aria-current={activeStageIndex === index ? 'step' : undefined}
-                aria-label={`Go to ${stage.label}`}
+                aria-label={`Jump to ${stage.label}`}
                 onClick={() => goToStage(index)}
               >
                 <span className="expat-stage-nav-dot" aria-hidden />
@@ -303,7 +372,6 @@ function ExpatOnboarding() {
             </li>
           ))}
         </ol>
-
         <div className="expat-stage-nav-controls">
           <button
             type="button"
@@ -318,6 +386,18 @@ function ExpatOnboarding() {
           <button
             type="button"
             className="expat-nav-control"
+            onClick={() => {
+              setIsPlaying((prev) => !prev)
+              setPlaybackSeed((prev) => prev + 1)
+            }}
+            aria-label={isPlaying ? 'Pause timeline' : 'Play timeline'}
+            disabled={exportMode}
+          >
+            {isPlaying ? 'Pause' : 'Play'}
+          </button>
+          <button
+            type="button"
+            className="expat-nav-control"
             onClick={() => goToStage(Math.min(STAGES.length - 1, activeStageIndex + 1))}
             disabled={activeStageIndex === STAGES.length - 1}
             aria-label="Go to next stage"
@@ -327,199 +407,6 @@ function ExpatOnboarding() {
           </button>
         </div>
       </nav>
-
-      <section id="arrival" className="expat-stage expat-stage-arrival" ref={registerStageRef(0)}>
-        <motion.div className="expat-stage-media" style={{ y: heroParallaxY }}>
-          <motion.img
-            src={STAGES[0].image}
-            alt="Palace of Culture and Science tower in Warsaw at dusk"
-            loading="eager"
-            className="expat-stage-image"
-            initial={shouldReduceMotion || exportMode ? false : { scale: 1.05, opacity: 0.84 }}
-            animate={shouldReduceMotion || exportMode ? undefined : { scale: 1, opacity: 1 }}
-            transition={{ duration: 1.35, ease: CINEMATIC_EASE }}
-          />
-          <div className="expat-stage-overlay" />
-          <div className="expat-stage-vignette" />
-          <span className="expat-ambient-glow expat-ambient-a" aria-hidden />
-          <span className="expat-ambient-glow expat-ambient-b" aria-hidden />
-        </motion.div>
-
-        <motion.div
-          className="expat-arrival-content"
-          variants={staggerContainer}
-          initial={exportMode ? false : 'hidden'}
-          animate="visible"
-        >
-          <motion.p variants={lineVariants} className="expat-overline">
-            Expat Village
-          </motion.p>
-          <motion.h1 variants={lineVariants}>{STAGES[0].title}</motion.h1>
-          <motion.h2 variants={lineVariants}>{STAGES[0].subtitle}</motion.h2>
-          <motion.p variants={lineVariants} className="expat-arrival-tagline">
-            {STAGES[0].tagline}
-          </motion.p>
-          <motion.div variants={lineVariants}>
-            <Link to="/onboarding" className="expat-cta-primary" aria-label="Begin your onboarding journey">
-              Begin Your Journey
-              <span aria-hidden>{'->'}</span>
-            </Link>
-          </motion.div>
-        </motion.div>
-      </section>
-
-      <motion.section
-        id="promise"
-        className="expat-stage expat-stage-promise"
-        ref={registerStageRef(1)}
-        variants={revealVariants}
-        {...sectionRevealProps}
-      >
-        <div className="expat-stage-media expat-stage-media-static">
-          <img
-            src={STAGES[1].image}
-            alt="Warm Old Town square evening lights in Warsaw"
-            loading="lazy"
-            className="expat-stage-image"
-          />
-          <div className="expat-stage-overlay expat-stage-overlay-soft" />
-        </div>
-        <motion.div className="expat-promise-panel" variants={staggerContainer}>
-          <motion.p variants={lineVariants} className="expat-overline">
-            The Promise
-          </motion.p>
-          <motion.h3 variants={lineVariants}>{STAGES[1].title}</motion.h3>
-          <motion.p variants={lineVariants}>{STAGES[1].copy}</motion.p>
-        </motion.div>
-      </motion.section>
-
-      <motion.section
-        id="path"
-        className="expat-stage expat-stage-path"
-        ref={registerStageRef(2)}
-        variants={revealVariants}
-        {...sectionRevealProps}
-      >
-        <div className="expat-stage-media expat-stage-media-subtle">
-          <img
-            src={STAGES[2].image}
-            alt="Old Town details in Warsaw at dusk"
-            loading="lazy"
-            className="expat-stage-image"
-          />
-          <div className="expat-stage-overlay expat-stage-overlay-faint" />
-        </div>
-
-        <div className="expat-path-content">
-          <motion.div className="expat-path-header" variants={staggerContainer} {...sectionRevealProps}>
-            <motion.p variants={lineVariants} className="expat-overline">
-              The Path
-            </motion.p>
-            <motion.h3 variants={lineVariants}>{STAGES[2].title}</motion.h3>
-            <motion.p variants={lineVariants}>{STAGES[2].copy}</motion.p>
-          </motion.div>
-
-          <motion.div
-            className="expat-path-grid"
-            variants={staggerContainer}
-            initial={exportMode ? false : 'hidden'}
-            whileInView={exportMode ? undefined : 'visible'}
-            animate={exportMode ? 'visible' : undefined}
-            viewport={{ once: true, amount: 0.2 }}
-          >
-            {STEP_CARDS.map((step) => {
-              const expanded = !isMobile || selectedStepCard === step.id
-              return (
-                <motion.article key={step.id} className="expat-step-card" variants={revealVariants}>
-                  <button
-                    type="button"
-                    className="expat-step-head"
-                    aria-expanded={expanded}
-                    aria-controls={`step-${step.id}`}
-                    onClick={() => {
-                      if (!isMobile) return
-                      setSelectedStepCard((prev) => (prev === step.id ? '' : step.id))
-                    }}
-                  >
-                    <span className="expat-step-icon">
-                      <Icon name={step.icon} size={16} />
-                    </span>
-                    <span className="expat-step-title">{step.title}</span>
-                    <Icon name="chevronDown" size={16} className={`expat-step-chevron${expanded ? ' is-open' : ''}`} />
-                  </button>
-
-                  <motion.div
-                    id={`step-${step.id}`}
-                    className="expat-step-details"
-                    initial={false}
-                    animate={expanded ? 'open' : 'closed'}
-                    variants={{
-                      open: { height: 'auto', opacity: 1 },
-                      closed: { height: isMobile ? 0 : 'auto', opacity: isMobile ? 0 : 1 },
-                    }}
-                    transition={{ duration: shouldReduceMotion ? 0 : 0.34, ease: CINEMATIC_EASE }}
-                  >
-                    <p>{step.description}</p>
-                    <Link to={`/onboarding?step=${step.id}`} className="expat-step-link" aria-label={`Learn more about ${step.title}`}>
-                      Learn More
-                      <span aria-hidden>{'->'}</span>
-                    </Link>
-                  </motion.div>
-                </motion.article>
-              )
-            })}
-          </motion.div>
-        </div>
-      </motion.section>
-
-      <motion.section
-        id="village"
-        className="expat-stage expat-stage-village"
-        ref={registerStageRef(3)}
-        variants={revealVariants}
-        {...sectionRevealProps}
-      >
-        <motion.div className="expat-stage-media" style={{ y: villageParallaxY }}>
-          <img
-            src={STAGES[3].image}
-            alt="Vistula promenade and Warsaw skyline at golden hour"
-            loading="lazy"
-            className="expat-stage-image"
-          />
-          <div className="expat-stage-overlay expat-stage-overlay-village" />
-        </motion.div>
-
-        <motion.div className="expat-village-panel" variants={staggerContainer} {...sectionRevealProps}>
-          <motion.p variants={lineVariants} className="expat-overline">
-            The Village
-          </motion.p>
-          <motion.h3 variants={lineVariants}>{STAGES[3].title}</motion.h3>
-          <motion.p variants={lineVariants}>{STAGES[3].copy}</motion.p>
-        </motion.div>
-      </motion.section>
-
-      <motion.section
-        id="final"
-        className="expat-stage expat-stage-final"
-        ref={registerStageRef(4)}
-        variants={revealVariants}
-        {...sectionRevealProps}
-      >
-        <motion.div className="expat-final-panel" variants={staggerContainer}>
-          <motion.p variants={lineVariants} className="expat-overline">
-            Final Step
-          </motion.p>
-          <motion.h3 variants={lineVariants}>{STAGES[4].title}</motion.h3>
-          <motion.div variants={lineVariants} className="expat-final-actions">
-            <Link to="/onboarding" className="expat-cta-primary" aria-label="Start onboarding">
-              Start Onboarding
-            </Link>
-            <Link to="/explore" className="expat-cta-secondary" aria-label="Explore first">
-              Explore First
-            </Link>
-          </motion.div>
-        </motion.div>
-      </motion.section>
     </main>
   )
 }
