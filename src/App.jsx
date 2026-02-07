@@ -1,6 +1,7 @@
 // src/App.jsx
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
+import { useAuth } from './contexts/AuthContext'
 import ScrollToTop from './components/ScrollToTop'
 import { useDeviceDetection } from './hooks/useDeviceDetection'
 
@@ -74,6 +75,24 @@ function DeviceCheck({ children }) {
   return children
 }
 
+function HomeEntry() {
+  const { loading, isAuthenticated } = useAuth()
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-terra-bg flex items-center justify-center">
+        <div className="text-terra-primary">Loading...</div>
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/expat-onboarding" replace />
+  }
+
+  return <Home />
+}
+
 function App() {
   return (
     <AuthProvider>
@@ -99,7 +118,7 @@ function App() {
           {/* Main app routes with device check */}
           <Route path="/" element={<DeviceCheck><MainLayout /></DeviceCheck>}>
             {/* Home */}
-            <Route index element={<Home />} />
+            <Route index element={<HomeEntry />} />
             
             {/* About & Legal */}
             <Route path="about" element={<About />} />
