@@ -84,6 +84,7 @@ function App() {
           <Route path="/desktop" element={<DesktopRedirect />} />
           <Route path="/expat-onboarding" element={<ExpatOnboarding />} />
           <Route path="/spark-onboarding" element={<Navigate to="/expat-onboarding" replace />} />
+          <Route path="/explore" element={<Navigate to="/live-your-life" replace />} />
 
           {/* Admin routes (protected, separate layout) */}
           <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>

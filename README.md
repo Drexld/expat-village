@@ -39,7 +39,11 @@ Currently in development
 ## Expat Onboarding Render
 
 - Preview route: `/expat-onboarding`
+- Cinematic multi-stage flow with floating stage navigation (Arrival -> Promise -> Path -> Village -> Start)
 - Timeline: 14 seconds at 60fps (vertical 9:16)
+- Deterministic export hooks are preserved:
+  - `window.__setExpatOnboardingTime(seconds)`
+  - `window.__expatOnboardingDuration` (14)
 
 ### Render commands
 
