@@ -1,0 +1,41 @@
+/* Additive cinematic utilities for app/expat-onboarding. */
+
+:root {
+  --cinematic-blue: #003a8c;
+  --cinematic-gold: #f4a261;
+  --cinematic-warm: #e07a5f;
+}
+
+.font-cinematic-heading {
+  font-family: var(--font-playfair), 'Playfair Display', Georgia, serif;
+}
+
+.font-cinematic-body {
+  font-family: var(--font-inter), Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+.cinematic-gradient {
+  background:
+    radial-gradient(1200px 700px at 20% -15%, rgba(0, 58, 140, 0.32), transparent 60%),
+    radial-gradient(950px 620px at 85% 12%, rgba(224, 122, 95, 0.2), transparent 58%),
+    linear-gradient(180deg, #070b14 0%, #0b111f 48%, #070b14 100%);
+}
+
+.cinematic-vignette {
+  background: radial-gradient(circle at center, transparent 25%, rgba(0, 0, 0, 0.5) 100%);
+}
+
+.text-shadow-hero {
+  text-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+}
+
+.focus-ring:focus-visible {
+  outline: 2px solid var(--cinematic-gold);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-safe-parallax {
+    transform: none !important;
+  }
+}
