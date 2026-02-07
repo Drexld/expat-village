@@ -127,6 +127,11 @@ function ExpatOnboarding() {
     return new URLSearchParams(window.location.search).get('export') === '1'
   }, [])
 
+  const showControls = useMemo(() => {
+    if (typeof window === 'undefined') return false
+    return new URLSearchParams(window.location.search).get('controls') === '1'
+  }, [])
+
   const initialTime = useMemo(() => {
     if (typeof window === 'undefined') return 0
     const parsed = Number.parseFloat(new URLSearchParams(window.location.search).get('t') || '0')
@@ -348,65 +353,67 @@ function ExpatOnboarding() {
         </motion.section>
       </div>
 
-      <nav className="expat-stage-nav" aria-label="Onboarding stage navigation">
-        <div className="expat-stage-head">
-          <span>Cinematic Flow</span>
-          <span>{timeLabel}</span>
-        </div>
-        <div className="expat-stage-progress">
-          <span style={{ width: `${progressRatio * 100}%` }} />
-        </div>
-        <ol className="expat-stage-nav-list">
-          {STAGES.map((stage, index) => (
-            <li key={stage.id}>
-              <button
-                type="button"
-                className={`expat-stage-nav-item${activeStageIndex === index ? ' is-active' : ''}`}
-                aria-current={activeStageIndex === index ? 'step' : undefined}
-                aria-label={`Jump to ${stage.label}`}
-                onClick={() => goToStage(index)}
-              >
-                <span className="expat-stage-nav-dot" aria-hidden />
-                <span className="expat-stage-nav-label">{stage.label}</span>
-              </button>
-            </li>
-          ))}
-        </ol>
-        <div className="expat-stage-nav-controls">
-          <button
-            type="button"
-            className="expat-nav-control"
-            onClick={() => goToStage(Math.max(0, activeStageIndex - 1))}
-            disabled={activeStageIndex === 0}
-            aria-label="Go to previous stage"
-          >
-            <Icon name="arrowLeft" size={15} />
-            Back
-          </button>
-          <button
-            type="button"
-            className="expat-nav-control"
-            onClick={() => {
-              setIsPlaying((prev) => !prev)
-              setPlaybackSeed((prev) => prev + 1)
-            }}
-            aria-label={isPlaying ? 'Pause timeline' : 'Play timeline'}
-            disabled={exportMode}
-          >
-            {isPlaying ? 'Pause' : 'Play'}
-          </button>
-          <button
-            type="button"
-            className="expat-nav-control"
-            onClick={() => goToStage(Math.min(STAGES.length - 1, activeStageIndex + 1))}
-            disabled={activeStageIndex === STAGES.length - 1}
-            aria-label="Go to next stage"
-          >
-            Next
-            <Icon name="arrowRight" size={15} />
-          </button>
-        </div>
-      </nav>
+      {showControls && (
+        <nav className="expat-stage-nav" aria-label="Onboarding stage navigation">
+          <div className="expat-stage-head">
+            <span>Cinematic Flow</span>
+            <span>{timeLabel}</span>
+          </div>
+          <div className="expat-stage-progress">
+            <span style={{ width: `${progressRatio * 100}%` }} />
+          </div>
+          <ol className="expat-stage-nav-list">
+            {STAGES.map((stage, index) => (
+              <li key={stage.id}>
+                <button
+                  type="button"
+                  className={`expat-stage-nav-item${activeStageIndex === index ? ' is-active' : ''}`}
+                  aria-current={activeStageIndex === index ? 'step' : undefined}
+                  aria-label={`Jump to ${stage.label}`}
+                  onClick={() => goToStage(index)}
+                >
+                  <span className="expat-stage-nav-dot" aria-hidden />
+                  <span className="expat-stage-nav-label">{stage.label}</span>
+                </button>
+              </li>
+            ))}
+          </ol>
+          <div className="expat-stage-nav-controls">
+            <button
+              type="button"
+              className="expat-nav-control"
+              onClick={() => goToStage(Math.max(0, activeStageIndex - 1))}
+              disabled={activeStageIndex === 0}
+              aria-label="Go to previous stage"
+            >
+              <Icon name="arrowLeft" size={15} />
+              Back
+            </button>
+            <button
+              type="button"
+              className="expat-nav-control"
+              onClick={() => {
+                setIsPlaying((prev) => !prev)
+                setPlaybackSeed((prev) => prev + 1)
+              }}
+              aria-label={isPlaying ? 'Pause timeline' : 'Play timeline'}
+              disabled={exportMode}
+            >
+              {isPlaying ? 'Pause' : 'Play'}
+            </button>
+            <button
+              type="button"
+              className="expat-nav-control"
+              onClick={() => goToStage(Math.min(STAGES.length - 1, activeStageIndex + 1))}
+              disabled={activeStageIndex === STAGES.length - 1}
+              aria-label="Go to next stage"
+            >
+              Next
+              <Icon name="arrowRight" size={15} />
+            </button>
+          </div>
+        </nav>
+      )}
     </main>
   )
 }
