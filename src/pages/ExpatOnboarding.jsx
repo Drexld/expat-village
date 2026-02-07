@@ -298,10 +298,6 @@ function ExpatOnboarding() {
                       <span className="expat-step-title">{step.title}</span>
                     </div>
                     <p>{step.description}</p>
-                    <Link to={`/onboarding?step=${step.id}`} className="expat-step-link" aria-label={`Learn more about ${step.title}`}>
-                      Learn More
-                      <span aria-hidden>{'->'}</span>
-                    </Link>
                   </article>
                 )
               })}

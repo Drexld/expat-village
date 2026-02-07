@@ -241,16 +241,6 @@
   font-size: 0.95rem;
 }
 
-.expat-step-link {
-  margin-top: 10px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--expat-gold);
-  font-weight: 600;
-  text-decoration: none;
-}
-
 .expat-burst {
   position: absolute;
   left: 50%;
@@ -319,7 +309,6 @@
 
 .expat-cta-primary:focus-visible,
 .expat-cta-secondary:focus-visible,
-.expat-step-link:focus-visible,
 .expat-stage-nav-item:focus-visible,
 .expat-nav-control:focus-visible {
   outline: 2px solid var(--expat-gold);
