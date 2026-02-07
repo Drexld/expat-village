@@ -8,9 +8,9 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "render:spark": "node scripts/render-spark-onboarding.mjs",
-    "render:spark:frames": "node scripts/render-spark-onboarding.mjs --frames-only",
-    "render:spark:mp4": "node scripts/render-spark-onboarding.mjs --mp4"
+    "render:expat": "node scripts/render-expat-onboarding.mjs",
+    "render:expat:frames": "node scripts/render-expat-onboarding.mjs --frames-only",
+    "render:expat:mp4": "node scripts/render-expat-onboarding.mjs --mp4"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.93.3",

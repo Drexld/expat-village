@@ -12,13 +12,13 @@ const HEIGHT = 1920
 const PORT = 4173
 
 const root = process.cwd()
-const renderRoot = path.join(root, 'renders', 'spark-onboarding')
+const renderRoot = path.join(root, 'renders', 'expat-onboarding')
 const framesDir = path.join(renderRoot, 'frames')
-const outputVideo = path.join(renderRoot, 'spark-onboarding.mp4')
+const outputVideo = path.join(renderRoot, 'expat-onboarding.mp4')
 const args = new Set(process.argv.slice(2))
 const urlArg = process.argv.find((item) => item.startsWith('--url='))
 const customUrl = urlArg ? urlArg.replace('--url=', '').trim() : ''
-const basePageUrl = customUrl || `http://127.0.0.1:${PORT}/spark-onboarding`
+const basePageUrl = customUrl || `http://127.0.0.1:${PORT}/expat-onboarding`
 const pageUrl = basePageUrl.includes('?')
   ? `${basePageUrl}&export=1`
   : `${basePageUrl}?export=1`
@@ -163,8 +163,8 @@ async function main() {
     for (let frame = 0; frame < TOTAL_FRAMES; frame += 1) {
       const t = frame / FPS
       await page.evaluate((time) => {
-        if (typeof window.__setSparkTime === 'function') {
-          window.__setSparkTime(time)
+        if (typeof window.__setExpatOnboardingTime === 'function') {
+          window.__setExpatOnboardingTime(time)
         }
       }, t)
 

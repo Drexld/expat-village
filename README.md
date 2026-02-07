@@ -36,22 +36,22 @@ npm run dev
 
 Currently in development
 
-## Spark Onboarding Render
+## Expat Onboarding Render
 
-- Preview route: `/spark-onboarding`
+- Preview route: `/expat-onboarding`
 - Timeline: 14 seconds at 60fps (vertical 9:16)
 
 ### Render commands
 
 ```bash
 # Capture PNG frames (1080x1920, 840 frames)
-npm run render:spark:frames
+npm run render:expat:frames
 
 # Capture frames + encode mp4 (requires ffmpeg in PATH)
-npm run render:spark:mp4
+npm run render:expat:mp4
 
 # Optional: use an already-running app URL instead of auto-starting vite
-node scripts/render-spark-onboarding.mjs --mp4 --url=http://127.0.0.1:5173/spark-onboarding
+node scripts/render-expat-onboarding.mjs --mp4 --url=http://127.0.0.1:5173/expat-onboarding
 ```
 
 ### Prerequisites
