@@ -1,0 +1,642 @@
+.spark-onboarding-page {
+  min-height: 100vh;
+  width: 100%;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: radial-gradient(90% 60% at 50% -10%, #2a1b4f, #0a0d1f 60%, #05070f 100%);
+}
+
+.spark-stage {
+  position: relative;
+  width: min(100vw, calc(100vh * 9 / 16));
+  aspect-ratio: 9 / 16;
+  overflow: hidden;
+  border-radius: clamp(24px, 3vw, 38px);
+  box-shadow:
+    0 44px 100px rgba(6, 8, 21, 0.7),
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  isolation: isolate;
+}
+
+.spark-onboarding-page.is-export {
+  padding: 0;
+  background: #02040d;
+}
+
+.spark-onboarding-page.is-export .spark-stage {
+  width: 100vw;
+  height: 100vh;
+  aspect-ratio: auto;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.spark-film-grain {
+  position: absolute;
+  inset: -200%;
+  z-index: 40;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='130' height='130' viewBox='0 0 130 130'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='130' height='130' filter='url(%23f)' opacity='0.19'/%3E%3C/svg%3E");
+  mix-blend-mode: soft-light;
+  opacity: 0.26;
+  pointer-events: none;
+  animation: sparkGrainShift 0.4s steps(2) infinite;
+}
+
+.spark-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  transition: opacity 360ms ease;
+}
+
+.spark-bg-1 {
+  background:
+    radial-gradient(55% 45% at 18% 18%, rgba(231, 83, 201, 0.42), transparent 78%),
+    radial-gradient(55% 45% at 82% 18%, rgba(49, 177, 255, 0.3), transparent 76%),
+    radial-gradient(65% 50% at 46% 82%, rgba(255, 132, 63, 0.3), transparent 78%),
+    linear-gradient(160deg, #251245, #0d1436 62%, #070c1f);
+}
+
+.spark-bg-2 {
+  background:
+    radial-gradient(58% 40% at 20% 14%, rgba(255, 95, 184, 0.35), transparent 74%),
+    radial-gradient(65% 52% at 80% 20%, rgba(56, 210, 255, 0.3), transparent 80%),
+    radial-gradient(70% 52% at 50% 88%, rgba(93, 255, 213, 0.2), transparent 75%),
+    linear-gradient(170deg, #1a1f4d, #11183f 55%, #0a102c);
+}
+
+.spark-bg-3 {
+  background:
+    radial-gradient(68% 55% at 22% 20%, rgba(247, 94, 188, 0.3), transparent 72%),
+    radial-gradient(62% 46% at 78% 24%, rgba(72, 177, 255, 0.3), transparent 78%),
+    radial-gradient(58% 44% at 50% 90%, rgba(255, 181, 65, 0.28), transparent 76%),
+    linear-gradient(155deg, #221443, #121a4f 58%, #0c1738);
+}
+
+.spark-bg-4 {
+  background:
+    radial-gradient(72% 55% at 20% 18%, rgba(255, 138, 66, 0.42), transparent 72%),
+    radial-gradient(70% 55% at 80% 20%, rgba(255, 80, 139, 0.28), transparent 76%),
+    radial-gradient(70% 60% at 52% 86%, rgba(255, 178, 90, 0.32), transparent 78%),
+    linear-gradient(168deg, #5e1f24, #8b3428 54%, #3f1b27);
+}
+
+.spark-bg-5 {
+  background:
+    radial-gradient(58% 50% at 26% 26%, rgba(180, 120, 255, 0.36), transparent 74%),
+    radial-gradient(58% 50% at 72% 32%, rgba(80, 214, 255, 0.3), transparent 80%),
+    radial-gradient(62% 58% at 52% 90%, rgba(255, 162, 203, 0.35), transparent 80%),
+    linear-gradient(180deg, #f8f4ff, #eef6ff 54%, #ffeaf7);
+}
+
+.spark-status-bar {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  right: 0;
+  z-index: 35;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 0.04em;
+}
+
+.spark-status-time {
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+.spark-status-icons {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.spark-pill-dot {
+  height: 6px;
+  width: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.spark-pill-dot-wide {
+  width: 14px;
+}
+
+.spark-blob-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  pointer-events: none;
+}
+
+.spark-blob {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform:
+    translate(-50%, -50%)
+    translate(var(--blob-x), var(--blob-y))
+    scale(var(--blob-scale, 1));
+  border-radius: 39% 61% 53% 47% / 47% 42% 58% 53%;
+  background:
+    radial-gradient(65% 68% at 34% 28%, rgba(255, 255, 255, 0.56), rgba(255, 255, 255, 0) 66%),
+    var(--blob-color);
+  filter: blur(2px) saturate(1.2);
+  mix-blend-mode: screen;
+  animation: sparkBlobMorph 5.6s ease-in-out infinite alternate;
+}
+
+.spark-scene {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  padding: clamp(24px, 5vw, 42px);
+  transition: opacity 320ms ease;
+  pointer-events: none;
+}
+
+.spark-scene-1 {
+  color: #fff;
+  text-align: center;
+}
+
+.spark-scene-copy h1 {
+  margin: 0;
+  font-size: clamp(34px, 5.7vw, 52px);
+  line-height: 1.07;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+  text-wrap: balance;
+  text-shadow:
+    0 16px 35px rgba(11, 16, 42, 0.6),
+    0 2px 0 rgba(255, 255, 255, 0.25);
+}
+
+.spark-underline {
+  margin-top: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.spark-underline span {
+  display: inline-block;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.18), rgba(255, 219, 130, 0.92), rgba(72, 196, 255, 0.86), rgba(255, 116, 200, 0.88), rgba(255, 255, 255, 0.2));
+}
+
+.spark-underline span:nth-child(1) {
+  height: 5px;
+  width: clamp(126px, 25vw, 162px);
+  box-shadow:
+    0 0 18px rgba(255, 171, 81, 0.82),
+    0 0 36px rgba(71, 196, 255, 0.55);
+}
+
+.spark-underline span:nth-child(2),
+.spark-underline span:nth-child(3) {
+  width: 6px;
+  height: 6px;
+  animation: sparkTwinkle 1.4s ease-in-out infinite alternate;
+}
+
+.spark-underline span:nth-child(3) {
+  animation-delay: 0.26s;
+}
+
+.spark-scene-2 {
+  grid-template-rows: auto auto;
+  gap: 16px;
+}
+
+.spark-kicker {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.92);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 12px;
+  text-shadow: 0 6px 24px rgba(7, 8, 23, 0.5);
+}
+
+.spark-ripple {
+  position: absolute;
+  inset: 11% 8%;
+  border-radius: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background:
+    radial-gradient(40% 45% at 50% 42%, rgba(255, 255, 255, 0.14), transparent 74%),
+    radial-gradient(40% 30% at 50% 70%, rgba(157, 139, 255, 0.24), transparent 74%);
+  filter: blur(0.5px);
+}
+
+.spark-phone-shell {
+  position: relative;
+  width: min(78%, 325px);
+  border-radius: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04) 52%),
+    rgba(11, 16, 38, 0.55);
+  box-shadow:
+    0 38px 75px rgba(6, 9, 27, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  padding: 14px;
+}
+
+.spark-phone-notch {
+  height: 24px;
+  width: 38%;
+  margin: 0 auto 10px;
+  border-radius: 999px;
+  background: rgba(9, 12, 26, 0.76);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+.spark-phone-screen {
+  position: relative;
+  border-radius: 30px;
+  padding: 26px 16px 18px;
+  background:
+    radial-gradient(64% 58% at 20% 16%, rgba(248, 87, 179, 0.27), transparent 78%),
+    radial-gradient(56% 52% at 82% 20%, rgba(67, 208, 255, 0.32), transparent 80%),
+    linear-gradient(180deg, rgba(20, 24, 57, 0.95), rgba(14, 18, 40, 0.93));
+}
+
+.spark-puzzle-card {
+  border-radius: 22px;
+  padding: 20px 16px;
+  text-align: center;
+  background:
+    linear-gradient(132deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.02) 56%),
+    linear-gradient(170deg, rgba(255, 121, 178, 0.28), rgba(59, 190, 255, 0.2), rgba(255, 157, 73, 0.25));
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  box-shadow: 0 26px 44px rgba(5, 8, 21, 0.52);
+}
+
+.spark-card-eyebrow {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.spark-puzzle-card h2 {
+  margin: 8px 0 0;
+  font-size: clamp(28px, 4.8vw, 40px);
+  line-height: 1;
+  color: #fff;
+  text-shadow: 0 12px 26px rgba(8, 11, 29, 0.52);
+}
+
+.spark-puzzle-icons {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.spark-puzzle-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 14px;
+  padding: 10px 8px;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 10px 20px rgba(6, 10, 26, 0.34);
+  animation: sparkPopIn 0.6s cubic-bezier(0.2, 0.8, 0.2, 1.25) both;
+}
+
+.spark-scene-3 {
+  align-content: center;
+  gap: 26px;
+}
+
+.spark-copy-block {
+  text-align: center;
+}
+
+.spark-copy-block h2 {
+  margin: 0;
+  font-size: clamp(32px, 5.6vw, 48px);
+  color: #fff;
+  letter-spacing: -0.02em;
+  line-height: 1.04;
+  text-shadow: 0 14px 32px rgba(8, 12, 30, 0.52);
+}
+
+.spark-copy-block p {
+  margin: 11px 0 0;
+  color: rgba(225, 234, 255, 0.95);
+  font-size: 14px;
+  letter-spacing: 0.01em;
+}
+
+.spark-carousel-wrap {
+  width: 120%;
+  overflow: hidden;
+  padding: 10px 0;
+}
+
+.spark-carousel-track {
+  display: flex;
+  align-items: stretch;
+  gap: 14px;
+  transition: transform 320ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.spark-theme-card {
+  flex: 0 0 122px;
+  border-radius: 20px;
+  padding: 12px 11px;
+  color: rgba(255, 255, 255, 0.93);
+  background:
+    linear-gradient(150deg, color-mix(in srgb, var(--theme-color) 34%, white 12%), rgba(255, 255, 255, 0.06)),
+    rgba(15, 23, 51, 0.55);
+  border: 1px solid color-mix(in srgb, var(--theme-color) 62%, white 22%);
+  box-shadow:
+    0 14px 28px rgba(5, 9, 25, 0.44),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+  transform-origin: center;
+}
+
+.spark-theme-card.is-selected {
+  box-shadow:
+    0 20px 34px rgba(6, 11, 27, 0.58),
+    0 0 30px color-mix(in srgb, var(--theme-color) 48%, white 5%);
+}
+
+.spark-theme-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.17);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.spark-theme-card h3 {
+  margin: 34px 0 0;
+  font-size: 13px;
+  line-height: 1.2;
+  text-wrap: balance;
+  font-weight: 600;
+}
+
+.spark-scene-4 {
+  text-align: center;
+}
+
+.spark-zoom-theme {
+  width: min(86%, 350px);
+}
+
+.spark-zoom-theme h2 {
+  margin: 10px 0 20px;
+  color: #fff;
+  font-size: clamp(30px, 5.3vw, 42px);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  text-shadow: 0 14px 34px rgba(28, 8, 6, 0.46);
+}
+
+.spark-grid-puzzle {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 7px;
+  padding: 14px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.13);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  backdrop-filter: blur(4px);
+}
+
+.spark-grid-cell {
+  aspect-ratio: 1 / 1;
+  border-radius: 9px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.02)),
+    rgba(255, 255, 255, 0.11);
+  animation: sparkCellPop 0.45s cubic-bezier(0.2, 0.85, 0.2, 1.2) both;
+}
+
+.spark-connection-lines {
+  position: relative;
+  height: 84px;
+  margin-top: 14px;
+}
+
+.spark-line {
+  position: absolute;
+  left: 10%;
+  width: 80%;
+  height: 4px;
+  border-radius: 999px;
+  transform-origin: left center;
+  background: linear-gradient(90deg, rgba(255, 198, 121, 0.22), rgba(255, 226, 164, 0.95), rgba(255, 124, 174, 0.95), rgba(121, 222, 255, 0.75));
+  box-shadow: 0 0 12px rgba(255, 205, 118, 0.6);
+}
+
+.spark-line-a {
+  top: 10px;
+}
+
+.spark-line-b {
+  top: 34px;
+}
+
+.spark-line-c {
+  top: 58px;
+}
+
+.spark-scene-5 {
+  text-align: center;
+  color: #fff;
+}
+
+.spark-burst {
+  position: absolute;
+  left: 50%;
+  top: 49%;
+  width: min(74vw, 380px);
+  aspect-ratio: 1;
+  border-radius: 999px;
+  transform: translate(-50%, -50%);
+  background:
+    radial-gradient(circle at 35% 32%, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0) 26%),
+    conic-gradient(from 18deg, #8f6dff, #ff5dbe, #ff9340, #4bd5ff, #8f6dff);
+  filter: blur(16px) saturate(1.2);
+}
+
+.spark-logo-lockup h2 {
+  margin: 0;
+  font-size: clamp(58px, 9.8vw, 88px);
+  line-height: 0.96;
+  letter-spacing: -0.05em;
+  font-weight: 700;
+  background: linear-gradient(100deg, #ffffff 8%, #9cdfff 48%, #ff94cf 74%, #ffd39a);
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  text-shadow: 0 18px 34px rgba(109, 111, 255, 0.2);
+}
+
+.spark-logo-lockup p {
+  margin: 10px 0 0;
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  color: rgba(52, 67, 110, 0.78);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.spark-particles {
+  position: absolute;
+  inset: 0;
+}
+
+.spark-particles span {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: radial-gradient(circle, #fff, rgba(255, 255, 255, 0.1) 70%);
+  animation-name: sparkDrift;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+  opacity: 0;
+}
+
+.spark-stage.is-export * {
+  transition: none !important;
+}
+
+.spark-stage.is-export .spark-film-grain,
+.spark-stage.is-export .spark-blob,
+.spark-stage.is-export .spark-puzzle-icon,
+.spark-stage.is-export .spark-grid-cell,
+.spark-stage.is-export .spark-particles span,
+.spark-stage.is-export .spark-underline span:nth-child(2),
+.spark-stage.is-export .spark-underline span:nth-child(3) {
+  animation: none !important;
+}
+
+.spark-stage.is-export .spark-particles span {
+  opacity: 0.55;
+}
+
+@keyframes sparkPopIn {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.82);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes sparkCellPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.76);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes sparkBlobMorph {
+  0% {
+    border-radius: 39% 61% 53% 47% / 47% 42% 58% 53%;
+    filter: blur(2px) saturate(1.1);
+  }
+  50% {
+    border-radius: 48% 52% 39% 61% / 51% 37% 63% 49%;
+    filter: blur(1.4px) saturate(1.3);
+  }
+  100% {
+    border-radius: 56% 44% 62% 38% / 34% 53% 47% 66%;
+    filter: blur(2.6px) saturate(1.25);
+  }
+}
+
+@keyframes sparkTwinkle {
+  0% {
+    transform: scale(0.72);
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(1.16);
+    opacity: 1;
+  }
+}
+
+@keyframes sparkDrift {
+  0% {
+    transform: translateY(10px) scale(0.4);
+    opacity: 0;
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-24px) scale(1.2);
+    opacity: 0;
+  }
+}
+
+@keyframes sparkGrainShift {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(6%, 7%);
+  }
+}
+
+@media (max-width: 560px) {
+  .spark-onboarding-page {
+    padding: 0;
+    background: #02040d;
+  }
+
+  .spark-stage {
+    width: 100vw;
+    height: 100vh;
+    aspect-ratio: auto;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spark-film-grain,
+  .spark-blob,
+  .spark-puzzle-icon,
+  .spark-grid-cell,
+  .spark-particles span,
+  .spark-underline span:nth-child(2),
+  .spark-underline span:nth-child(3) {
+    animation: none !important;
+  }
+}

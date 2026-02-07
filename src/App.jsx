@@ -16,6 +16,7 @@ import Home from './pages/Home'
 import About from './pages/About'
 import Privacy from './pages/Privacy'
 import DesktopRedirect from './pages/DesktopRedirect'
+import SparkOnboarding from './pages/SparkOnboarding'
 
 // Main Sections
 import GetThingsDone from './pages/GetThingsDone'
@@ -81,6 +82,7 @@ function App() {
         <Routes>
           {/* Desktop redirect page (no MainLayout) */}
           <Route path="/desktop" element={<DesktopRedirect />} />
+          <Route path="/spark-onboarding" element={<SparkOnboarding />} />
 
           {/* Admin routes (protected, separate layout) */}
           <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
