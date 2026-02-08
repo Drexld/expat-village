@@ -15,6 +15,7 @@ function MainLayout() {
   const [showUserMenu, setShowUserMenu] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const location = useLocation()
+  const isLoggedOutRoot = !isAuthenticated && location.pathname === '/'
 
   const isCoreScreen = (
     location.pathname === '/'
@@ -216,7 +217,7 @@ function MainLayout() {
       </main>
 
       {/* Bottom Navigation - Always visible (mobile-first layout) */}
-      <BottomNav />
+      {!isLoggedOutRoot && <BottomNav />}
 
       {/* ===== FOOTER ===== (Hidden - we use bottom nav for navigation) */}
       <footer className="hidden glass-panel border-t border-black/10">
