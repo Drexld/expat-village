@@ -8,6 +8,7 @@ const EASE = [0.22, 0.61, 0.36, 1]
 const SPRING = { stiffness: 120, damping: 20, mass: 0.9 }
 const STEP_TIME = TOTAL_DURATION / 5
 const _MOTION_COMPONENT_REFERENCE = motion.div
+const SWIPE_THRESHOLD = 56
 
 const SLIDES = [
   {
@@ -91,6 +92,7 @@ function ExpatOnboarding() {
   const [direction, setDirection] = useState(1)
   const [assetsReady, setAssetsReady] = useState(false)
   const indexRef = useRef(0)
+  const touchStartXRef = useRef(null)
 
   const exportMode = useMemo(() => {
     if (typeof window === 'undefined') return false
@@ -110,6 +112,12 @@ function ExpatOnboarding() {
     return cores <= 4 || memory <= 4
   }, [])
 
+  const isTouchDevice = useMemo(() => {
+    if (typeof window === 'undefined') return false
+    return navigator.maxTouchPoints > 0 || window.matchMedia('(pointer: coarse)').matches
+  }, [])
+
+  const performanceMode = reduceMotion || isLowPowerDevice || isTouchDevice
   const animateBackground = !reduceMotion && !isLowPowerDevice && assetsReady
 
   const goTo = (next) => {
@@ -211,7 +219,7 @@ function ExpatOnboarding() {
   }
 
   const dragEnd = (_, info) => {
-    if (reduceMotion) return
+    if (performanceMode) return
     if (info.offset.x < -85 || info.velocity.x < -550) {
       goTo(index + 1)
       return
@@ -223,7 +231,7 @@ function ExpatOnboarding() {
 
   const slideVariants = {
     enter: (dir) => ({
-      x: reduceMotion ? 0 : dir > 0 ? '45%' : '-45%',
+      x: performanceMode ? 0 : dir > 0 ? '45%' : '-45%',
       opacity: 0,
     }),
     center: {
@@ -231,18 +239,33 @@ function ExpatOnboarding() {
       opacity: 1,
     },
     exit: (dir) => ({
-      x: reduceMotion ? 0 : dir > 0 ? '-32%' : '32%',
+      x: performanceMode ? 0 : dir > 0 ? '-32%' : '32%',
       opacity: 0,
     }),
   }
 
   const wordVariants = {
-    hidden: { opacity: 0, y: reduceMotion ? 0 : 30 },
+    hidden: { opacity: 0, y: performanceMode ? 0 : 30 },
     show: {
       opacity: 1,
       y: 0,
-      transition: reduceMotion ? { duration: 0.12 } : { type: 'spring', ...SPRING },
+      transition: performanceMode ? { duration: 0.12 } : { type: 'spring', ...SPRING },
     },
+  }
+
+  const onTouchStart = (event) => {
+    touchStartXRef.current = event.changedTouches[0]?.clientX ?? null
+  }
+
+  const onTouchEnd = (event) => {
+    if (exportMode) return
+    const start = touchStartXRef.current
+    const end = event.changedTouches[0]?.clientX ?? null
+    if (start === null || end === null) return
+    const delta = end - start
+    if (Math.abs(delta) < SWIPE_THRESHOLD) return
+    if (delta < 0) goTo(indexRef.current + 1)
+    if (delta > 0) goTo(indexRef.current - 1)
   }
 
   return (
@@ -301,7 +324,7 @@ function ExpatOnboarding() {
         />
       </div>
 
-      <AnimatePresence mode="wait" custom={direction}>
+      <AnimatePresence mode="sync" custom={direction}>
         <motion.section
           key={slide.id}
           custom={direction}
@@ -309,22 +332,31 @@ function ExpatOnboarding() {
           initial="enter"
           animate="center"
           exit="exit"
-          transition={reduceMotion ? { duration: 0.12 } : { duration: 0.38, ease: EASE }}
-          drag={reduceMotion || isLowPowerDevice ? false : 'x'}
+          transition={performanceMode ? { duration: 0.12 } : { duration: 0.32, ease: EASE }}
+          drag={performanceMode ? false : 'x'}
           dragConstraints={{ left: 0, right: 0 }}
           dragElastic={0.04}
           onDragEnd={dragEnd}
-          className="relative z-10 h-screen w-full touch-pan-y"
-          style={{ willChange: 'transform, opacity' }}
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
+          className="relative z-10 h-screen w-full touch-pan-y select-none"
+          style={{ willChange: 'transform, opacity', touchAction: 'pan-y' }}
         >
           <motion.div
             className="absolute inset-0"
             style={{ willChange: 'transform, opacity' }}
-            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 1.03 }}
-            animate={reduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
-            transition={reduceMotion ? { duration: 0.12 } : { duration: 0.55, ease: EASE }}
+            initial={performanceMode ? { opacity: 0 } : { opacity: 0, scale: 1.03 }}
+            animate={performanceMode ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+            transition={performanceMode ? { duration: 0.12 } : { duration: 0.55, ease: EASE }}
           >
-            <img src={slide.image} alt={slide.heading} loading={index === 0 ? 'eager' : 'lazy'} className="h-full w-full object-cover" />
+            <img
+              src={slide.image}
+              alt={slide.heading}
+              loading={index === 0 ? 'eager' : 'lazy'}
+              decoding="async"
+              fetchPriority={index === 0 ? 'high' : 'auto'}
+              className="h-full w-full object-cover"
+            />
           </motion.div>
 
           <div className="absolute inset-0 bg-black/50" />
@@ -340,7 +372,7 @@ function ExpatOnboarding() {
                 variants={{
                   hidden: {},
                   show: {
-                    transition: reduceMotion ? { staggerChildren: 0.01 } : { staggerChildren: 0.09, delayChildren: 0.06 },
+                    transition: performanceMode ? { staggerChildren: 0.01 } : { staggerChildren: 0.09, delayChildren: 0.06 },
                   },
                 }}
                 className="space-y-4 text-center"
@@ -349,11 +381,13 @@ function ExpatOnboarding() {
                   Expat Village
                 </motion.p>
                 <motion.h1 className="font-display text-5xl leading-[0.95] sm:text-6xl">
-                  {splitWords(slide.heading).map((word, i) => (
-                    <motion.span key={`${word}-${i}`} variants={wordVariants} className="mr-2 inline-block">
-                      {word}
-                    </motion.span>
-                  ))}
+                  {performanceMode
+                    ? slide.heading
+                    : splitWords(slide.heading).map((word, i) => (
+                        <motion.span key={`${word}-${i}`} variants={wordVariants} className="mr-2 inline-block">
+                          {word}
+                        </motion.span>
+                      ))}
                 </motion.h1>
                 <motion.p variants={wordVariants} className="text-3xl font-semibold leading-tight sm:text-4xl">
                   {slide.subheading}
@@ -380,7 +414,7 @@ function ExpatOnboarding() {
                 variants={{
                   hidden: {},
                   show: {
-                    transition: reduceMotion ? { staggerChildren: 0.01 } : { staggerChildren: 0.1, delayChildren: 0.05 },
+                    transition: performanceMode ? { staggerChildren: 0.01 } : { staggerChildren: 0.1, delayChildren: 0.05 },
                   },
                 }}
                 className="space-y-4"
@@ -389,11 +423,13 @@ function ExpatOnboarding() {
                   The Promise
                 </motion.p>
                 <motion.h2 className="font-display text-4xl leading-tight sm:text-5xl">
-                  {splitWords(slide.heading).map((word, i) => (
-                    <motion.span key={`${word}-${i}`} variants={wordVariants} className="mr-2 inline-block">
-                      {word}
-                    </motion.span>
-                  ))}
+                  {performanceMode
+                    ? slide.heading
+                    : splitWords(slide.heading).map((word, i) => (
+                        <motion.span key={`${word}-${i}`} variants={wordVariants} className="mr-2 inline-block">
+                          {word}
+                        </motion.span>
+                      ))}
                 </motion.h2>
                 <motion.p variants={wordVariants} className="max-w-md text-base leading-relaxed text-white/90 sm:text-lg">
                   {slide.body}
@@ -409,7 +445,7 @@ function ExpatOnboarding() {
                   variants={{
                     hidden: {},
                     show: {
-                      transition: reduceMotion ? { staggerChildren: 0.01 } : { staggerChildren: 0.08, delayChildren: 0.04 },
+                      transition: performanceMode ? { staggerChildren: 0.01 } : { staggerChildren: 0.08, delayChildren: 0.04 },
                     },
                   }}
                   className="space-y-3"
@@ -418,11 +454,13 @@ function ExpatOnboarding() {
                     The Path
                   </motion.p>
                   <motion.h2 className="font-display text-4xl leading-tight sm:text-5xl">
-                    {splitWords(slide.heading).map((word, i) => (
-                      <motion.span key={`${word}-${i}`} variants={wordVariants} className="mr-2 inline-block">
-                        {word}
-                      </motion.span>
-                    ))}
+                    {performanceMode
+                      ? slide.heading
+                      : splitWords(slide.heading).map((word, i) => (
+                          <motion.span key={`${word}-${i}`} variants={wordVariants} className="mr-2 inline-block">
+                            {word}
+                          </motion.span>
+                        ))}
                   </motion.h2>
                   <motion.p variants={wordVariants} className="text-base text-white/90 sm:text-lg">
                     {slide.body}
@@ -435,7 +473,7 @@ function ExpatOnboarding() {
                   variants={{
                     hidden: {},
                     show: {
-                      transition: reduceMotion ? { staggerChildren: 0.01 } : { staggerChildren: 0.12, delayChildren: 0.06 },
+                      transition: performanceMode ? { staggerChildren: 0.01 } : { staggerChildren: 0.1, delayChildren: 0.04 },
                     },
                   }}
                   className="grid grid-cols-1 gap-3 sm:grid-cols-2"
@@ -444,11 +482,11 @@ function ExpatOnboarding() {
                     <motion.article
                       key={card.title}
                       variants={{
-                        hidden: { y: reduceMotion ? 0 : 96, opacity: 0 },
+                        hidden: { y: performanceMode ? 0 : 96, opacity: 0 },
                         show: {
                           y: 0,
                           opacity: 1,
-                          transition: reduceMotion ? { duration: 0.1 } : { duration: 0.34, ease: EASE },
+                          transition: performanceMode ? { duration: 0.1 } : { duration: 0.3, ease: EASE },
                         },
                       }}
                       className="rounded-2xl border border-white/20 bg-black/45 p-4"
@@ -473,7 +511,7 @@ function ExpatOnboarding() {
                 variants={{
                   hidden: {},
                   show: {
-                    transition: reduceMotion ? { staggerChildren: 0.01 } : { staggerChildren: 0.1, delayChildren: 0.05 },
+                    transition: performanceMode ? { staggerChildren: 0.01 } : { staggerChildren: 0.1, delayChildren: 0.05 },
                   },
                 }}
                 className="space-y-4"
@@ -482,27 +520,29 @@ function ExpatOnboarding() {
                   The Village
                 </motion.p>
                 <motion.h2 className="font-display text-4xl leading-tight sm:text-5xl">
-                  {splitWords(slide.heading).map((word, i) => (
-                    <motion.span key={`${word}-${i}`} variants={wordVariants} className="mr-2 inline-block">
-                      {word}
-                    </motion.span>
-                  ))}
+                  {performanceMode
+                    ? slide.heading
+                    : splitWords(slide.heading).map((word, i) => (
+                        <motion.span key={`${word}-${i}`} variants={wordVariants} className="mr-2 inline-block">
+                          {word}
+                        </motion.span>
+                      ))}
                 </motion.h2>
                 <motion.p variants={wordVariants} className="max-w-md text-base leading-relaxed text-white/90 sm:text-lg">
                   {slide.body}
                 </motion.p>
                 <motion.div
                   variants={{
-                    hidden: { y: reduceMotion ? 0 : 100, opacity: 0 },
+                    hidden: { y: performanceMode ? 0 : 100, opacity: 0 },
                     show: {
                       y: 0,
                       opacity: 1,
-                      transition: reduceMotion ? { duration: 0.1 } : { type: 'spring', stiffness: 115, damping: 19 },
+                      transition: performanceMode ? { duration: 0.1 } : { duration: 0.3, ease: EASE },
                     },
                   }}
                   className="relative h-44 overflow-hidden rounded-2xl border border-white/20 bg-black/35"
                 >
-                  <img src={slide.emotionImage} alt="New beginnings and achievement" className="h-full w-full object-cover" />
+                  <img src={slide.emotionImage} alt="New beginnings and achievement" loading="lazy" decoding="async" className="h-full w-full object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/52 to-transparent" />
                 </motion.div>
               </motion.div>
@@ -515,7 +555,7 @@ function ExpatOnboarding() {
                 variants={{
                   hidden: {},
                   show: {
-                    transition: reduceMotion ? { staggerChildren: 0.01 } : { staggerChildren: 0.1, delayChildren: 0.05 },
+                    transition: performanceMode ? { staggerChildren: 0.01 } : { staggerChildren: 0.1, delayChildren: 0.05 },
                   },
                 }}
                 className="space-y-5 text-center"
@@ -524,11 +564,13 @@ function ExpatOnboarding() {
                   Final Step
                 </motion.p>
                 <motion.h2 className="font-display text-4xl leading-tight sm:text-5xl">
-                  {splitWords(slide.heading).map((word, i) => (
-                    <motion.span key={`${word}-${i}`} variants={wordVariants} className="mr-2 inline-block">
-                      {word}
-                    </motion.span>
-                  ))}
+                  {performanceMode
+                    ? slide.heading
+                    : splitWords(slide.heading).map((word, i) => (
+                        <motion.span key={`${word}-${i}`} variants={wordVariants} className="mr-2 inline-block">
+                          {word}
+                        </motion.span>
+                      ))}
                 </motion.h2>
                 <motion.div variants={wordVariants} className="mx-auto flex max-w-sm flex-col gap-3">
                   <motion.div whileTap={{ scale: 0.95 }}>
@@ -550,7 +592,7 @@ function ExpatOnboarding() {
                         scale: dotIndex === index ? 1.3 : 1,
                         backgroundColor: dotIndex === index ? '#003A8C' : 'rgba(255,255,255,0.55)',
                       }}
-                      transition={reduceMotion ? { duration: 0.1 } : { duration: 0.26, ease: EASE }}
+                      transition={performanceMode ? { duration: 0.1 } : { duration: 0.2, ease: EASE }}
                     />
                   </button>
                 ))}
