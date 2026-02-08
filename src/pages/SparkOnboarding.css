@@ -1,0 +1,513 @@
+/* ── Spark-style Onboarding for Expat Village ── */
+
+.spark-onboarding {
+  position: fixed;
+  inset: 0;
+  background: #FDFBF8;
+  color: #2C1810;
+  font-family: 'Space Grotesk', sans-serif;
+  overflow: hidden;
+  z-index: 9999;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Blobs ── */
+.spark-blob {
+  position: absolute;
+  border-radius: 50% 40% 60% 45% / 50% 55% 40% 50%;
+  will-change: transform;
+  z-index: 0;
+}
+
+/* ── Splash ── */
+.spark-splash {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.spark-splash-title {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(2.8rem, 9vw, 4.5rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  text-align: center;
+  z-index: 2;
+}
+
+.spark-splash-subtitle {
+  font-size: clamp(0.95rem, 2.5vw, 1.15rem);
+  color: #6A4A42;
+  margin-top: 12px;
+  z-index: 2;
+  font-weight: 400;
+}
+
+/* ── Screens (value props, survey, reveal) ── */
+.spark-screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.spark-skip {
+  position: absolute;
+  top: max(env(safe-area-inset-top, 12px), 12px);
+  right: 20px;
+  z-index: 10;
+  background: none;
+  border: none;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #4D302A;
+  cursor: pointer;
+  padding: 8px 4px;
+}
+
+.spark-screen-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px 0;
+  overflow: hidden;
+}
+
+.spark-screen-text {
+  text-align: center;
+  padding: 0 8px;
+  flex-shrink: 0;
+}
+
+.spark-screen-text h2 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(1.55rem, 5.5vw, 2rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: #2C1810;
+  margin: 0;
+}
+
+.spark-screen-text p {
+  font-size: clamp(0.88rem, 2.4vw, 1rem);
+  color: #6A4A42;
+  margin: 8px 0 0;
+  line-height: 1.5;
+}
+
+.spark-screen-footer {
+  flex-shrink: 0;
+  padding: 16px 24px max(env(safe-area-inset-bottom, 20px), 20px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+/* ── Pagination dots ── */
+.spark-dots {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.spark-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #D9CFC6;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.spark-dot.active {
+  background: #3B9EE0;
+  transform: scale(1.15);
+}
+
+/* ── CTA button ── */
+.spark-cta {
+  width: 100%;
+  max-width: 380px;
+  height: 54px;
+  border-radius: 16px;
+  border: none;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.spark-cta:active {
+  transform: scale(0.98);
+}
+
+.spark-cta-primary {
+  background: #3B9EE0;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(59, 158, 224, 0.3);
+}
+
+.spark-cta-primary:hover {
+  box-shadow: 0 6px 24px rgba(59, 158, 224, 0.4);
+}
+
+.spark-cta-disabled {
+  background: #D9CFC6;
+  color: #A89A8F;
+  cursor: default;
+  box-shadow: none;
+}
+
+/* ── Image Grid (Value 1) ── */
+.spark-image-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  width: 100%;
+  max-width: 340px;
+  margin-bottom: 24px;
+}
+
+.spark-grid-card {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  aspect-ratio: 0.82;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.spark-grid-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.spark-grid-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 6px 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #fff;
+  line-height: 1.2;
+}
+
+/* Card label colors */
+.spark-grid-card:nth-child(1) .spark-grid-label { background: #C76B55; }
+.spark-grid-card:nth-child(2) .spark-grid-label { background: #E8836B; }
+.spark-grid-card:nth-child(3) .spark-grid-label { background: #75997C; }
+.spark-grid-card:nth-child(4) .spark-grid-label { background: #7CC5D6; }
+.spark-grid-card:nth-child(5) .spark-grid-label { background: #C76B55; }
+.spark-grid-card:nth-child(6) .spark-grid-label { background: #B88A5E; }
+.spark-grid-card:nth-child(7) .spark-grid-label { background: #75997C; }
+.spark-grid-card:nth-child(8) .spark-grid-label { background: #A07CC5; }
+.spark-grid-card:nth-child(9) .spark-grid-label { background: #E8836B; }
+
+/* ── Phone Fan (Value 2) ── */
+.spark-phone-fan {
+  position: relative;
+  width: 280px;
+  height: 320px;
+  margin-bottom: 20px;
+}
+
+.spark-phone-card {
+  position: absolute;
+  width: 180px;
+  height: 280px;
+  border-radius: 20px;
+  border: 2px solid #E6D3C2;
+  background: #FDFBF8;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(77, 48, 42, 0.12);
+  top: 50%;
+  left: 50%;
+}
+
+.spark-phone-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.spark-phone-card-inner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  gap: 6px;
+}
+
+.spark-mini-card {
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* ── Featured card (Value 3) ── */
+.spark-featured {
+  position: relative;
+  width: 220px;
+  height: 200px;
+  margin-bottom: 16px;
+}
+
+.spark-featured-image {
+  width: 160px;
+  height: 160px;
+  border-radius: 16px;
+  overflow: hidden;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-3deg);
+  box-shadow: 0 12px 32px rgba(77, 48, 42, 0.18);
+  z-index: 1;
+}
+
+.spark-featured-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.spark-featured-badge {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  z-index: 2;
+  border: 2px solid #FDFBF8;
+}
+
+/* ── Survey ── */
+.spark-survey {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.spark-survey-title {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(1.6rem, 5.5vw, 2rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #2C1810;
+  text-align: left;
+  padding: 0 24px;
+  margin: 0;
+}
+
+.spark-survey-list {
+  flex: 1;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.spark-survey-option {
+  width: 100%;
+  padding: 16px 18px;
+  border: none;
+  border-bottom: 1px solid #F0EBE4;
+  background: transparent;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1rem;
+  color: #2C1810;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.spark-survey-option:first-child {
+  border-top: 1px solid #F0EBE4;
+}
+
+.spark-survey-option:hover {
+  background: #F6F1EA;
+}
+
+.spark-survey-option.selected {
+  background: #EDE5DB;
+  font-weight: 600;
+}
+
+/* ── City Reveal ── */
+.spark-reveal {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+}
+
+.spark-reveal-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px 0;
+  text-align: center;
+}
+
+.spark-reveal-overline {
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #6A4A42;
+  margin-bottom: 4px;
+}
+
+.spark-reveal-title {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(2rem, 7vw, 2.8rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: #2C1810;
+  margin: 0;
+}
+
+.spark-reveal-subtitle {
+  font-size: clamp(0.88rem, 2.4vw, 1rem);
+  color: #6A4A42;
+  margin: 10px 0 0;
+  line-height: 1.5;
+  max-width: 320px;
+}
+
+.spark-reveal-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  width: 100%;
+  max-width: 420px;
+  margin-top: 24px;
+}
+
+.spark-reveal-grid-item {
+  border-radius: 10px;
+  overflow: hidden;
+  aspect-ratio: 1;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.spark-reveal-grid-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.spark-reveal-footer {
+  flex-shrink: 0;
+  padding: 16px 24px max(env(safe-area-inset-bottom, 24px), 24px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.spark-reveal-author {
+  font-size: 0.88rem;
+  color: #6A4A42;
+  font-weight: 500;
+}
+
+.spark-reveal-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 380px;
+}
+
+.spark-invite-btn {
+  flex: 1;
+  height: 48px;
+  border-radius: 999px;
+  border: 1.5px solid #D9CFC6;
+  background: transparent;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: #4D302A;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.15s ease;
+}
+
+.spark-invite-btn:hover {
+  background: #F6F1EA;
+}
+
+.spark-go-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  border: none;
+  background: #F0EBE4;
+  color: #4D302A;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  transition: background 0.15s ease, transform 0.15s ease;
+  flex-shrink: 0;
+}
+
+.spark-go-btn:hover {
+  background: #E6D3C2;
+  transform: scale(1.05);
+}
+
+/* ── Sparkle decorations ── */
+.spark-sparkle {
+  position: absolute;
+  font-size: 0.7rem;
+  color: #A89A8F;
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .spark-blob,
+  .spark-onboarding * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

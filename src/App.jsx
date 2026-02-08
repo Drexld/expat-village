@@ -18,6 +18,7 @@ import About from './pages/About'
 import Privacy from './pages/Privacy'
 import DesktopRedirect from './pages/DesktopRedirect'
 import ExpatOnboarding from './pages/ExpatOnboarding'
+import SparkOnboarding from './pages/SparkOnboarding'
 
 // Main Sections
 import GetThingsDone from './pages/GetThingsDone'
@@ -76,7 +77,8 @@ function DeviceCheck({ children }) {
 }
 
 function HomeEntry() {
-  const { loading, isAuthenticated } = useAuth()
+  const { loading, isAuthenticated, openAuthModal } = useAuth()
+  const hasOnboarded = localStorage.getItem('expat-village-onboarded') === 'true'
 
   if (loading) {
     return (
@@ -86,8 +88,14 @@ function HomeEntry() {
     )
   }
 
-  if (!isAuthenticated) {
+  // Not authenticated and hasn't completed onboarding → show onboarding
+  if (!isAuthenticated && !hasOnboarded) {
     return <Navigate to="/expat-onboarding" replace />
+  }
+
+  // Completed onboarding but not signed in → show Home with auth modal
+  if (!isAuthenticated && hasOnboarded) {
+    return <Home />
   }
 
   return <Home />
@@ -101,8 +109,8 @@ function App() {
         <Routes>
           {/* Desktop redirect page (no MainLayout) */}
           <Route path="/desktop" element={<DesktopRedirect />} />
-          <Route path="/expat-onboarding" element={<ExpatOnboarding />} />
-          <Route path="/spark-onboarding" element={<Navigate to="/expat-onboarding" replace />} />
+          <Route path="/expat-onboarding" element={<SparkOnboarding />} />
+          <Route path="/expat-onboarding-classic" element={<ExpatOnboarding />} />
           <Route path="/explore" element={<Navigate to="/live-your-life" replace />} />
 
           {/* Admin routes (protected, separate layout) */}
