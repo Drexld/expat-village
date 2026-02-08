@@ -149,7 +149,7 @@ function ExpatOnboarding() {
   const [index, setIndex] = useState(0)
   const indexRef = useRef(0)
   const loadedSourcesRef = useRef(new Set())
-  const swipeRef = useRef({ source: null, startX: null })
+  const swipeRef = useRef({ source: null, startX: null, startY: null })
 
   const exportMode = useMemo(() => {
     if (typeof window === 'undefined') return false
@@ -291,7 +291,8 @@ function ExpatOnboarding() {
     ))
   }
 
-  const applySwipeDelta = (deltaX) => {
+  const applySwipeDelta = (deltaX, deltaY = 0) => {
+    if (Math.abs(deltaY) > Math.abs(deltaX)) return
     if (Math.abs(deltaX) < SWIPE_THRESHOLD) return
     if (deltaX < 0) goTo(indexRef.current + 1)
     if (deltaX > 0) goTo(indexRef.current - 1)
@@ -299,25 +300,32 @@ function ExpatOnboarding() {
 
   const onPointerDown = (event) => {
     if (event.pointerType !== 'touch') return
-    swipeRef.current = { source: 'pointer', startX: event.clientX }
+    swipeRef.current = { source: 'pointer', startX: event.clientX, startY: event.clientY }
   }
 
   const onPointerUp = (event) => {
     if (event.pointerType !== 'touch') return
-    if (swipeRef.current.source !== 'pointer' || swipeRef.current.startX === null) return
-    applySwipeDelta(event.clientX - swipeRef.current.startX)
-    swipeRef.current = { source: null, startX: null }
+    if (swipeRef.current.source !== 'pointer' || swipeRef.current.startX === null || swipeRef.current.startY === null) return
+    applySwipeDelta(event.clientX - swipeRef.current.startX, event.clientY - swipeRef.current.startY)
+    swipeRef.current = { source: null, startX: null, startY: null }
   }
 
   const onTouchStart = (event) => {
     if (swipeRef.current.source === 'pointer') return
-    swipeRef.current = { source: 'touch', startX: event.changedTouches[0]?.clientX ?? null }
+    swipeRef.current = {
+      source: 'touch',
+      startX: event.changedTouches[0]?.clientX ?? null,
+      startY: event.changedTouches[0]?.clientY ?? null,
+    }
   }
 
   const onTouchEnd = (event) => {
-    if (swipeRef.current.source !== 'touch' || swipeRef.current.startX === null) return
-    applySwipeDelta((event.changedTouches[0]?.clientX ?? 0) - swipeRef.current.startX)
-    swipeRef.current = { source: null, startX: null }
+    if (swipeRef.current.source !== 'touch' || swipeRef.current.startX === null || swipeRef.current.startY === null) return
+    applySwipeDelta(
+      (event.changedTouches[0]?.clientX ?? 0) - swipeRef.current.startX,
+      (event.changedTouches[0]?.clientY ?? 0) - swipeRef.current.startY
+    )
+    swipeRef.current = { source: null, startX: null, startY: null }
   }
 
   const baseRevealTransition = performanceMode
@@ -326,12 +334,16 @@ function ExpatOnboarding() {
 
   return (
     <main
-      className="relative h-screen w-full overflow-hidden bg-[#070b14] text-white"
+      className="relative h-screen h-[100dvh] min-h-[100svh] w-full overflow-hidden bg-[#070b14] text-white [--controls-h:120px] sm:[--controls-h:108px]"
       onPointerDown={onPointerDown}
       onPointerUp={onPointerUp}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
-      style={{ touchAction: 'pan-y' }}
+      style={{
+        touchAction: 'pan-y',
+        '--safe-top': 'env(safe-area-inset-top, 0px)',
+        '--safe-bottom': 'env(safe-area-inset-bottom, 0px)',
+      }}
     >
       <div className="pointer-events-none absolute inset-0">
         <motion.div
@@ -356,10 +368,11 @@ function ExpatOnboarding() {
           className="flex h-full"
           style={{ width: `${SLIDES.length * 100}%`, willChange: 'transform' }}
           animate={{ x: `-${index * slideWidth}%` }}
-          transition={performanceMode ? { duration: 0.14 } : { duration: 0.32, ease: EASE }}
+          transition={performanceMode ? { duration: 0.1 } : { duration: 0.32, ease: EASE }}
         >
           {SLIDES.map((slide, slideIndex) => {
             const isActive = slideIndex === index
+            const isCenterSlide = slide.id === 'arrival' || slide.id === 'final'
 
             return (
               <section key={slide.id} className="relative h-full flex-none" style={{ width: `${slideWidth}%` }} aria-hidden={!isActive}>
@@ -375,20 +388,27 @@ function ExpatOnboarding() {
                 <div className="absolute inset-0 bg-black/52" />
                 <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/45 to-black/74" />
 
-                <div className="relative mx-auto flex h-full w-full max-w-md flex-col justify-center px-5 pb-32 pt-10 sm:max-w-lg sm:px-7">
-                  {isActive && (
-                    <motion.div
-                      key={`${slide.id}-${index}`}
-                      initial="hidden"
-                      animate="show"
-                      variants={{
-                        hidden: {},
-                        show: {
-                          transition: performanceMode ? { staggerChildren: 0.01 } : { staggerChildren: 0.08, delayChildren: 0.04 },
-                        },
-                      }}
-                      className={slide.id === 'arrival' || slide.id === 'final' ? 'space-y-5 text-center' : 'space-y-4'}
-                    >
+                <div
+                  className="relative mx-auto flex h-full w-full max-w-md flex-col justify-start px-5 sm:max-w-lg sm:px-7"
+                  style={{
+                    paddingTop: 'calc(var(--safe-top) + 16px)',
+                    paddingBottom: 'calc(var(--safe-bottom) + var(--controls-h) + 16px)',
+                  }}
+                >
+                  <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
+                    {isActive && (
+                      <motion.div
+                        key={`${slide.id}-${index}`}
+                        initial="hidden"
+                        animate="show"
+                        variants={{
+                          hidden: {},
+                          show: {
+                            transition: performanceMode ? { staggerChildren: 0.01 } : { staggerChildren: 0.08, delayChildren: 0.04 },
+                          },
+                        }}
+                        className={isCenterSlide ? 'min-h-full space-y-5 text-center flex flex-col justify-center' : 'space-y-4 pt-2'}
+                      >
                       {slide.id === 'arrival' && (
                         <>
                           <motion.p variants={wordVariants} className="text-xs uppercase tracking-[0.26em] text-[#F4A261]">
@@ -435,7 +455,10 @@ function ExpatOnboarding() {
                             {slide.body}
                           </motion.p>
 
-                          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                          <div
+                            className="grid grid-cols-1 gap-3 max-h-[48dvh] overflow-y-auto overscroll-contain pr-1 sm:max-h-none sm:grid-cols-2 sm:overflow-visible sm:pr-0"
+                            style={{ WebkitOverflowScrolling: 'touch' }}
+                          >
                             {slide.steps.map((card) => (
                               <motion.article
                                 key={card.title}
@@ -506,8 +529,9 @@ function ExpatOnboarding() {
                           </motion.div>
                         </>
                       )}
-                    </motion.div>
-                  )}
+                      </motion.div>
+                    )}
+                  </div>
                 </div>
               </section>
             )
@@ -515,7 +539,10 @@ function ExpatOnboarding() {
         </motion.div>
       </div>
 
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 pb-6">
+      <div
+        className="pointer-events-none absolute inset-x-0 z-20"
+        style={{ bottom: 'calc(var(--safe-bottom) + 8px)' }}
+      >
         <div className="pointer-events-auto mx-auto w-full max-w-md px-5 sm:max-w-lg sm:px-7">
           <div className="rounded-2xl border border-white/20 bg-black/45 p-4">
             <div className="flex items-center justify-center gap-2">
