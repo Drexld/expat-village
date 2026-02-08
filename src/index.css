@@ -102,10 +102,6 @@
   pointer-events: none;
 }
 
-.prism-backdrop > * {
-  z-index: 1;
-}
-
 * {
   box-sizing: border-box;
 }
