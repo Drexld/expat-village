@@ -89,6 +89,7 @@ function ExpatOnboarding() {
   const reduceMotion = Boolean(useReducedMotion())
   const [index, setIndex] = useState(0)
   const [direction, setDirection] = useState(1)
+  const [assetsReady, setAssetsReady] = useState(false)
   const indexRef = useRef(0)
 
   const exportMode = useMemo(() => {
@@ -109,7 +110,7 @@ function ExpatOnboarding() {
     return cores <= 4 || memory <= 4
   }, [])
 
-  const animateBackground = !reduceMotion && !isLowPowerDevice
+  const animateBackground = !reduceMotion && !isLowPowerDevice && assetsReady
 
   const goTo = (next) => {
     if (next < 0 || next > SLIDES.length - 1) return
@@ -123,7 +124,7 @@ function ExpatOnboarding() {
   }, [index])
 
   useEffect(() => {
-    if (exportMode || reduceMotion) return undefined
+    if (!assetsReady || exportMode || reduceMotion || isLowPowerDevice) return undefined
 
     const interval = window.setInterval(() => {
       const next = (indexRef.current + 1) % SLIDES.length
@@ -131,16 +132,44 @@ function ExpatOnboarding() {
     }, 4800)
 
     return () => window.clearInterval(interval)
-  }, [exportMode, reduceMotion])
+  }, [assetsReady, exportMode, reduceMotion, isLowPowerDevice])
 
   useEffect(() => {
-    // Preload slide images once to avoid transition stutter on first visit.
-    SLIDES.forEach((slide) => {
-      if (!slide.image) return
-      const img = new Image()
-      img.src = slide.image
-    })
-  }, [])
+    if (exportMode) {
+      setAssetsReady(true)
+      return
+    }
+
+    let cancelled = false
+    const urls = Array.from(
+      new Set(
+        SLIDES.flatMap((slide) => [slide.image, slide.emotionImage]).filter(Boolean)
+      )
+    )
+
+    const preload = async () => {
+      try {
+        await Promise.all(
+          urls.map(
+            (src) =>
+              new Promise((resolve) => {
+                const img = new Image()
+                img.src = src
+                img.onload = () => resolve()
+                img.onerror = () => resolve()
+              })
+          )
+        )
+      } finally {
+        if (!cancelled) setAssetsReady(true)
+      }
+    }
+
+    preload()
+    return () => {
+      cancelled = true
+    }
+  }, [exportMode])
 
   useEffect(() => {
     if (!exportMode || typeof window === 'undefined') return undefined
@@ -164,6 +193,22 @@ function ExpatOnboarding() {
   }, [exportMode, initialTime])
 
   const slide = SLIDES[index]
+
+  if (!assetsReady) {
+    return (
+      <main className="relative flex h-screen w-full items-center justify-center overflow-hidden bg-[#070b14] text-white">
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0a1428] via-[#070b14] to-[#05070c]" />
+          <div className="absolute left-[-18%] top-[-10%] h-96 w-96 rounded-[50%] bg-gradient-to-br from-[#1E40AF]/38 to-[#003A8C]/28" />
+          <div className="absolute bottom-[-18%] right-[-14%] h-96 w-96 rounded-[50%] bg-gradient-to-br from-[#F4A261]/30 to-[#E07A5F]/30" />
+        </div>
+        <div className="relative z-10 text-center">
+          <p className="text-xs uppercase tracking-[0.26em] text-[#F4A261]">Expat Village</p>
+          <p className="mt-2 text-2xl font-display sm:text-3xl">Loading cinematic experience...</p>
+        </div>
+      </main>
+    )
+  }
 
   const dragEnd = (_, info) => {
     if (reduceMotion) return
@@ -204,55 +249,55 @@ function ExpatOnboarding() {
     <main className="relative h-screen w-full overflow-hidden bg-[#070b14] text-white">
       <div className="pointer-events-none absolute inset-0">
         <motion.div
-          className="absolute left-[-16%] top-[-8%] h-72 w-72 rounded-[50%] bg-gradient-to-br from-[#003A8C]/80 to-[#1E40AF]/70 blur-2xl"
+          className="absolute left-[-18%] top-[-10%] h-96 w-96 rounded-[50%] bg-gradient-to-br from-[#003A8C]/38 to-[#1E40AF]/30"
           style={{ willChange: 'transform, opacity' }}
           animate={
             animateBackground
               ? {
-                  scale: [1, 1.09, 1.03, 1],
-                  x: [0, 8, -6, 0],
-                  y: [0, -7, 6, 0],
-                  opacity: [0.85, 0.95, 0.88, 0.92],
+                  scale: 1.08 - index * 0.008,
+                  x: index % 2 === 0 ? -8 : 8,
+                  y: index % 2 === 0 ? 6 : -6,
+                  opacity: 0.9,
                 }
               : reduceMotion
               ? { opacity: 0.95 }
               : { opacity: 0.9, scale: 1.02 }
           }
-          transition={animateBackground ? { duration: 14, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' } : undefined}
+          transition={animateBackground ? { duration: 0.7, ease: EASE } : undefined}
         />
         <motion.div
-          className="absolute right-[-18%] top-[18%] h-64 w-64 rounded-[50%] bg-gradient-to-br from-[#F4A261]/75 to-[#E07A5F]/70 blur-2xl"
+          className="absolute right-[-16%] top-[14%] h-80 w-80 rounded-[50%] bg-gradient-to-br from-[#F4A261]/30 to-[#E07A5F]/30"
           style={{ willChange: 'transform, opacity' }}
           animate={
             animateBackground
               ? {
-                  scale: [1, 1.1, 1.04, 1],
-                  x: [0, -8, 8, 0],
-                  y: [0, 7, -9, 0],
-                  opacity: [0.86, 0.95, 0.9, 0.92],
+                  scale: 1.06 + (index % 3) * 0.02,
+                  x: index % 2 === 0 ? 7 : -7,
+                  y: index % 2 === 0 ? -8 : 8,
+                  opacity: 0.9,
                 }
               : reduceMotion
               ? { opacity: 0.92 }
               : { opacity: 0.88, scale: 1.02 }
           }
-          transition={animateBackground ? { duration: 13, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut', delay: 1.1 } : undefined}
+          transition={animateBackground ? { duration: 0.72, ease: EASE } : undefined}
         />
         <motion.div
-          className="absolute bottom-[-16%] left-[12%] h-72 w-72 rounded-[50%] bg-gradient-to-br from-[#6B7280]/68 to-[#374151]/75 blur-2xl"
+          className="absolute bottom-[-18%] left-[8%] h-96 w-96 rounded-[50%] bg-gradient-to-br from-[#6B7280]/26 to-[#374151]/30"
           style={{ willChange: 'transform, opacity' }}
           animate={
             animateBackground
               ? {
-                  scale: [1, 1.08, 1.04, 1],
-                  x: [0, 9, -6, 0],
-                  y: [0, -7, 6, 0],
-                  opacity: [0.84, 0.92, 0.9, 0.91],
+                  scale: 1.05 + index * 0.006,
+                  x: index % 2 === 0 ? 8 : -8,
+                  y: index % 2 === 0 ? -5 : 5,
+                  opacity: 0.88,
                 }
               : reduceMotion
               ? { opacity: 0.9 }
               : { opacity: 0.86, scale: 1.02 }
           }
-          transition={animateBackground ? { duration: 15, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut', delay: 0.6 } : undefined}
+          transition={animateBackground ? { duration: 0.75, ease: EASE } : undefined}
         />
       </div>
 
@@ -264,10 +309,10 @@ function ExpatOnboarding() {
           initial="enter"
           animate="center"
           exit="exit"
-          transition={reduceMotion ? { duration: 0.12 } : { duration: 0.44, ease: EASE }}
-          drag={reduceMotion ? false : 'x'}
+          transition={reduceMotion ? { duration: 0.12 } : { duration: 0.38, ease: EASE }}
+          drag={reduceMotion || isLowPowerDevice ? false : 'x'}
           dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={0.08}
+          dragElastic={0.04}
           onDragEnd={dragEnd}
           className="relative z-10 h-screen w-full touch-pan-y"
           style={{ willChange: 'transform, opacity' }}
@@ -275,16 +320,11 @@ function ExpatOnboarding() {
           <motion.div
             className="absolute inset-0"
             style={{ willChange: 'transform, opacity' }}
-            animate={
-              animateBackground
-                ? { scale: [1.02, 1.04, 1.02] }
-                : reduceMotion
-                ? { scale: 1 }
-                : { scale: 1.01 }
-            }
-            transition={animateBackground ? { duration: 16, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' } : undefined}
+            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 1.03 }}
+            animate={reduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+            transition={reduceMotion ? { duration: 0.12 } : { duration: 0.55, ease: EASE }}
           >
-            <img src={slide.image} alt={slide.heading} className="h-full w-full object-cover" />
+            <img src={slide.image} alt={slide.heading} loading={index === 0 ? 'eager' : 'lazy'} className="h-full w-full object-cover" />
           </motion.div>
 
           <div className="absolute inset-0 bg-black/50" />
@@ -408,10 +448,10 @@ function ExpatOnboarding() {
                         show: {
                           y: 0,
                           opacity: 1,
-                          transition: reduceMotion ? { duration: 0.1 } : { type: 'spring', stiffness: 120, damping: 18 },
+                          transition: reduceMotion ? { duration: 0.1 } : { duration: 0.34, ease: EASE },
                         },
                       }}
-                      className="rounded-2xl border border-white/20 bg-black/35 p-4 backdrop-blur-md"
+                      className="rounded-2xl border border-white/20 bg-black/45 p-4"
                     >
                       <div className="flex items-center gap-2">
                         <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-white/20 bg-[#1E40AF]/60">
