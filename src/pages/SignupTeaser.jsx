@@ -6,7 +6,7 @@ import AuthModal from '../components/AuthModal'
 import Icon from '../components/Icon'
 
 function SignupTeaser() {
-  const { loading, isAuthenticated, openAuthModal } = useAuth()
+  const { loading, isAuthenticated, authModal, openAuthModal } = useAuth()
   const [weatherData, setWeatherData] = useState({ temp: 0 })
 
   useEffect(() => {
@@ -80,27 +80,29 @@ function SignupTeaser() {
         </header>
 
         <main className="pt-20 md:pt-24 min-h-[calc(100vh-5rem)] md:min-h-[calc(100vh-6rem)] flex items-center justify-center">
-          <section className="hero-card texture-layer texture-paper texture-amber text-center motion-rise glass-sheen w-full">
-            <p className="text-xs uppercase tracking-widest text-terra-taupe">The Digital Neighborhood</p>
-            <h1 className="text-3xl font-display text-terra-ink mt-2">
-              A concierge in your pocket.
-            </h1>
-            <p className="text-sm text-terra-ink-soft mt-3">
-              Warm, local guidance for expats settling in Warsaw and beyond.
-            </p>
-            <div className="mt-4 flex flex-wrap justify-center gap-2">
-              <span className="pill pill-accent">Warsaw - Live</span>
-              <span className="pill pill-accent">{weatherData.temp}C today</span>
-            </div>
-            <button
-              onClick={() => openAuthModal('sign_up')}
-              className="mt-5 inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-terra-bg hover-tilt"
-              style={{ background: 'linear-gradient(135deg, #C76B55, #D07C63)' }}
-            >
-              Join the village
-              <Icon name="arrowRight" className="w-4 h-4 text-terra-bg" />
-            </button>
-          </section>
+          {!authModal?.isOpen && (
+            <section className="hero-card texture-layer texture-paper texture-amber text-center motion-rise glass-sheen w-full">
+              <p className="text-xs uppercase tracking-widest text-terra-taupe">The Digital Neighborhood</p>
+              <h1 className="text-3xl font-display text-terra-ink mt-2">
+                A concierge in your pocket.
+              </h1>
+              <p className="text-sm text-terra-ink-soft mt-3">
+                Warm, local guidance for expats settling in Warsaw and beyond.
+              </p>
+              <div className="mt-4 flex flex-wrap justify-center gap-2">
+                <span className="pill pill-accent">Warsaw - Live</span>
+                <span className="pill pill-accent">{weatherData.temp}C today</span>
+              </div>
+              <button
+                onClick={() => openAuthModal('sign_up')}
+                className="mt-5 inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-terra-bg hover-tilt"
+                style={{ background: 'linear-gradient(135deg, #C76B55, #D07C63)' }}
+              >
+                Join the village
+                <Icon name="arrowRight" className="w-4 h-4 text-terra-bg" />
+              </button>
+            </section>
+          )}
         </main>
       </div>
     </div>
