@@ -1,95 +1,79 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { motion, useReducedMotion } from 'framer-motion'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import Icon from '../components/Icon'
-import './ExpatOnboarding.css'
 
 const TOTAL_DURATION = 14
-const CINEMATIC_EASE = [0.22, 0.61, 0.36, 1]
+const EASE = [0.22, 0.61, 0.36, 1]
+const SPRING = { stiffness: 120, damping: 20, mass: 0.9 }
+const STEP_TIME = TOTAL_DURATION / 5
+const _MOTION_COMPONENT_REFERENCE = motion.div
 
-const STAGES = [
+const SLIDES = [
   {
     id: 'arrival',
-    label: 'Arrival',
-    start: 0,
-    end: 3,
-    image: '/images/expat-onboarding/hero-bg.jpg',
-    title: 'Expat Village - Warsaw and Beyond',
-    subtitle: 'Your soft landing in Poland',
-    copy: "From paperwork to Polish sunsets - we've got you",
+    image: '/images/expat-onboarding/crowded-street.jpg',
+    heading: 'Expat Village - Warsaw & Beyond',
+    subheading: 'Your soft landing in Poland',
+    body: "From paperwork to Polish sunsets - we've got you",
+    cta: 'Begin Journey',
   },
   {
     id: 'promise',
-    label: 'Promise',
-    start: 3,
-    end: 6,
-    image: '/images/expat-onboarding/oldtown.jpg',
-    title: 'A calmer way to begin life in Warsaw',
-    copy: 'Relocation can feel intense. We turn uncertainty into clear next actions, trusted local context, and a community that truly understands this transition.',
+    image: '/images/expat-onboarding/couple-walking-back.jpg',
+    heading: 'A calmer way to begin life in Warsaw',
+    body: 'Relocation can feel intense. We turn uncertainty into clear next actions, trusted local context, and a community that truly understands.',
   },
   {
     id: 'path',
-    label: 'Path',
-    start: 6,
-    end: 9,
-    image: '/images/expat-onboarding/oldtown.jpg',
-    title: 'Handle the hard stuff, step by step',
-    copy: 'One practical path from arrival pressure to everyday confidence.',
+    image: '/images/expat-onboarding/modern-atrium-lights.jpg',
+    heading: 'Handle the hard stuff, step by step',
+    body: 'One practical path from arrival pressure to everyday confidence.',
+    steps: [
+      {
+        icon: 'checklist',
+        title: 'PESEL',
+        description: 'Prepare your documents and get your national ID number without office-day guesswork.',
+      },
+      {
+        icon: 'document',
+        title: 'Residency',
+        description: 'Navigate permits, timelines, and legal next steps with clear guidance.',
+      },
+      {
+        icon: 'building',
+        title: 'Banking',
+        description: 'Open the right account fast and avoid common newcomer mistakes.',
+      },
+      {
+        icon: 'health',
+        title: 'Healthcare',
+        description: 'Compare NFZ and private options so you can access care with confidence.',
+      },
+      {
+        icon: 'home',
+        title: 'Housing',
+        description: 'Find trusted neighborhoods and rental guidance before signing.',
+      },
+      {
+        icon: 'briefcase',
+        title: 'Jobs',
+        description: 'Understand CV norms, permit realities, and practical routes into Warsaw work life.',
+      },
+    ],
   },
   {
     id: 'village',
-    label: 'Village',
-    start: 9,
-    end: 12,
-    image: '/images/expat-onboarding/riverside.jpg',
-    title: 'Daily city pulse, curated for expats',
-    copy: 'Discover trusted recommendations, local events, real stories from people building a life here. Practical updates meet human warmth so your days feel connected.',
+    image: '/images/expat-onboarding/historic-cafe-arcade-flowers.jpg',
+    heading: 'Daily city pulse, curated for expats',
+    body: 'Discover trusted recommendations, local events, real stories from people building a life here. Practical updates meet human warmth so your days feel connected.',
+    emotionImage: '/images/expat-onboarding/woman-arms-raised-mountains.jpg',
   },
   {
     id: 'final',
-    label: 'Start',
-    start: 12,
-    end: 14,
-    title: 'Ready to make Warsaw feel like home?',
-  },
-]
-
-const STEP_CARDS = [
-  {
-    id: 'pesel',
-    icon: 'checklist',
-    title: 'PESEL',
-    description: 'Prepare your documents and get your national ID number without office-day guesswork.',
-  },
-  {
-    id: 'residency',
-    icon: 'document',
-    title: 'Residency',
-    description: 'Navigate permits, timelines, and legal next steps with clear guidance.',
-  },
-  {
-    id: 'banking',
-    icon: 'building',
-    title: 'Banking',
-    description: 'Open the right account fast and avoid common newcomer mistakes.',
-  },
-  {
-    id: 'healthcare',
-    icon: 'health',
-    title: 'Healthcare',
-    description: 'Compare NFZ and private options so you can access care with confidence.',
-  },
-  {
-    id: 'housing',
-    icon: 'home',
-    title: 'Housing',
-    description: 'Find trusted neighborhoods and rental guidance before signing.',
-  },
-  {
-    id: 'jobs',
-    icon: 'briefcase',
-    title: 'Jobs',
-    description: 'Understand CV norms, permit realities, and practical routes into Warsaw work life.',
+    image: '/images/expat-onboarding/crowded-street.jpg',
+    heading: 'Ready to make Warsaw feel like home?',
+    body: '',
   },
 ]
 
@@ -97,39 +81,20 @@ function clamp(value, min = 0, max = 1) {
   return Math.min(max, Math.max(min, value))
 }
 
-function smoothstep(edge0, edge1, value) {
-  const t = clamp((value - edge0) / (edge1 - edge0))
-  return t * t * (3 - 2 * t)
-}
-
-function mix(a, b, t) {
-  return a + (b - a) * clamp(t)
-}
-
-function fadeWindow(time, start, end, fadeIn = 0.36, fadeOut = 0.4) {
-  const enter = smoothstep(start - fadeIn, start + 0.01, time)
-  const leave = 1 - smoothstep(end - 0.01, end + fadeOut, time)
-  return clamp(Math.min(enter, leave))
-}
-
-function getActiveStageIndex(time) {
-  for (let idx = STAGES.length - 1; idx >= 0; idx -= 1) {
-    if (time >= STAGES[idx].start) return idx
-  }
-  return 0
+function splitWords(text) {
+  return text.split(' ').filter(Boolean)
 }
 
 function ExpatOnboarding() {
-  const shouldReduceMotion = Boolean(useReducedMotion())
+  const reduceMotion = Boolean(useReducedMotion())
+  const [index, setIndex] = useState(0)
+  const [direction, setDirection] = useState(1)
+  const indexRef = useRef(0)
+  const autoSeedRef = useRef(0)
 
   const exportMode = useMemo(() => {
     if (typeof window === 'undefined') return false
     return new URLSearchParams(window.location.search).get('export') === '1'
-  }, [])
-
-  const showControls = useMemo(() => {
-    if (typeof window === 'undefined') return false
-    return new URLSearchParams(window.location.search).get('controls') === '1'
   }, [])
 
   const initialTime = useMemo(() => {
@@ -138,49 +103,28 @@ function ExpatOnboarding() {
     return clamp(Number.isFinite(parsed) ? parsed : 0, 0, TOTAL_DURATION)
   }, [])
 
-  const timeRef = useRef(initialTime)
-  const [time, setTime] = useState(initialTime)
-  const [isPlaying, setIsPlaying] = useState(() => !exportMode)
-  const [playbackSeed, setPlaybackSeed] = useState(0)
-  const _MOTION_COMPONENT_REFERENCE = motion.div
-
-  const jumpToTime = useCallback(
-    (nextTime) => {
-      const clamped = clamp(nextTime, 0, TOTAL_DURATION)
-      timeRef.current = clamped
-      setTime(clamped)
-      if (!exportMode && isPlaying) {
-        setPlaybackSeed((prev) => prev + 1)
-      }
-    },
-    [exportMode, isPlaying]
-  )
-
-  const goToStage = useCallback(
-    (index) => {
-      const stage = STAGES[index]
-      if (!stage) return
-      jumpToTime(stage.start + 0.001)
-    },
-    [jumpToTime]
-  )
+  const goTo = (next) => {
+    if (next < 0 || next > SLIDES.length - 1) return
+    setDirection(next > indexRef.current ? 1 : -1)
+    indexRef.current = next
+    setIndex(next)
+  }
 
   useEffect(() => {
-    if (exportMode || !isPlaying) return undefined
+    indexRef.current = index
+  }, [index])
 
-    let rafId = 0
-    const start = performance.now() - timeRef.current * 1000
+  useEffect(() => {
+    if (exportMode || reduceMotion) return undefined
 
-    const tick = (now) => {
-      const elapsed = ((now - start) / 1000) % TOTAL_DURATION
-      timeRef.current = elapsed
-      setTime(elapsed)
-      rafId = window.requestAnimationFrame(tick)
-    }
+    const interval = window.setInterval(() => {
+      autoSeedRef.current += 1
+      const next = (indexRef.current + 1) % SLIDES.length
+      goTo(next)
+    }, 3600)
 
-    rafId = window.requestAnimationFrame(tick)
-    return () => window.cancelAnimationFrame(rafId)
-  }, [exportMode, isPlaying, playbackSeed])
+    return () => window.clearInterval(interval)
+  }, [exportMode, reduceMotion])
 
   useEffect(() => {
     if (!exportMode || typeof window === 'undefined') return undefined
@@ -188,7 +132,9 @@ function ExpatOnboarding() {
     const setExportTime = (value) => {
       const parsed = Number.parseFloat(value)
       if (!Number.isFinite(parsed)) return
-      jumpToTime(parsed)
+      const t = clamp(parsed, 0, TOTAL_DURATION)
+      const nextIndex = Math.min(SLIDES.length - 1, Math.floor(t / STEP_TIME))
+      goTo(nextIndex)
     }
 
     window.__setExpatOnboardingTime = setExportTime
@@ -199,217 +145,373 @@ function ExpatOnboarding() {
       delete window.__setExpatOnboardingTime
       delete window.__expatOnboardingDuration
     }
-  }, [exportMode, initialTime, jumpToTime])
+  }, [exportMode, initialTime])
 
-  const activeStageIndex = getActiveStageIndex(time)
-  const progressRatio = clamp(time / TOTAL_DURATION)
-  const stageState = STAGES.map((stage) => {
-    const duration = stage.end - stage.start
-    const progress = clamp((time - stage.start) / duration)
-    const opacity = fadeWindow(time, stage.start, stage.end)
-    return { progress, opacity }
-  })
+  const slide = SLIDES[index]
 
-  const arrival = stageState[0]
-  const promise = stageState[1]
-  const pathStage = stageState[2]
-  const village = stageState[3]
-  const final = stageState[4]
+  const dragEnd = (_, info) => {
+    if (reduceMotion) return
+    if (info.offset.x < -85 || info.velocity.x < -550) {
+      goTo(index + 1)
+      return
+    }
+    if (info.offset.x > 85 || info.velocity.x > 550) {
+      goTo(index - 1)
+    }
+  }
 
-  const ambientDrift = shouldReduceMotion ? 0 : Math.sin(time * 0.9) * 8
-  const heroScale = mix(1.05, 1, arrival.progress)
-  const heroY = shouldReduceMotion ? 0 : mix(-10, 18, arrival.progress) + ambientDrift
-  const promiseY = shouldReduceMotion ? 0 : mix(16, -12, promise.progress) + ambientDrift * 0.4
-  const villageY = shouldReduceMotion ? 0 : mix(16, -18, village.progress) - ambientDrift * 0.5
+  const slideVariants = {
+    enter: (dir) => ({
+      x: reduceMotion ? 0 : dir > 0 ? '45%' : '-45%',
+      opacity: 0,
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+    },
+    exit: (dir) => ({
+      x: reduceMotion ? 0 : dir > 0 ? '-32%' : '32%',
+      opacity: 0,
+    }),
+  }
 
-  const timeLabel = `${String(Math.floor(time)).padStart(2, '0')}:${String(Math.floor((time % 1) * 10)).padStart(1, '0')}`
+  const wordVariants = {
+    hidden: { opacity: 0, y: reduceMotion ? 0 : 30 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: reduceMotion ? { duration: 0.12 } : { type: 'spring', ...SPRING },
+    },
+  }
 
   return (
-    <main className={`expat-cinematic-player${exportMode ? ' is-export' : ''}`}>
-      <div className="expat-film-canvas">
+    <main className="relative h-screen w-full overflow-hidden bg-[#070b14] text-white">
+      <div className="pointer-events-none absolute inset-0">
+        <motion.div
+          className="absolute left-[-16%] top-[-8%] h-72 w-72 rounded-[50%] bg-gradient-to-br from-[#003A8C]/80 to-[#1E40AF]/70 blur-3xl"
+          animate={
+            reduceMotion
+              ? { opacity: 0.95 }
+              : {
+                  scale: [1, 1.12, 1.03, 1],
+                  x: [0, 12, -8, 0],
+                  y: [0, -10, 8, 0],
+                  opacity: [0.85, 1, 0.88, 0.95],
+                }
+          }
+          transition={reduceMotion ? undefined : { duration: 13, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
+        />
+        <motion.div
+          className="absolute right-[-18%] top-[18%] h-64 w-64 rounded-[50%] bg-gradient-to-br from-[#F4A261]/75 to-[#E07A5F]/70 blur-3xl"
+          animate={
+            reduceMotion
+              ? { opacity: 0.92 }
+              : {
+                  scale: [1, 1.15, 1.04, 1],
+                  x: [0, -10, 10, 0],
+                  y: [0, 8, -12, 0],
+                  opacity: [0.86, 1, 0.9, 0.94],
+                }
+          }
+          transition={reduceMotion ? undefined : { duration: 12, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut', delay: 1.1 }}
+        />
+        <motion.div
+          className="absolute bottom-[-16%] left-[12%] h-72 w-72 rounded-[50%] bg-gradient-to-br from-[#6B7280]/68 to-[#374151]/75 blur-3xl"
+          animate={
+            reduceMotion
+              ? { opacity: 0.9 }
+              : {
+                  scale: [1, 1.1, 1.05, 1],
+                  x: [0, 14, -8, 0],
+                  y: [0, -8, 8, 0],
+                  opacity: [0.84, 0.98, 0.9, 0.94],
+                }
+          }
+          transition={reduceMotion ? undefined : { duration: 14, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut', delay: 0.6 }}
+        />
+      </div>
+
+      <AnimatePresence mode="wait" custom={direction}>
         <motion.section
-          className="expat-scene-layer"
-          style={{ opacity: arrival.opacity, pointerEvents: arrival.opacity > 0.52 ? 'auto' : 'none' }}
-          transition={{ duration: shouldReduceMotion ? 0 : 0.55, ease: CINEMATIC_EASE }}
+          key={slide.id}
+          custom={direction}
+          variants={slideVariants}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={reduceMotion ? { duration: 0.12 } : { duration: 0.52, ease: EASE }}
+          drag={reduceMotion ? false : 'x'}
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.12}
+          onDragEnd={dragEnd}
+          className="relative z-10 h-screen w-full touch-pan-y"
         >
-          <motion.div className="expat-scene-media" style={{ transform: `translateY(${heroY}px) scale(${heroScale})` }}>
-            <img src={STAGES[0].image} alt="Palace of Culture and Science tower in Warsaw at dusk" loading="eager" className="expat-scene-image" />
-            <div className="expat-scene-overlay expat-scene-overlay-hero" />
-            <div className="expat-scene-vignette" />
-            <span className="expat-blob expat-blob-a" aria-hidden />
-            <span className="expat-blob expat-blob-b" aria-hidden />
+          <motion.div
+            className="absolute inset-0"
+            animate={reduceMotion ? { scale: 1 } : { scale: [1.03, 1.08, 1.04, 1.03] }}
+            transition={reduceMotion ? undefined : { duration: 13, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
+          >
+            <img src={slide.image} alt={slide.heading} className="h-full w-full object-cover" />
           </motion.div>
-          <div className="expat-scene-content expat-arrival-content">
-            <p className="expat-overline">Expat Village</p>
-            <h1>{STAGES[0].title}</h1>
-            <h2>{STAGES[0].subtitle}</h2>
-            <p className="expat-copy">{STAGES[0].copy}</p>
-            <Link to="/onboarding" className="expat-cta-primary" aria-label="Begin your onboarding journey">
-              Begin Your Journey
-              <span aria-hidden>{'->'}</span>
-            </Link>
-          </div>
-        </motion.section>
 
-        <motion.section
-          className="expat-scene-layer"
-          style={{ opacity: promise.opacity, pointerEvents: promise.opacity > 0.5 ? 'auto' : 'none' }}
-          transition={{ duration: shouldReduceMotion ? 0 : 0.5, ease: CINEMATIC_EASE }}
-        >
-          <div className="expat-scene-media" style={{ transform: `translateY(${promiseY}px)` }}>
-            <img src={STAGES[1].image} alt="Warm Old Town square evening lights in Warsaw" loading="lazy" className="expat-scene-image" />
-            <div className="expat-scene-overlay expat-scene-overlay-warm" />
-          </div>
-          <div className="expat-scene-content expat-panel-content">
-            <div className="expat-panel">
-              <p className="expat-overline">The Promise</p>
-              <h3>{STAGES[1].title}</h3>
-              <p className="expat-copy">{STAGES[1].copy}</p>
-            </div>
-          </div>
-        </motion.section>
+          <div className="absolute inset-0 bg-black/50" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/45 to-black/70" />
 
-        <motion.section
-          className="expat-scene-layer"
-          style={{ opacity: pathStage.opacity, pointerEvents: pathStage.opacity > 0.5 ? 'auto' : 'none' }}
-          transition={{ duration: shouldReduceMotion ? 0 : 0.5, ease: CINEMATIC_EASE }}
-        >
-          <div className="expat-scene-media">
-            <img src={STAGES[2].image} alt="Old Town details in Warsaw at dusk" loading="lazy" className="expat-scene-image" />
-            <div className="expat-scene-overlay expat-scene-overlay-path" />
-          </div>
-          <div className="expat-scene-content expat-path-content">
-            <div className="expat-path-header">
-              <p className="expat-overline">The Path</p>
-              <h3>{STAGES[2].title}</h3>
-              <p className="expat-copy">{STAGES[2].copy}</p>
-            </div>
-            <div className="expat-path-grid">
-              {STEP_CARDS.map((step, index) => {
-                const cardProgress = smoothstep(0.12 + index * 0.07, 0.45 + index * 0.07, pathStage.progress)
-                const opacity = pathStage.opacity * cardProgress
-                const y = mix(34, 0, cardProgress)
-                return (
-                  <article key={step.id} className="expat-step-card" style={{ opacity, transform: `translateY(${y}px)` }}>
-                    <div className="expat-step-head">
-                      <span className="expat-step-icon">
-                        <Icon name={step.icon} size={16} />
-                      </span>
-                      <span className="expat-step-title">{step.title}</span>
-                    </div>
-                    <p>{step.description}</p>
-                  </article>
-                )
-              })}
-            </div>
-          </div>
-        </motion.section>
+          <div className="relative mx-auto flex h-full w-full max-w-md flex-col justify-between px-5 pb-8 pt-10 sm:max-w-lg sm:px-7">
+            <div />
 
-        <motion.section
-          className="expat-scene-layer"
-          style={{ opacity: village.opacity, pointerEvents: village.opacity > 0.5 ? 'auto' : 'none' }}
-          transition={{ duration: shouldReduceMotion ? 0 : 0.5, ease: CINEMATIC_EASE }}
-        >
-          <div className="expat-scene-media" style={{ transform: `translateY(${villageY}px)` }}>
-            <img src={STAGES[3].image} alt="Vistula promenade and Warsaw skyline at golden hour" loading="lazy" className="expat-scene-image" />
-            <div className="expat-scene-overlay expat-scene-overlay-village" />
-          </div>
-          <div className="expat-scene-content expat-panel-content">
-            <div className="expat-panel">
-              <p className="expat-overline">The Village</p>
-              <h3>{STAGES[3].title}</h3>
-              <p className="expat-copy">{STAGES[3].copy}</p>
-            </div>
-          </div>
-        </motion.section>
+            {slide.id === 'arrival' && (
+              <motion.div
+                initial="hidden"
+                animate="show"
+                variants={{
+                  hidden: {},
+                  show: {
+                    transition: reduceMotion ? { staggerChildren: 0.01 } : { staggerChildren: 0.09, delayChildren: 0.06 },
+                  },
+                }}
+                className="space-y-4 text-center"
+              >
+                <motion.p variants={wordVariants} className="text-xs uppercase tracking-[0.26em] text-[#F4A261]">
+                  Expat Village
+                </motion.p>
+                <motion.h1 className="font-display text-5xl leading-[0.95] sm:text-6xl">
+                  {splitWords(slide.heading).map((word, i) => (
+                    <motion.span key={`${word}-${i}`} variants={wordVariants} className="mr-2 inline-block">
+                      {word}
+                    </motion.span>
+                  ))}
+                </motion.h1>
+                <motion.p variants={wordVariants} className="text-3xl font-semibold leading-tight sm:text-4xl">
+                  {slide.subheading}
+                </motion.p>
+                <motion.p variants={wordVariants} className="mx-auto max-w-sm text-base text-white/90 sm:text-lg">
+                  {slide.body}
+                </motion.p>
+                <motion.button
+                  type="button"
+                  onClick={() => goTo(1)}
+                  whileTap={{ scale: 0.95 }}
+                  whileHover={reduceMotion ? undefined : { y: -2, boxShadow: '0 16px 30px rgba(0,0,0,0.35)' }}
+                  className="mx-auto inline-flex h-12 items-center justify-center rounded-full border border-[#F4A261]/75 bg-[#003A8C]/85 px-7 font-semibold"
+                >
+                  {slide.cta}
+                </motion.button>
+              </motion.div>
+            )}
 
-        <motion.section
-          className="expat-scene-layer"
-          style={{ opacity: final.opacity, pointerEvents: final.opacity > 0.45 ? 'auto' : 'none' }}
-          transition={{ duration: shouldReduceMotion ? 0 : 0.45, ease: CINEMATIC_EASE }}
-        >
-          <div className="expat-scene-media expat-scene-media-final">
-            <div className="expat-scene-overlay expat-scene-overlay-final" />
-            <div className="expat-burst" style={{ transform: `scale(${mix(0.65, 1.08, final.progress)})` }} />
-          </div>
-          <div className="expat-scene-content expat-panel-content">
-            <div className="expat-panel expat-panel-final">
-              <p className="expat-overline">Final Step</p>
-              <h3>{STAGES[4].title}</h3>
-              <div className="expat-final-actions">
-                <Link to="/onboarding" className="expat-cta-primary" aria-label="Start onboarding">
-                  Start Onboarding
-                </Link>
-                <Link to="/explore" className="expat-cta-secondary" aria-label="Explore first">
-                  Explore First
-                </Link>
+            {slide.id === 'promise' && (
+              <motion.div
+                initial="hidden"
+                animate="show"
+                variants={{
+                  hidden: {},
+                  show: {
+                    transition: reduceMotion ? { staggerChildren: 0.01 } : { staggerChildren: 0.1, delayChildren: 0.05 },
+                  },
+                }}
+                className="space-y-4"
+              >
+                <motion.p variants={wordVariants} className="text-xs uppercase tracking-[0.26em] text-[#F4A261]">
+                  The Promise
+                </motion.p>
+                <motion.h2 className="font-display text-4xl leading-tight sm:text-5xl">
+                  {splitWords(slide.heading).map((word, i) => (
+                    <motion.span key={`${word}-${i}`} variants={wordVariants} className="mr-2 inline-block">
+                      {word}
+                    </motion.span>
+                  ))}
+                </motion.h2>
+                <motion.p variants={wordVariants} className="max-w-md text-base leading-relaxed text-white/90 sm:text-lg">
+                  {slide.body}
+                </motion.p>
+              </motion.div>
+            )}
+
+            {slide.id === 'path' && (
+              <div className="space-y-5">
+                <motion.div
+                  initial="hidden"
+                  animate="show"
+                  variants={{
+                    hidden: {},
+                    show: {
+                      transition: reduceMotion ? { staggerChildren: 0.01 } : { staggerChildren: 0.08, delayChildren: 0.04 },
+                    },
+                  }}
+                  className="space-y-3"
+                >
+                  <motion.p variants={wordVariants} className="text-xs uppercase tracking-[0.26em] text-[#F4A261]">
+                    The Path
+                  </motion.p>
+                  <motion.h2 className="font-display text-4xl leading-tight sm:text-5xl">
+                    {splitWords(slide.heading).map((word, i) => (
+                      <motion.span key={`${word}-${i}`} variants={wordVariants} className="mr-2 inline-block">
+                        {word}
+                      </motion.span>
+                    ))}
+                  </motion.h2>
+                  <motion.p variants={wordVariants} className="text-base text-white/90 sm:text-lg">
+                    {slide.body}
+                  </motion.p>
+                </motion.div>
+
+                <motion.div
+                  initial="hidden"
+                  animate="show"
+                  variants={{
+                    hidden: {},
+                    show: {
+                      transition: reduceMotion ? { staggerChildren: 0.01 } : { staggerChildren: 0.12, delayChildren: 0.06 },
+                    },
+                  }}
+                  className="grid grid-cols-1 gap-3 sm:grid-cols-2"
+                >
+                  {slide.steps.map((card) => (
+                    <motion.article
+                      key={card.title}
+                      variants={{
+                        hidden: { y: reduceMotion ? 0 : 96, opacity: 0 },
+                        show: {
+                          y: 0,
+                          opacity: 1,
+                          transition: reduceMotion ? { duration: 0.1 } : { type: 'spring', stiffness: 120, damping: 18 },
+                        },
+                      }}
+                      className="rounded-2xl border border-white/20 bg-black/35 p-4 backdrop-blur-md"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-white/20 bg-[#1E40AF]/60">
+                          <Icon name={card.icon} size={14} />
+                        </span>
+                        <p className="text-lg font-semibold">{card.title}</p>
+                      </div>
+                      <p className="mt-2 text-sm leading-relaxed text-white/90">{card.description}</p>
+                    </motion.article>
+                  ))}
+                </motion.div>
+              </div>
+            )}
+
+            {slide.id === 'village' && (
+              <motion.div
+                initial="hidden"
+                animate="show"
+                variants={{
+                  hidden: {},
+                  show: {
+                    transition: reduceMotion ? { staggerChildren: 0.01 } : { staggerChildren: 0.1, delayChildren: 0.05 },
+                  },
+                }}
+                className="space-y-4"
+              >
+                <motion.p variants={wordVariants} className="text-xs uppercase tracking-[0.26em] text-[#F4A261]">
+                  The Village
+                </motion.p>
+                <motion.h2 className="font-display text-4xl leading-tight sm:text-5xl">
+                  {splitWords(slide.heading).map((word, i) => (
+                    <motion.span key={`${word}-${i}`} variants={wordVariants} className="mr-2 inline-block">
+                      {word}
+                    </motion.span>
+                  ))}
+                </motion.h2>
+                <motion.p variants={wordVariants} className="max-w-md text-base leading-relaxed text-white/90 sm:text-lg">
+                  {slide.body}
+                </motion.p>
+                <motion.div
+                  variants={{
+                    hidden: { y: reduceMotion ? 0 : 100, opacity: 0 },
+                    show: {
+                      y: 0,
+                      opacity: 1,
+                      transition: reduceMotion ? { duration: 0.1 } : { type: 'spring', stiffness: 115, damping: 19 },
+                    },
+                  }}
+                  className="relative h-44 overflow-hidden rounded-2xl border border-white/20 bg-black/35"
+                >
+                  <img src={slide.emotionImage} alt="New beginnings and achievement" className="h-full w-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/52 to-transparent" />
+                </motion.div>
+              </motion.div>
+            )}
+
+            {slide.id === 'final' && (
+              <motion.div
+                initial="hidden"
+                animate="show"
+                variants={{
+                  hidden: {},
+                  show: {
+                    transition: reduceMotion ? { staggerChildren: 0.01 } : { staggerChildren: 0.1, delayChildren: 0.05 },
+                  },
+                }}
+                className="space-y-5 text-center"
+              >
+                <motion.p variants={wordVariants} className="text-xs uppercase tracking-[0.26em] text-[#F4A261]">
+                  Final Step
+                </motion.p>
+                <motion.h2 className="font-display text-4xl leading-tight sm:text-5xl">
+                  {splitWords(slide.heading).map((word, i) => (
+                    <motion.span key={`${word}-${i}`} variants={wordVariants} className="mr-2 inline-block">
+                      {word}
+                    </motion.span>
+                  ))}
+                </motion.h2>
+                <motion.div variants={wordVariants} className="mx-auto flex max-w-sm flex-col gap-3">
+                  <motion.div whileTap={{ scale: 0.95 }}>
+                    <Link to="/onboarding" className="inline-flex h-12 w-full items-center justify-center rounded-full border border-[#F4A261]/75 bg-[#003A8C]/85 px-7 font-semibold">
+                      Begin Onboarding
+                    </Link>
+                  </motion.div>
+                  <motion.div whileTap={{ scale: 0.95 }}>
+                    <Link to="/explore" className="inline-flex h-12 w-full items-center justify-center rounded-full border border-white/30 bg-black/30 px-7 font-semibold">
+                      Explore First
+                    </Link>
+                  </motion.div>
+                </motion.div>
+              </motion.div>
+            )}
+
+            <div className="flex flex-col items-center gap-4">
+              <div className="flex items-center justify-center gap-2">
+                {SLIDES.map((_, dotIndex) => (
+                  <button key={dotIndex} type="button" aria-label={`Go to step ${dotIndex + 1}`} onClick={() => goTo(dotIndex)} className="h-4 w-4 rounded-full p-0">
+                    <motion.span
+                      className="block h-2.5 w-2.5 rounded-full"
+                      animate={{
+                        scale: dotIndex === index ? 1.3 : 1,
+                        backgroundColor: dotIndex === index ? '#003A8C' : 'rgba(255,255,255,0.55)',
+                      }}
+                      transition={reduceMotion ? { duration: 0.1 } : { duration: 0.26, ease: EASE }}
+                    />
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex w-full items-center justify-between">
+                <motion.button
+                  type="button"
+                  onClick={() => goTo(index - 1)}
+                  whileTap={{ scale: 0.95 }}
+                  className="h-11 rounded-full border border-white/22 bg-black/35 px-5 text-sm font-medium disabled:opacity-35"
+                  disabled={index === 0}
+                >
+                  Back
+                </motion.button>
+                <motion.button
+                  type="button"
+                  onClick={() => goTo(index + 1)}
+                  whileTap={{ scale: 0.95 }}
+                  className="h-11 rounded-full border border-[#F4A261]/75 bg-[#003A8C]/82 px-6 text-sm font-semibold disabled:opacity-35"
+                  disabled={index === SLIDES.length - 1}
+                >
+                  Next
+                </motion.button>
               </div>
             </div>
           </div>
         </motion.section>
-      </div>
-
-      {showControls && (
-        <nav className="expat-stage-nav" aria-label="Onboarding stage navigation">
-          <div className="expat-stage-head">
-            <span>Cinematic Flow</span>
-            <span>{timeLabel}</span>
-          </div>
-          <div className="expat-stage-progress">
-            <span style={{ width: `${progressRatio * 100}%` }} />
-          </div>
-          <ol className="expat-stage-nav-list">
-            {STAGES.map((stage, index) => (
-              <li key={stage.id}>
-                <button
-                  type="button"
-                  className={`expat-stage-nav-item${activeStageIndex === index ? ' is-active' : ''}`}
-                  aria-current={activeStageIndex === index ? 'step' : undefined}
-                  aria-label={`Jump to ${stage.label}`}
-                  onClick={() => goToStage(index)}
-                >
-                  <span className="expat-stage-nav-dot" aria-hidden />
-                  <span className="expat-stage-nav-label">{stage.label}</span>
-                </button>
-              </li>
-            ))}
-          </ol>
-          <div className="expat-stage-nav-controls">
-            <button
-              type="button"
-              className="expat-nav-control"
-              onClick={() => goToStage(Math.max(0, activeStageIndex - 1))}
-              disabled={activeStageIndex === 0}
-              aria-label="Go to previous stage"
-            >
-              <Icon name="arrowLeft" size={15} />
-              Back
-            </button>
-            <button
-              type="button"
-              className="expat-nav-control"
-              onClick={() => {
-                setIsPlaying((prev) => !prev)
-                setPlaybackSeed((prev) => prev + 1)
-              }}
-              aria-label={isPlaying ? 'Pause timeline' : 'Play timeline'}
-              disabled={exportMode}
-            >
-              {isPlaying ? 'Pause' : 'Play'}
-            </button>
-            <button
-              type="button"
-              className="expat-nav-control"
-              onClick={() => goToStage(Math.min(STAGES.length - 1, activeStageIndex + 1))}
-              disabled={activeStageIndex === STAGES.length - 1}
-              aria-label="Go to next stage"
-            >
-              Next
-              <Icon name="arrowRight" size={15} />
-            </button>
-          </div>
-        </nav>
-      )}
+      </AnimatePresence>
     </main>
   )
 }
