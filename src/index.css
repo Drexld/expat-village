@@ -103,7 +103,6 @@
 }
 
 .prism-backdrop > * {
-  position: relative;
   z-index: 1;
 }
 

@@ -79,8 +79,8 @@ function SignupTeaser() {
           </div>
         </header>
 
-        <main className="pt-20 md:pt-24">
-          <section className="hero-card texture-layer texture-paper texture-amber text-center motion-rise glass-sheen">
+        <main className="pt-20 md:pt-24 min-h-[calc(100vh-5rem)] md:min-h-[calc(100vh-6rem)] flex items-center justify-center">
+          <section className="hero-card texture-layer texture-paper texture-amber text-center motion-rise glass-sheen w-full">
             <p className="text-xs uppercase tracking-widest text-terra-taupe">The Digital Neighborhood</p>
             <h1 className="text-3xl font-display text-terra-ink mt-2">
               A concierge in your pocket.
