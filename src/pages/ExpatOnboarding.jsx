@@ -90,7 +90,6 @@ function ExpatOnboarding() {
   const [index, setIndex] = useState(0)
   const [direction, setDirection] = useState(1)
   const indexRef = useRef(0)
-  const autoSeedRef = useRef(0)
 
   const exportMode = useMemo(() => {
     if (typeof window === 'undefined') return false
@@ -102,6 +101,15 @@ function ExpatOnboarding() {
     const parsed = Number.parseFloat(new URLSearchParams(window.location.search).get('t') || '0')
     return clamp(Number.isFinite(parsed) ? parsed : 0, 0, TOTAL_DURATION)
   }, [])
+
+  const isLowPowerDevice = useMemo(() => {
+    if (typeof window === 'undefined') return false
+    const cores = navigator.hardwareConcurrency || 8
+    const memory = navigator.deviceMemory || 8
+    return cores <= 4 || memory <= 4
+  }, [])
+
+  const animateBackground = !reduceMotion && !isLowPowerDevice
 
   const goTo = (next) => {
     if (next < 0 || next > SLIDES.length - 1) return
@@ -118,13 +126,21 @@ function ExpatOnboarding() {
     if (exportMode || reduceMotion) return undefined
 
     const interval = window.setInterval(() => {
-      autoSeedRef.current += 1
       const next = (indexRef.current + 1) % SLIDES.length
       goTo(next)
-    }, 3600)
+    }, 4800)
 
     return () => window.clearInterval(interval)
   }, [exportMode, reduceMotion])
+
+  useEffect(() => {
+    // Preload slide images once to avoid transition stutter on first visit.
+    SLIDES.forEach((slide) => {
+      if (!slide.image) return
+      const img = new Image()
+      img.src = slide.image
+    })
+  }, [])
 
   useEffect(() => {
     if (!exportMode || typeof window === 'undefined') return undefined
@@ -188,46 +204,55 @@ function ExpatOnboarding() {
     <main className="relative h-screen w-full overflow-hidden bg-[#070b14] text-white">
       <div className="pointer-events-none absolute inset-0">
         <motion.div
-          className="absolute left-[-16%] top-[-8%] h-72 w-72 rounded-[50%] bg-gradient-to-br from-[#003A8C]/80 to-[#1E40AF]/70 blur-3xl"
+          className="absolute left-[-16%] top-[-8%] h-72 w-72 rounded-[50%] bg-gradient-to-br from-[#003A8C]/80 to-[#1E40AF]/70 blur-2xl"
+          style={{ willChange: 'transform, opacity' }}
           animate={
-            reduceMotion
+            animateBackground
+              ? {
+                  scale: [1, 1.09, 1.03, 1],
+                  x: [0, 8, -6, 0],
+                  y: [0, -7, 6, 0],
+                  opacity: [0.85, 0.95, 0.88, 0.92],
+                }
+              : reduceMotion
               ? { opacity: 0.95 }
-              : {
-                  scale: [1, 1.12, 1.03, 1],
-                  x: [0, 12, -8, 0],
-                  y: [0, -10, 8, 0],
-                  opacity: [0.85, 1, 0.88, 0.95],
-                }
+              : { opacity: 0.9, scale: 1.02 }
           }
-          transition={reduceMotion ? undefined : { duration: 13, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
+          transition={animateBackground ? { duration: 14, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' } : undefined}
         />
         <motion.div
-          className="absolute right-[-18%] top-[18%] h-64 w-64 rounded-[50%] bg-gradient-to-br from-[#F4A261]/75 to-[#E07A5F]/70 blur-3xl"
+          className="absolute right-[-18%] top-[18%] h-64 w-64 rounded-[50%] bg-gradient-to-br from-[#F4A261]/75 to-[#E07A5F]/70 blur-2xl"
+          style={{ willChange: 'transform, opacity' }}
           animate={
-            reduceMotion
+            animateBackground
+              ? {
+                  scale: [1, 1.1, 1.04, 1],
+                  x: [0, -8, 8, 0],
+                  y: [0, 7, -9, 0],
+                  opacity: [0.86, 0.95, 0.9, 0.92],
+                }
+              : reduceMotion
               ? { opacity: 0.92 }
-              : {
-                  scale: [1, 1.15, 1.04, 1],
-                  x: [0, -10, 10, 0],
-                  y: [0, 8, -12, 0],
-                  opacity: [0.86, 1, 0.9, 0.94],
-                }
+              : { opacity: 0.88, scale: 1.02 }
           }
-          transition={reduceMotion ? undefined : { duration: 12, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut', delay: 1.1 }}
+          transition={animateBackground ? { duration: 13, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut', delay: 1.1 } : undefined}
         />
         <motion.div
-          className="absolute bottom-[-16%] left-[12%] h-72 w-72 rounded-[50%] bg-gradient-to-br from-[#6B7280]/68 to-[#374151]/75 blur-3xl"
+          className="absolute bottom-[-16%] left-[12%] h-72 w-72 rounded-[50%] bg-gradient-to-br from-[#6B7280]/68 to-[#374151]/75 blur-2xl"
+          style={{ willChange: 'transform, opacity' }}
           animate={
-            reduceMotion
-              ? { opacity: 0.9 }
-              : {
-                  scale: [1, 1.1, 1.05, 1],
-                  x: [0, 14, -8, 0],
-                  y: [0, -8, 8, 0],
-                  opacity: [0.84, 0.98, 0.9, 0.94],
+            animateBackground
+              ? {
+                  scale: [1, 1.08, 1.04, 1],
+                  x: [0, 9, -6, 0],
+                  y: [0, -7, 6, 0],
+                  opacity: [0.84, 0.92, 0.9, 0.91],
                 }
+              : reduceMotion
+              ? { opacity: 0.9 }
+              : { opacity: 0.86, scale: 1.02 }
           }
-          transition={reduceMotion ? undefined : { duration: 14, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut', delay: 0.6 }}
+          transition={animateBackground ? { duration: 15, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut', delay: 0.6 } : undefined}
         />
       </div>
 
@@ -239,17 +264,25 @@ function ExpatOnboarding() {
           initial="enter"
           animate="center"
           exit="exit"
-          transition={reduceMotion ? { duration: 0.12 } : { duration: 0.52, ease: EASE }}
+          transition={reduceMotion ? { duration: 0.12 } : { duration: 0.44, ease: EASE }}
           drag={reduceMotion ? false : 'x'}
           dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={0.12}
+          dragElastic={0.08}
           onDragEnd={dragEnd}
           className="relative z-10 h-screen w-full touch-pan-y"
+          style={{ willChange: 'transform, opacity' }}
         >
           <motion.div
             className="absolute inset-0"
-            animate={reduceMotion ? { scale: 1 } : { scale: [1.03, 1.08, 1.04, 1.03] }}
-            transition={reduceMotion ? undefined : { duration: 13, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
+            style={{ willChange: 'transform, opacity' }}
+            animate={
+              animateBackground
+                ? { scale: [1.02, 1.04, 1.02] }
+                : reduceMotion
+                ? { scale: 1 }
+                : { scale: 1.01 }
+            }
+            transition={animateBackground ? { duration: 16, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' } : undefined}
           >
             <img src={slide.image} alt={slide.heading} className="h-full w-full object-cover" />
           </motion.div>
@@ -461,11 +494,6 @@ function ExpatOnboarding() {
                   <motion.div whileTap={{ scale: 0.95 }}>
                     <Link to="/onboarding" className="inline-flex h-12 w-full items-center justify-center rounded-full border border-[#F4A261]/75 bg-[#003A8C]/85 px-7 font-semibold">
                       Begin Onboarding
-                    </Link>
-                  </motion.div>
-                  <motion.div whileTap={{ scale: 0.95 }}>
-                    <Link to="/explore" className="inline-flex h-12 w-full items-center justify-center rounded-full border border-white/30 bg-black/30 px-7 font-semibold">
-                      Explore First
                     </Link>
                   </motion.div>
                 </motion.div>
