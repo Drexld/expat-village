@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 240" width="800" height="240">
+  <defs>
+    <linearGradient id="navyBrandGradLight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E3A5F"/>
+      <stop offset="50%" stop-color="#2E5C8A"/>
+      <stop offset="100%" stop-color="#4A90E2"/>
+    </linearGradient>
+    
+    <linearGradient id="arcticGlowLight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2E5C8A"/>
+      <stop offset="100%" stop-color="#4A90E2"/>
+    </linearGradient>
+    
+    <radialGradient id="dotGlowLight" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#4A90E2" stop-opacity="1"/>
+      <stop offset="50%" stop-color="#2E5C8A" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#4A90E2" stop-opacity="0"/>
+    </radialGradient>
+    
+    <filter id="arcticBlurLight" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Light background (optional - can be transparent) -->
+  <rect width="800" height="240" fill="#FFFFFF" rx="8"/>
+  
+  <!-- Icon Mark: Minimalist Skyline -->
+  <g id="skyline-icon" transform="translate(60, 120)">
+    <!-- Building 1 (leftmost, shortest) -->
+    <rect x="0" y="40" width="24" height="60" fill="#1E3A5F" rx="2"/>
+    <rect x="4" y="48" width="4" height="4" fill="#4A90E2" opacity="0.8" rx="1"/>
+    <rect x="14" y="48" width="4" height="4" fill="#4A90E2" opacity="0.6" rx="1"/>
+    <rect x="4" y="60" width="4" height="4" fill="#4A90E2" opacity="0.7" rx="1"/>
+    <rect x="14" y="60" width="4" height="4" fill="#4A90E2" opacity="0.9" rx="1"/>
+    
+    <!-- Building 2 (tallest, central with spire) -->
+    <polygon points="34,10 45,0 56,10" fill="#2E5C8A"/>
+    <rect x="34" y="10" width="22" height="90" fill="url(#navyBrandGradLight)" rx="2"/>
+    <line x1="45" y1="0" x2="45" y2="-8" stroke="#2E5C8A" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="45" cy="-10" r="3" fill="#4A90E2" filter="url(#arcticBlurLight)"/>
+    <rect x="38" y="18" width="4" height="4" fill="#64B5F6" opacity="0.9" rx="1"/>
+    <rect x="48" y="18" width="4" height="4" fill="#64B5F6" opacity="0.8" rx="1"/>
+    <rect x="38" y="30" width="4" height="4" fill="#64B5F6" opacity="0.7" rx="1"/>
+    <rect x="48" y="30" width="4" height="4" fill="#64B5F6" opacity="1" rx="1"/>
+    <rect x="38" y="42" width="4" height="4" fill="#64B5F6" opacity="0.8" rx="1"/>
+    <rect x="48" y="42" width="4" height="4" fill="#64B5F6" opacity="0.7" rx="1"/>
+    
+    <!-- Building 3 (medium height) -->
+    <rect x="64" y="30" width="26" height="70" fill="#1E3A5F" rx="2"/>
+    <rect x="69" y="38" width="4" height="4" fill="#4A90E2" opacity="0.8" rx="1"/>
+    <rect x="80" y="38" width="4" height="4" fill="#4A90E2" opacity="0.7" rx="1"/>
+    <rect x="69" y="50" width="4" height="4" fill="#4A90E2" opacity="0.9" rx="1"/>
+    <rect x="80" y="50" width="4" height="4" fill="#4A90E2" opacity="0.6" rx="1"/>
+    
+    <!-- Building 4 (rightmost, varied height) -->
+    <rect x="98" y="45" width="22" height="55" fill="#2E5C8A" rx="2"/>
+    <rect x="102" y="53" width="4" height="4" fill="#64B5F6" opacity="0.8" rx="1"/>
+    <rect x="112" y="53" width="4" height="4" fill="#64B5F6" opacity="0.7" rx="1"/>
+    
+    <!-- Ground line -->
+    <line x1="-5" y1="100" x2="125" y2="100" stroke="#2E5C8A" stroke-width="1.5" opacity="0.4"/>
+    
+    <!-- Central glowing dot (you in the village) -->
+    <circle cx="45" cy="85" r="16" fill="url(#dotGlowLight)" opacity="0.3"/>
+    <circle cx="45" cy="85" r="5" fill="url(#arcticGlowLight)" filter="url(#arcticBlurLight)"/>
+  </g>
+  
+  <!-- Wordmark -->
+  <g id="wordmark" transform="translate(220, 140)">
+    <!-- "Expat" in Arctic Blue, Bold -->
+    <text 
+      font-family="Inter, system-ui, sans-serif" 
+      font-size="48" 
+      font-weight="700" 
+      fill="#4A90E2" 
+      letter-spacing="0.02em">
+      Expat
+    </text>
+    
+    <!-- "Village" in Midnight Blue, Regular -->
+    <text 
+      font-family="Inter, system-ui, sans-serif" 
+      font-size="48" 
+      font-weight="400" 
+      fill="#000814" 
+      letter-spacing="0.02em"
+      x="150">
+      Village
+    </text>
+  </g>
+  
+  <!-- Tagline (optional) -->
+  <text 
+    x="220" 
+    y="175" 
+    font-family="Inter, system-ui, sans-serif" 
+    font-size="14" 
+    font-weight="400" 
+    fill="#475569"
+    letter-spacing="0.01em">
+    Your Poland concierge
+  </text>
+</svg>

@@ -1,0 +1,64 @@
+:root {
+  --bg-black: #000000;
+  --bg-dark: #0a0e1a;
+  --navy-primary: #1a2642;
+  --navy-secondary: #14203a;
+  --navy-deep: #0f1829;
+  --navy-darker: #0f172a;
+  --blue-primary: #3b9eff;
+  --blue-dark: #2d7dd2;
+  --blue-darker: #0066cc;
+  --pink-primary: #ff6b9d;
+  --pink-dark: #ec4899;
+  --pink-darker: #db2777;
+  --purple-primary: #8b5cf6;
+  --purple-dark: #7c3aed;
+  --green-primary: #10b981;
+  --green-dark: #059669;
+  --amber-primary: #f59e0b;
+  --red-primary: #ef4444;
+  --text-white: #ffffff;
+  --text-white-70: rgba(255, 255, 255, 0.7);
+  --text-white-60: rgba(255, 255, 255, 0.6);
+  --text-white-50: rgba(255, 255, 255, 0.5);
+  --text-white-40: rgba(255, 255, 255, 0.4);
+  --text-white-30: rgba(255, 255, 255, 0.3);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--text-white);
+  background: var(--bg-black);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .pt-safe {
+    padding-top: max(env(safe-area-inset-top), 0.75rem);
+  }
+
+  .pb-safe {
+    padding-bottom: max(env(safe-area-inset-bottom), 0.75rem);
+  }
+}
