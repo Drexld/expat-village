@@ -11,15 +11,15 @@
   "icons": [
     {
       "src": "/brand/expat-village-icon-navy.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/brand/expat-village-logo-light-navy.svg",
-      "sizes": "any",
+      "sizes": "240x240",
       "type": "image/svg+xml",
       "purpose": "any"
+    },
+    {
+      "src": "/brand/expat-village-icon-navy.svg",
+      "sizes": "240x240",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
     }
   ]
 }
