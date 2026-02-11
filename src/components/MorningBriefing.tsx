@@ -1,5 +1,5 @@
-import { motion, PanInfo } from 'motion/react';
-import { useRef } from 'react';
+import { motion, PanInfo, useDragControls } from 'motion/react';
+import { useRef, type TouchEvent } from 'react';
 import { Cloud, Sparkles, Navigation, MapPin, Lightbulb, Calendar, ChevronUp } from 'lucide-react';
 
 interface MorningBriefingProps {
@@ -9,19 +9,40 @@ interface MorningBriefingProps {
 
 export function MorningBriefing({ onDismiss, isOpen }: MorningBriefingProps) {
   const contentRef = useRef<HTMLDivElement>(null);
+  const dragControls = useDragControls();
+  const touchStartYRef = useRef<number | null>(null);
+  const touchStartTimeRef = useRef<number>(0);
+  const DISMISS_DISTANCE = -45;
+  const DISMISS_VELOCITY = -140;
+  const QUICK_SWIPE_DISTANCE = 35;
+  const QUICK_SWIPE_TIME_MS = 500;
 
   const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    // Swipe UP to dismiss (negative velocity means upward)
-    if (info.offset.y < -100 || info.velocity.y < -500) {
+    // Make upward dismiss easier: shorter pull and lower flick velocity.
+    if (
+      info.offset.y <= DISMISS_DISTANCE ||
+      info.velocity.y <= DISMISS_VELOCITY ||
+      (info.offset.y <= -20 && info.velocity.y < -80)
+    ) {
       onDismiss();
     }
   };
 
-  const handleDrag = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    // Prevent dragging up when content is scrollable and not at top
-    const content = contentRef.current;
-    if (content && content.scrollTop > 0) {
-      return;
+  const handleTouchStart = (event: TouchEvent<HTMLDivElement>) => {
+    touchStartYRef.current = event.touches[0]?.clientY ?? null;
+    touchStartTimeRef.current = Date.now();
+  };
+
+  const handleTouchEnd = (event: TouchEvent<HTMLDivElement>) => {
+    if (touchStartYRef.current === null) return;
+    const endY = event.changedTouches[0]?.clientY ?? touchStartYRef.current;
+    const deltaY = touchStartYRef.current - endY;
+    const elapsed = Date.now() - touchStartTimeRef.current;
+    touchStartYRef.current = null;
+
+    // Fast upward flick from handle dismisses immediately.
+    if (deltaY >= QUICK_SWIPE_DISTANCE && elapsed <= QUICK_SWIPE_TIME_MS) {
+      onDismiss();
     }
   };
 
@@ -40,10 +61,11 @@ export function MorningBriefing({ onDismiss, isOpen }: MorningBriefingProps) {
       {/* Briefing Panel - Draggable */}
       <motion.div
         drag="y"
+        dragListener={false}
+        dragControls={dragControls}
         dragDirectionLock
-        dragConstraints={{ top: -200, bottom: 0 }}
-        dragElastic={{ top: 0.2, bottom: 0 }}
-        onDrag={handleDrag}
+        dragConstraints={{ top: -320, bottom: 0 }}
+        dragElastic={{ top: 0.35, bottom: 0 }}
         onDragEnd={handleDragEnd}
         initial={{ y: '100%' }}
         animate={{ y: 0 }}
@@ -52,8 +74,14 @@ export function MorningBriefing({ onDismiss, isOpen }: MorningBriefingProps) {
         className="relative w-full max-h-[90vh] flex flex-col bg-gradient-to-b from-[#1a2642] via-[#14203a] to-[#0d1520] rounded-t-[32px] shadow-[0_-8px_32px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.1)] touch-none"
       >
         {/* Drag Handle */}
-        <div className="flex justify-center pt-3 pb-2 bg-gradient-to-b from-[#1a2642] to-transparent">
-          <div className="w-12 h-1.5 rounded-full bg-white/20" />
+        <div
+          className="flex justify-center pt-4 pb-3 bg-gradient-to-b from-[#1a2642] to-transparent cursor-grab active:cursor-grabbing touch-none select-none"
+          onPointerDown={(event) => dragControls.start(event)}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          title="Swipe up from here to dismiss"
+        >
+          <div className="w-16 h-2 rounded-full bg-white/25" />
         </div>
 
         {/* Scrollable Content */}

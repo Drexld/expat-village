@@ -34,7 +34,29 @@ async function clearStaleLocalServiceWorkers() {
   }
 }
 
-void clearStaleLocalServiceWorkers();
+function registerProductionServiceWorker() {
+  if (!('serviceWorker' in navigator)) {
+    return;
+  }
+
+  if (!window.isSecureContext) {
+    return;
+  }
+
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch((error) => {
+      console.warn('Service worker registration failed:', error);
+    });
+  });
+}
+
+const host = window.location.hostname;
+const isLocalHost = host === 'localhost' || host === '127.0.0.1';
+if (isLocalHost) {
+  void clearStaleLocalServiceWorkers();
+} else {
+  registerProductionServiceWorker();
+}
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

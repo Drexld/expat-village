@@ -1,0 +1,25 @@
+{
+  "name": "Expat Village",
+  "short_name": "ExpatVillage",
+  "description": "Premium mobile-first platform for expats in Warsaw.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#000000",
+  "theme_color": "#0a0e1a",
+  "icons": [
+    {
+      "src": "/brand/expat-village-icon-navy.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/brand/expat-village-logo-light-navy.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
