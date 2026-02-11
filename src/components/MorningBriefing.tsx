@@ -1,4 +1,4 @@
-import { motion, PanInfo, useDragControls } from 'motion/react';
+import { motion } from 'motion/react';
 import { useRef, type TouchEvent } from 'react';
 import { Cloud, Sparkles, Navigation, MapPin, Lightbulb, Calendar, ChevronUp } from 'lucide-react';
 
@@ -9,24 +9,10 @@ interface MorningBriefingProps {
 
 export function MorningBriefing({ onDismiss, isOpen }: MorningBriefingProps) {
   const contentRef = useRef<HTMLDivElement>(null);
-  const dragControls = useDragControls();
   const touchStartYRef = useRef<number | null>(null);
   const touchStartTimeRef = useRef<number>(0);
-  const DISMISS_DISTANCE = -45;
-  const DISMISS_VELOCITY = -140;
-  const QUICK_SWIPE_DISTANCE = 35;
-  const QUICK_SWIPE_TIME_MS = 500;
-
-  const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    // Make upward dismiss easier: shorter pull and lower flick velocity.
-    if (
-      info.offset.y <= DISMISS_DISTANCE ||
-      info.velocity.y <= DISMISS_VELOCITY ||
-      (info.offset.y <= -20 && info.velocity.y < -80)
-    ) {
-      onDismiss();
-    }
-  };
+  const QUICK_SWIPE_DISTANCE = 20;
+  const QUICK_SWIPE_TIME_MS = 900;
 
   const handleTouchStart = (event: TouchEvent<HTMLDivElement>) => {
     touchStartYRef.current = event.touches[0]?.clientY ?? null;
@@ -58,25 +44,17 @@ export function MorningBriefing({ onDismiss, isOpen }: MorningBriefingProps) {
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onDismiss} />
 
-      {/* Briefing Panel - Draggable */}
+      {/* Briefing Panel */}
       <motion.div
-        drag="y"
-        dragListener={false}
-        dragControls={dragControls}
-        dragDirectionLock
-        dragConstraints={{ top: -320, bottom: 0 }}
-        dragElastic={{ top: 0.35, bottom: 0 }}
-        onDragEnd={handleDragEnd}
         initial={{ y: '100%' }}
         animate={{ y: 0 }}
         exit={{ y: '100%' }}
         transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-        className="relative w-full max-h-[90vh] flex flex-col bg-gradient-to-b from-[#1a2642] via-[#14203a] to-[#0d1520] rounded-t-[32px] shadow-[0_-8px_32px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.1)] touch-none"
+        className="relative w-full max-h-[90vh] flex flex-col bg-gradient-to-b from-[#1a2642] via-[#14203a] to-[#0d1520] rounded-t-[32px] shadow-[0_-8px_32px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.1)]"
       >
         {/* Drag Handle */}
         <div
-          className="flex justify-center pt-4 pb-3 bg-gradient-to-b from-[#1a2642] to-transparent cursor-grab active:cursor-grabbing touch-none select-none"
-          onPointerDown={(event) => dragControls.start(event)}
+          className="flex justify-center pt-4 pb-3 bg-gradient-to-b from-[#1a2642] to-transparent select-none"
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
           title="Swipe up from here to dismiss"
@@ -238,8 +216,12 @@ export function MorningBriefing({ onDismiss, isOpen }: MorningBriefingProps) {
             </div>
           </div>
 
-          {/* Swipe Up Hint */}
-          <div className="flex items-center justify-center gap-2 py-4 text-white/40">
+          {/* Swipe Up Hint / Gesture zone */}
+          <div
+            className="flex items-center justify-center gap-2 py-4 text-white/40 select-none"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
             <span className="text-sm">Swipe up to dismiss</span>
             <ChevronUp className="w-4 h-4" strokeWidth={2} />
           </div>

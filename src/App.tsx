@@ -26,19 +26,20 @@ export default function App() {
   });
 
   useEffect(() => {
+    const currentHour = new Date().getHours();
     const today = new Date().toDateString();
     const briefingSeenDate = sessionStorage.getItem('briefing-seen-date');
     const moodCheckSeenDate = sessionStorage.getItem('mood-check-date');
-    const selectedMood = sessionStorage.getItem('mood-check-selected');
     
-    // Show mood check once per day, but keep prompting if user hasn't selected a mood yet.
-    // This also recovers from old "mood-check-done=true" flags.
-    if (!selectedMood || moodCheckSeenDate !== today) {
+    // Mood check: only around noon/2 PM, once per day.
+    const isMoodWindow = currentHour >= 12 && currentHour < 15;
+    if (isMoodWindow && moodCheckSeenDate !== today) {
       setTimeout(() => setShowMoodCheck(true), 2000);
     }
     
-    // Show daily briefing once per day, regardless of hour.
-    if (briefingSeenDate !== today) {
+    // Morning briefing: only in the morning, first open of the day.
+    const isMorningWindow = currentHour >= 5 && currentHour < 12;
+    if (isMorningWindow && briefingSeenDate !== today) {
       setTimeout(() => setShowBriefing(true), 1000);
     }
   }, []);
