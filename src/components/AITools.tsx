@@ -2,6 +2,11 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Upload, FileText, AlertCircle, CheckCircle, Brain, Share2, Users, X, Edit3, AlertTriangle, Info, Scale, ShieldCheck, Clock3 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAITools } from '../services/api/hooks';
+import type {
+  ContractAnalysisResult as ApiContractAnalysisResult,
+  DocumentAnalysisResult as ApiDocumentAnalysisResult,
+} from '../services/api/types';
 
 type Severity = 'high' | 'medium' | 'low';
 
@@ -29,11 +34,117 @@ interface ContractAnalysisResult {
   legalChecks: LegalCheck[];
 }
 
+interface DocumentNextStep {
+  step: string;
+  link?: string;
+  priority: 'high' | 'medium' | 'low';
+}
+
+interface DocumentAnalysisViewModel {
+  urgency: 'high' | 'medium' | 'low';
+  type: string;
+  summary: string;
+  actionRequired: boolean;
+  deadline?: string;
+  keyPoints: string[];
+  nextSteps: DocumentNextStep[];
+  translation: string;
+  relatedGuide: string;
+}
+
+function toContractViewModel(result: ApiContractAnalysisResult): ContractAnalysisResult {
+  const score = Math.max(0, Math.min(100, 100 - result.riskScore));
+  const baseSeverity: Severity =
+    result.riskLevel === 'high' ? 'high' : result.riskLevel === 'medium' ? 'medium' : 'low';
+
+  const issues: ContractIssue[] =
+    result.redFlags.length > 0
+      ? result.redFlags.map((flag, index) => ({
+          severity: index === 0 ? baseSeverity : baseSeverity === 'high' ? 'medium' : 'low',
+          title: `Risk ${index + 1}`,
+          description: flag,
+          suggestion: 'Request clause clarification and legal wording update before signing.',
+          location: `Section ${index + 1}`,
+          legalReference: `Polish law (${result.legalFramework}) compliance check`,
+        }))
+      : [
+          {
+            severity: 'low',
+            title: 'No critical flags detected',
+            description: 'AI did not detect high-risk clauses in the uploaded contract.',
+            suggestion: 'Still request legal review for final confirmation before signing.',
+            location: 'Global',
+            legalReference: `Polish law (${result.legalFramework}) screening baseline`,
+          },
+        ];
+
+  return {
+    score,
+    issues,
+    positives: [
+      'Contract structure is readable and machine-parseable',
+      'Key obligations are detectable for both parties',
+      'Polish law mode applied during analysis',
+    ],
+    warsawTips: [
+      'Verify landlord identity and ownership documents before deposit transfer',
+      'Always require written inventory handover protocol (protokol zdawczo-odbiorczy)',
+      'Confirm utility billing method and invoice proof in writing',
+    ],
+    legalChecks: [
+      {
+        title: 'Contract under Polish law context',
+        status: 'pass',
+        detail: `Analysis used legal framework ${result.legalFramework}.`,
+        legalReference: 'Jurisdiction-aware AI screening mode',
+      },
+      {
+        title: 'High-risk clauses requiring human review',
+        status: result.redFlags.length > 0 ? 'review' : 'pass',
+        detail:
+          result.redFlags.length > 0
+            ? `${result.redFlags.length} potentially risky clauses were identified.`
+            : 'No high-risk clauses were identified by the AI pass.',
+        legalReference: 'Human-in-the-loop legal validation standard',
+      },
+      {
+        title: 'Final legal sign-off',
+        status: 'missing',
+        detail: 'A licensed lawyer must confirm enforceability before signing.',
+        legalReference: 'Professional legal advice recommendation',
+      },
+    ],
+  };
+}
+
+function toDocumentViewModel(result: ApiDocumentAnalysisResult): DocumentAnalysisViewModel {
+  const urgency = result.urgency;
+  const actionRequired = urgency !== 'low' || result.nextSteps.length > 0;
+
+  return {
+    urgency,
+    type: result.documentType,
+    summary:
+      result.keyPoints[0] ||
+      'Document analyzed. Review key points and complete recommended next steps.',
+    actionRequired,
+    keyPoints: result.keyPoints,
+    nextSteps: result.nextSteps.map((step) => ({
+      step: step.title,
+      priority: step.priority,
+    })),
+    translation: 'English translation available in-app',
+    relatedGuide: 'Updated Polish process guide',
+  };
+}
+
 export function AITools() {
+  const { isLive: isAiLive, analyzeContract, analyzeDocument, requestLawyerReview } = useAITools();
   const [activeTab, setActiveTab] = useState<'contract' | 'document' | 'nestquest'>('contract');
   const [analyzing, setAnalyzing] = useState(false);
   const [contractResults, setContractResults] = useState<ContractAnalysisResult | null>(null);
-  const [documentResults, setDocumentResults] = useState<any>(null);
+  const [documentResults, setDocumentResults] = useState<DocumentAnalysisViewModel | null>(null);
+  const [contractAnalysisId, setContractAnalysisId] = useState<string | null>(null);
   const [editingClause, setEditingClause] = useState(false);
   const [showLawyerModal, setShowLawyerModal] = useState(false);
   const [requestingLawyer, setRequestingLawyer] = useState(false);
@@ -43,127 +154,54 @@ export function AITools() {
     note: '',
   });
 
-  const handleFileUpload = (type: 'contract' | 'document') => {
+  const handleFileUpload = async (type: 'contract' | 'document') => {
     setAnalyzing(true);
-    
-    toast.info('🧠 AI analyzing...', {
+
+    toast.info('AI analyzing...', {
       description: 'This may take a few seconds',
       duration: 2000,
     });
 
-    // Simulate AI analysis
-    setTimeout(() => {
-      setAnalyzing(false);
-      
+    try {
       if (type === 'contract') {
-        setContractResults({
-          score: 75,
-          issues: [
-            {
-              severity: 'high',
-              title: 'No registration clause found',
-              description: 'Contract lacks clause requiring landlord to register tenancy - common scam in Warsaw',
-              suggestion: 'Add: "Landlord agrees to register this tenancy with tax authorities within 14 days"',
-              location: 'Section 3.2',
-              legalReference: 'Polish tax-registration duties for rental income (landlord side)'
-            },
-            {
-              severity: 'medium',
-              title: 'Deposit terms unclear',
-              description: 'Return conditions not specified',
-              suggestion: 'Specify: "Deposit returned within 30 days after move-out, minus documented damages"',
-              location: 'Section 5.1',
-              legalReference: 'Civil Code fairness principle for clear obligations'
-            },
-            {
-              severity: 'low',
-              title: 'Utilities payment method',
-              description: 'Could be more specific about billing cycle',
-              suggestion: 'Consider monthly pre-payment system',
-              location: 'Section 6',
-              legalReference: 'Consumer transparency practice for recurring charges'
-            }
-          ],
-          positives: [
-            'Clear rent amount and payment dates',
-            'Proper notice period specified',
-            'Maintenance responsibilities defined'
-          ],
-          warsawTips: [
-            'In Warsaw, landlords must register tenancy or face fines',
-            'Average security deposit is 1-2 months rent',
-            'Utilities usually average 400-600 PLN/month for studio'
-          ],
-          legalChecks: [
-            {
-              title: 'Landlord identity and ownership traceability',
-              status: 'review',
-              detail: 'No explicit ownership verification clause was found.',
-              legalReference: 'Polish Civil Code due-diligence best practice'
-            },
-            {
-              title: 'Deposit return and damage deduction terms',
-              status: 'review',
-              detail: 'Deposit process exists but timeline and evidence requirements are vague.',
-              legalReference: 'Contract clarity requirement under Civil Code principles'
-            },
-            {
-              title: 'Termination and notice clauses',
-              status: 'pass',
-              detail: 'Termination window appears defined and bilateral.',
-              legalReference: 'General contractual balance standards'
-            },
-            {
-              title: 'Utilities and additional charges transparency',
-              status: 'missing',
-              detail: 'No detailed monthly settlement method or invoice evidence path.',
-              legalReference: 'Consumer-rights transparency expectations'
-            }
-          ]
+        const result = await analyzeContract({
+          documentName: 'warsaw-rental-contract.pdf',
+          documentText:
+            'Rental contract draft for Warsaw apartment. Analyze under Polish law and flag risky clauses.',
         });
 
-        toast.success('✅ Analysis complete!', {
-          description: 'Found 3 issues to review',
+        setContractAnalysisId(result.id);
+        setContractResults(toContractViewModel(result));
+
+        toast.success('Analysis complete!', {
+          description: isAiLive ? 'Live AI contract screening completed' : 'Preview mode analysis completed',
           duration: 3000,
         });
       } else {
-        setDocumentResults({
-          urgency: 'medium',
-          type: 'Tax Office Notice',
-          summary: 'This is a notice about your upcoming tax filing deadline',
-          actionRequired: true,
-          deadline: 'April 30, 2026',
-          keyPoints: [
-            'Annual tax return (PIT) must be filed',
-            'If employed, employer may have already filed for you',
-            'Check your e-PIT account online',
-            'Deadline: April 30, 2026'
-          ],
-          nextSteps: [
-            {
-              step: 'Check e-PIT system',
-              link: 'https://www.podatki.gov.pl',
-              priority: 'high'
-            },
-            {
-              step: 'Gather income documents',
-              priority: 'medium'
-            },
-            {
-              step: 'Consult tax advisor if complex',
-              priority: 'low'
-            }
-          ],
-          translation: 'Full English translation available',
-          relatedGuide: 'Polish Tax System for Expats'
+        const result = await analyzeDocument({
+          documentName: 'government-notice.pdf',
+          documentText:
+            'Official Polish government notice. Identify urgency, key points, and recommended next steps.',
         });
 
-        toast.success('✅ Document analyzed!', {
-          description: 'Action required by April 30',
+        setDocumentResults(toDocumentViewModel(result));
+
+        toast.success('Document analyzed!', {
+          description: isAiLive
+            ? 'Live AI document analysis completed'
+            : 'Preview mode document analysis completed',
           duration: 3000,
         });
       }
-    }, 3000);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Could not reach AI service';
+      toast.error('AI analysis failed', {
+        description: message,
+        duration: 3500,
+      });
+    } finally {
+      setAnalyzing(false);
+    }
   };
 
   const handleWhatIfSimulator = () => {
@@ -185,21 +223,35 @@ export function AITools() {
     setShowLawyerModal(true);
   };
 
-  const handleSubmitLawyerRequest = () => {
+  const handleSubmitLawyerRequest = async () => {
     if (!lawyerForm.email.trim() || !lawyerForm.email.includes('@')) {
       toast.error('Enter a valid email for lawyer follow-up');
       return;
     }
 
     setRequestingLawyer(true);
-    setTimeout(() => {
-      setRequestingLawyer(false);
+    try {
+      await requestLawyerReview({
+        contractAnalysisId: contractAnalysisId || undefined,
+        contactEmail: lawyerForm.email.trim(),
+        notes: `Priority: ${lawyerForm.priority}\n${lawyerForm.note}`.trim(),
+      });
+
       setShowLawyerModal(false);
       toast.success('Lawyer review requested', {
-        description: 'A verified Warsaw lawyer will review flagged clauses and contact you.',
+        description: isAiLive
+          ? 'A verified Warsaw lawyer will review flagged clauses and contact you.'
+          : 'Preview mode: lawyer request captured locally.',
         duration: 3000,
       });
-    }, 1200);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Could not send lawyer request';
+      toast.error('Could not request lawyer review', {
+        description: message,
+      });
+    } finally {
+      setRequestingLawyer(false);
+    }
   };
 
   return (
@@ -341,7 +393,10 @@ export function AITools() {
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="font-bold text-lg">Contract Score</h3>
                       <button
-                        onClick={() => setContractResults(null)}
+                        onClick={() => {
+                          setContractResults(null);
+                          setContractAnalysisId(null);
+                        }}
                         className="p-2 rounded-lg bg-white/5 hover:bg-white/10"
                       >
                         <X className="w-4 h-4" strokeWidth={2} />
@@ -666,7 +721,7 @@ export function AITools() {
                   <div className="relative rounded-[20px] bg-gradient-to-br from-[#1a2642]/90 to-[#0f172a]/95 backdrop-blur-xl p-4">
                     <h3 className="font-bold mb-3">Next Steps</h3>
                     <div className="space-y-2">
-                      {documentResults.nextSteps.map((step: any, index: number) => (
+                      {documentResults.nextSteps.map((step: DocumentNextStep, index: number) => (
                         <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-white/5">
                           <span className="w-6 h-6 rounded-full bg-[#3b9eff]/20 text-[#3b9eff] flex items-center justify-center text-xs font-bold">
                             {index + 1}
@@ -983,4 +1038,6 @@ export function AITools() {
     </div>
   );
 }
+
+
 

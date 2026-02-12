@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Sparkles, ChevronRight, CheckCircle2, Circle, Star, Trophy, Map, Zap } from 'lucide-react';
+import { Sparkles, ChevronRight, CheckCircle2, Circle, Star, Trophy, Map, MapPin } from 'lucide-react';
+import type { MeMilestone, MeProgress } from '../services/api/types';
 
 interface PremiumJourneyProps {
   user: {
@@ -9,12 +10,14 @@ interface PremiumJourneyProps {
     points: number;
     streak: number;
   };
+  journeyData?: MeProgress | null;
 }
 
-export function PremiumJourney({ user }: PremiumJourneyProps) {
+export function PremiumJourney({ user, journeyData }: PremiumJourneyProps) {
   const [showSubtasks, setShowSubtasks] = useState(false);
   const [showJourneyMap, setShowJourneyMap] = useState(false);
-  const progress = (user.completedTasks / user.totalTasks) * 100;
+  const safeTotalTasks = Math.max(1, user.totalTasks || 0);
+  const progress = (user.completedTasks / safeTotalTasks) * 100;
   
   // Level-up tier system
   const getTier = (points: number) => {
@@ -27,7 +30,7 @@ export function PremiumJourney({ user }: PremiumJourneyProps) {
   const tier = getTier(user.points);
   const pointsToNext = tier.next ? tier.next - user.points : 0;
   
-  const currentMilestone = {
+  const fallbackMilestone: MeMilestone = {
     name: "Get PESEL number",
     subtasks: [
       { id: 1, name: "Book office appointment", done: false, points: 15 },
@@ -37,6 +40,8 @@ export function PremiumJourney({ user }: PremiumJourneyProps) {
     reward: 50,
     location: { lat: 52.2297, lng: 21.0122 } // Warsaw coordinates
   };
+  const currentMilestone = journeyData?.currentMilestone || fallbackMilestone;
+  const weekLabel = journeyData?.weekLabel || 'Week 2 in Poland';
 
   const handleCircleClick = () => {
     setShowSubtasks(!showSubtasks);
@@ -69,7 +74,7 @@ export function PremiumJourney({ user }: PremiumJourneyProps) {
           <div className="flex items-start justify-between mb-4">
             <div>
               <h2 className="text-[20px] font-bold mb-1">Your Journey</h2>
-              <p className="text-[13px] text-white/50">Week 2 in Poland</p>
+              <p className="text-[13px] text-white/50">{weekLabel}</p>
             </div>
             
             {/* Tier Badge */}
@@ -92,7 +97,7 @@ export function PremiumJourney({ user }: PremiumJourneyProps) {
               <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
                 <motion.div
                   initial={{ width: 0 }}
-                  animate={{ width: `${((user.points % tier.next) / tier.next) * 100}%` }}
+                  animate={{ width: `${(user.points / tier.next) * 100}%` }}
                   transition={{ duration: 1, ease: "easeOut" }}
                   className="h-full bg-gradient-to-r from-[#3b9eff] to-[#8b5cf6] rounded-full"
                 />

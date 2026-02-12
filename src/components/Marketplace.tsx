@@ -1,147 +1,118 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, Plus, Shield, MapPin, Star, Eye, MessageCircle, Heart, ChevronRight, AlertTriangle, CheckCircle, Package, TrendingUp } from 'lucide-react';
+import {
+  Search,
+  Plus,
+  Shield,
+  MapPin,
+  Star,
+  Eye,
+  MessageCircle,
+  Heart,
+  ChevronRight,
+  AlertTriangle,
+  CheckCircle,
+  Package,
+  TrendingUp,
+  X,
+} from 'lucide-react';
 import { toast } from 'sonner';
+import { useMarketplace } from '../services/api/hooks';
+import type { MarketplaceListingSummary } from '../services/api/types';
 
-interface Listing {
-  id: string;
-  title: string;
-  price: number;
-  category: string;
-  condition: 'New' | 'Like New' | 'Good' | 'Fair';
-  seller: {
-    name: string;
-    trustScore: number;
-    reviews: number;
-    verified: boolean;
-  };
-  distance: string;
-  postedAt: string;
-  images: number;
-  description: string;
-  hasAR?: boolean;
-  escrowAvailable: boolean;
-  featured?: boolean;
-  aiScamScore: number; // 0-100, lower is safer
+type Listing = MarketplaceListingSummary;
+
+const categoryIconById: Record<string, string> = {
+  all: '???',
+  furniture: '???',
+  electronics: '??',
+  home: '??',
+  clothing: '??',
+  bikes: '??',
+  moving: '??',
+};
+
+function normalizeCategory(value: string): string {
+  return value.trim().toLowerCase();
+}
+
+function toCategoryLabel(value: string): string {
+  if (!value) return 'Other';
+  return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
 export function Marketplace() {
+  const { data, isLoading, isLive, createListing, expressInterest, submitReview } = useMarketplace();
+  const listings = data ?? [];
+
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
   const [expandedListing, setExpandedListing] = useState<string | null>(null);
   const [showListModal, setShowListModal] = useState(false);
+  const [submittingListing, setSubmittingListing] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [reviewListingId, setReviewListingId] = useState<string | null>(null);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewBody, setReviewBody] = useState('');
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [listForm, setListForm] = useState({
+    title: '',
+    price: '',
+    category: '',
+    description: '',
+  });
 
-  const listings: Listing[] = [
-    {
-      id: '1',
-      title: 'IKEA MALM Bed Frame (King)',
-      price: 450,
-      category: 'Furniture',
-      condition: 'Like New',
-      seller: {
-        name: 'Sarah M.',
-        trustScore: 4.9,
-        reviews: 23,
-        verified: true
-      },
-      distance: '1.2 km',
-      postedAt: '2 hours ago',
-      images: 4,
-      description: 'Moving back to UK, bought 6 months ago. Perfect condition, non-smoking home.',
-      hasAR: true,
-      escrowAvailable: true,
-      featured: true,
-      aiScamScore: 5
-    },
-    {
-      id: '2',
-      title: 'MacBook Air M2 (2023)',
-      price: 4200,
-      category: 'Electronics',
-      condition: 'Good',
-      seller: {
-        name: 'Luca R.',
-        trustScore: 4.7,
-        reviews: 15,
-        verified: true
-      },
-      distance: '3.5 km',
-      postedAt: '1 day ago',
-      images: 6,
-      description: 'Upgrading to Pro. 8GB RAM, 256GB SSD. Original box & charger included.',
-      hasAR: false,
-      escrowAvailable: true,
-      aiScamScore: 8
-    },
-    {
-      id: '3',
-      title: 'Winter Coat - North Face',
-      price: 280,
-      category: 'Clothing',
-      condition: 'Good',
-      seller: {
-        name: 'Maria K.',
-        trustScore: 5.0,
-        reviews: 8,
-        verified: true
-      },
-      distance: '0.5 km',
-      postedAt: '3 days ago',
-      images: 3,
-      description: 'Size M, warm for Warsaw winters. Worn one season.',
-      hasAR: false,
-      escrowAvailable: false,
-      aiScamScore: 3
-    },
-    {
-      id: '4',
-      title: 'Dyson V11 Vacuum Cleaner',
-      price: 890,
-      category: 'Home',
-      condition: 'Like New',
-      seller: {
-        name: 'Alex P.',
-        trustScore: 4.8,
-        reviews: 12,
-        verified: true
-      },
-      distance: '2.1 km',
-      postedAt: '5 hours ago',
-      images: 5,
-      description: 'Used 3 times, too powerful for small apartment. All attachments.',
-      hasAR: true,
-      escrowAvailable: true,
-      featured: true,
-      aiScamScore: 4
+  const categories = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const listing of listings) {
+      const key = normalizeCategory(listing.category);
+      counts.set(key, (counts.get(key) || 0) + 1);
     }
-  ];
 
-  const categories = [
-    { id: 'all', name: 'All', icon: '🛍️', count: listings.length },
-    { id: 'furniture', name: 'Furniture', icon: '🛋️', count: 45 },
-    { id: 'electronics', name: 'Electronics', icon: '💻', count: 32 },
-    { id: 'home', name: 'Home', icon: '🏠', count: 28 },
-    { id: 'clothing', name: 'Clothing', icon: '👕', count: 19 },
-  ];
+    return [
+      { id: 'all', name: 'All', icon: categoryIconById.all, count: listings.length },
+      ...Array.from(counts.entries()).map(([id, count]) => ({
+        id,
+        name: toCategoryLabel(id),
+        icon: categoryIconById[id] || '??',
+        count,
+      })),
+    ];
+  }, [listings]);
+
+  const filteredListings = listings
+    .filter((l) => activeCategory === 'all' || normalizeCategory(l.category) === activeCategory)
+    .filter((l) => l.title.toLowerCase().includes(searchQuery.toLowerCase()));
 
   const handleARPreview = (listing: Listing) => {
-    toast.info('🔮 AR Preview', {
-      description: 'Opening camera to preview in your space...',
+    toast.info('AR Preview', {
+      description: `Opening camera preview for ${listing.title}...`,
       duration: 2000,
     });
   };
 
-  const handleInitiateTrade = (listing: Listing) => {
-    if (listing.escrowAvailable) {
-      toast.success('🔒 Secure Trade Initiated', {
-        description: 'Payment held in escrow until you confirm receipt',
-        duration: 3000,
+  const handleInitiateTrade = async (listing: Listing) => {
+    try {
+      await expressInterest(listing.id, {
+        mode: listing.escrowAvailable ? 'secure_buy' : 'message_seller',
       });
-    } else {
-      toast.info('💬 Message Seller', {
-        description: 'Opening chat with ' + listing.seller.name,
-        duration: 2000,
-      });
+
+      if (listing.escrowAvailable) {
+        toast.success('Secure Trade Initiated', {
+          description: isLive
+            ? 'Interest sent and payment flow will use escrow protection.'
+            : 'Preview mode: secure trade request captured locally.',
+          duration: 3000,
+        });
+      } else {
+        toast.info('Message Seller', {
+          description: `Opening chat with ${listing.seller.name}`,
+          duration: 2000,
+        });
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Could not initiate trade';
+      toast.error('Trade request failed', { description: message });
     }
 
     if ('vibrate' in navigator) {
@@ -149,21 +120,75 @@ export function Marketplace() {
     }
   };
 
-  const handleListItem = () => {
-    setShowListModal(false);
-    toast.success('✅ Item listed!', {
-      description: '+10 points earned. Sell it for +50 more!',
-      duration: 3000,
-    });
+  const openReviewModal = (listingId: string) => {
+    setReviewListingId(listingId);
+    setReviewRating(5);
+    setReviewBody('');
+    setShowReviewModal(true);
   };
 
-  const filteredListings = listings
-    .filter(l => activeCategory === 'all' || l.category.toLowerCase() === activeCategory)
-    .filter(l => l.title.toLowerCase().includes(searchQuery.toLowerCase()));
+  const handleSubmitReview = async () => {
+    if (!reviewListingId) return;
+    if (!reviewBody.trim()) {
+      toast.error('Add a short review before submitting');
+      return;
+    }
+
+    setSubmittingReview(true);
+    try {
+      await submitReview(reviewListingId, { rating: reviewRating, body: reviewBody.trim() });
+      setShowReviewModal(false);
+      toast.success('Review submitted', {
+        description: 'Your feedback helps other expats avoid bad listings.',
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Could not submit review';
+      toast.error('Review failed', { description: message });
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
+
+  const handleListItem = async () => {
+    const title = listForm.title.trim();
+    const category = listForm.category.trim();
+    const description = listForm.description.trim();
+    const price = Number(listForm.price);
+
+    if (!title || !category || !description || !Number.isFinite(price) || price <= 0) {
+      toast.error('Complete title, price, category, and description');
+      return;
+    }
+
+    setSubmittingListing(true);
+    try {
+      await createListing({
+        title,
+        price,
+        category: toCategoryLabel(category),
+        description,
+        escrowRequested: true,
+      });
+
+      setShowListModal(false);
+      setListForm({ title: '', price: '', category: '', description: '' });
+
+      toast.success('Item listed!', {
+        description: isLive
+          ? '+10 points earned. Listing is now live in marketplace feed.'
+          : '+10 points earned. Preview listing added locally.',
+        duration: 3000,
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Could not create listing';
+      toast.error('Listing failed', { description: message });
+    } finally {
+      setSubmittingListing(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#000000] via-[#0a0e1a] to-[#000000] text-white">
-      {/* Header */}
       <div className="sticky top-0 z-40 px-5 pt-8 pb-4 backdrop-blur-xl bg-gradient-to-b from-[#000000] to-transparent">
         <div className="flex items-center justify-between mb-4">
           <div>
@@ -181,7 +206,6 @@ export function Marketplace() {
           </button>
         </div>
 
-        {/* Search */}
         <div className="relative mb-4">
           <div className="relative rounded-[16px] p-[1px] bg-gradient-to-b from-white/25 to-white/10">
             <div className="relative rounded-[16px] bg-gradient-to-b from-[#1a2642]/90 to-[#0f172a]/95 backdrop-blur-xl">
@@ -199,7 +223,6 @@ export function Marketplace() {
           </div>
         </div>
 
-        {/* Category Pills */}
         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
           {categories.map((cat) => (
             <button
@@ -219,9 +242,7 @@ export function Marketplace() {
         </div>
       </div>
 
-      {/* Content */}
       <div className="px-5 pb-24 space-y-4">
-        {/* Trust Banner */}
         <div className="relative rounded-[20px] p-[1px] bg-gradient-to-b from-green-400/30 to-green-500/10">
           <div className="relative rounded-[20px] bg-gradient-to-br from-[#1a2642]/90 to-[#0f172a]/95 backdrop-blur-xl p-4">
             <div className="flex items-center gap-3">
@@ -229,15 +250,14 @@ export function Marketplace() {
               <div className="flex-1">
                 <h3 className="font-semibold text-sm mb-1">AI Scam Shield Active</h3>
                 <p className="text-xs text-white/60 leading-relaxed">
-                  Every listing verified with escrow protection • 95% scam-free guarantee
+                  Every listing verified with escrow protection � {isLive ? 'Live backend sync active' : 'Preview mode active'}
                 </p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Featured Listings */}
-        {filteredListings.filter(l => l.featured).length > 0 && (
+        {filteredListings.filter((l) => l.featured).length > 0 && (
           <div>
             <div className="flex items-center gap-2 mb-3">
               <TrendingUp className="w-5 h-5 text-amber-400" strokeWidth={2} />
@@ -246,7 +266,10 @@ export function Marketplace() {
           </div>
         )}
 
-        {/* Listings */}
+        {isLoading && listings.length === 0 && (
+          <div className="text-center py-6 text-sm text-white/60">Loading marketplace listings...</div>
+        )}
+
         <div className="space-y-3">
           {filteredListings.map((listing, index) => (
             <motion.div
@@ -261,10 +284,8 @@ export function Marketplace() {
               }`}
             >
               <div className="relative rounded-[24px] bg-gradient-to-b from-[#1a2642]/90 to-[#0f172a]/95 backdrop-blur-xl p-4">
-                {/* Glossy overlay */}
                 <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent rounded-[24px] pointer-events-none" />
-                
-                {/* AI Scam Score Badge */}
+
                 {listing.aiScamScore <= 10 && (
                   <div className="absolute top-3 right-3 px-2 py-1 rounded-full bg-green-500/20 border border-green-400/30">
                     <div className="flex items-center gap-1">
@@ -284,28 +305,31 @@ export function Marketplace() {
                 )}
 
                 <div className="relative">
-                  {/* Image Placeholder & Title */}
                   <div className="flex items-start gap-3 mb-3">
                     <div className="w-20 h-20 rounded-[12px] bg-gradient-to-br from-[#3b9eff]/20 to-[#8b5cf6]/20 flex items-center justify-center">
                       <Package className="w-8 h-8 text-white/40" strokeWidth={1.5} />
-                      <span className="absolute bottom-1 right-1 text-[9px] px-1.5 py-0.5 rounded bg-black/40 text-white/80">
-                        +{listing.images - 1}
-                      </span>
+                      {listing.images > 1 && (
+                        <span className="absolute bottom-1 right-1 text-[9px] px-1.5 py-0.5 rounded bg-black/40 text-white/80">
+                          +{listing.images - 1}
+                        </span>
+                      )}
                     </div>
 
                     <div className="flex-1">
                       <h3 className="font-semibold text-base mb-1">{listing.title}</h3>
-                      
+
                       <div className="flex items-center gap-2 flex-wrap mb-2">
                         <span className="text-xl font-bold text-[#10b981]">{listing.price} PLN</span>
-                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
-                          listing.condition === 'New' || listing.condition === 'Like New'
-                            ? 'bg-green-500/20 text-green-400'
-                            : 'bg-amber-500/20 text-amber-400'
-                        }`}>
+                        <span
+                          className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
+                            listing.condition === 'New' || listing.condition === 'Like New'
+                              ? 'bg-green-500/20 text-green-400'
+                              : 'bg-amber-500/20 text-amber-400'
+                          }`}
+                        >
                           {listing.condition}
                         </span>
-                        
+
                         {listing.escrowAvailable && (
                           <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 font-semibold flex items-center gap-1">
                             <Shield className="w-2.5 h-2.5" strokeWidth={2} />
@@ -314,7 +338,6 @@ export function Marketplace() {
                         )}
                       </div>
 
-                      {/* Seller Info */}
                       <div className="flex items-center gap-2 mb-2">
                         <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#3b9eff] to-[#8b5cf6] flex items-center justify-center text-xs font-bold">
                           {listing.seller.name[0]}
@@ -330,13 +353,12 @@ export function Marketplace() {
                         </div>
                       </div>
 
-                      {/* Meta */}
                       <div className="flex items-center gap-3 text-xs text-white/50">
                         <div className="flex items-center gap-1">
                           <MapPin className="w-3 h-3" strokeWidth={2} />
                           <span>{listing.distance}</span>
                         </div>
-                        <span>•</span>
+                        <span>�</span>
                         <span>{listing.postedAt}</span>
                       </div>
                     </div>
@@ -354,7 +376,6 @@ export function Marketplace() {
                     </button>
                   </div>
 
-                  {/* Expanded View */}
                   <AnimatePresence>
                     {expandedListing === listing.id && (
                       <motion.div
@@ -365,9 +386,7 @@ export function Marketplace() {
                         className="overflow-hidden"
                       >
                         <div className="pt-3 mt-3 border-t border-white/10">
-                          <p className="text-sm text-white/70 leading-relaxed mb-3">
-                            {listing.description}
-                          </p>
+                          <p className="text-sm text-white/70 leading-relaxed mb-3">{listing.description}</p>
 
                           <div className="grid grid-cols-2 gap-2">
                             <button
@@ -397,6 +416,14 @@ export function Marketplace() {
                               </button>
                             )}
 
+                            <button
+                              onClick={() => openReviewModal(listing.id)}
+                              className="flex items-center justify-center gap-2 py-2.5 rounded-lg bg-white/5 hover:bg-white/10 font-semibold text-sm"
+                            >
+                              <Star className="w-4 h-4" strokeWidth={2} />
+                              Review
+                            </button>
+
                             <button className="flex items-center justify-center gap-2 py-2.5 rounded-lg bg-white/5 hover:bg-white/10 font-semibold text-sm">
                               <Heart className="w-4 h-4" strokeWidth={2} />
                               Save
@@ -412,7 +439,7 @@ export function Marketplace() {
           ))}
         </div>
 
-        {filteredListings.length === 0 && (
+        {filteredListings.length === 0 && !isLoading && (
           <div className="text-center py-12">
             <p className="text-white/50 mb-2">No listings found</p>
             <p className="text-sm text-white/30">Try a different search</p>
@@ -420,7 +447,6 @@ export function Marketplace() {
         )}
       </div>
 
-      {/* List Item Modal */}
       <AnimatePresence>
         {showListModal && (
           <motion.div
@@ -431,7 +457,7 @@ export function Marketplace() {
             onClick={() => setShowListModal(false)}
           >
             <div className="absolute inset-0 bg-black/80 backdrop-blur-md" />
-            
+
             <motion.div
               initial={{ y: '100%' }}
               animate={{ y: 0 }}
@@ -442,48 +468,138 @@ export function Marketplace() {
             >
               <div className="rounded-t-[28px] bg-gradient-to-b from-[#1a2642]/98 to-[#0f172a]/98 backdrop-blur-xl p-6">
                 <h3 className="text-xl font-bold mb-4">List an Item</h3>
-                
+
                 <div className="space-y-3 mb-4">
                   <input
                     type="text"
                     placeholder="Item title"
+                    value={listForm.title}
+                    onChange={(e) => setListForm((prev) => ({ ...prev, title: e.target.value }))}
                     className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/40 outline-none focus:border-[#10b981]/50"
                   />
                   <input
                     type="number"
                     placeholder="Price (PLN)"
+                    value={listForm.price}
+                    onChange={(e) => setListForm((prev) => ({ ...prev, price: e.target.value }))}
                     className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/40 outline-none focus:border-[#10b981]/50"
                   />
-                  <select className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white outline-none focus:border-[#10b981]/50">
-                    <option value="" className="bg-[#1a2642]">Select category</option>
-                    <option value="furniture" className="bg-[#1a2642]">Furniture</option>
-                    <option value="electronics" className="bg-[#1a2642]">Electronics</option>
-                    <option value="home" className="bg-[#1a2642]">Home</option>
-                    <option value="clothing" className="bg-[#1a2642]">Clothing</option>
+                  <select
+                    value={listForm.category}
+                    onChange={(e) => setListForm((prev) => ({ ...prev, category: e.target.value }))}
+                    className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white outline-none focus:border-[#10b981]/50"
+                  >
+                    <option value="" className="bg-[#1a2642]">
+                      Select category
+                    </option>
+                    {categories
+                      .filter((cat) => cat.id !== 'all')
+                      .map((cat) => (
+                        <option key={cat.id} value={cat.id} className="bg-[#1a2642]">
+                          {cat.name}
+                        </option>
+                      ))}
                   </select>
                   <textarea
                     placeholder="Description"
                     rows={3}
+                    value={listForm.description}
+                    onChange={(e) => setListForm((prev) => ({ ...prev, description: e.target.value }))}
                     className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/40 outline-none focus:border-[#10b981]/50 resize-none"
                   />
                 </div>
 
                 <div className="p-3 rounded-lg bg-green-500/10 border border-green-400/20 mb-4">
                   <p className="text-xs text-green-400 leading-relaxed">
-                    <span className="font-semibold">✓ AI auto-categorizes</span> • Escrow available • Earn +10 points for listing, +50 for sale
+                    <span className="font-semibold">? AI auto-categorizes</span> � Escrow available � Earn +10 points for listing, +50 for sale
                   </p>
                 </div>
 
                 <div className="flex gap-2">
                   <button
                     onClick={handleListItem}
-                    className="flex-1 py-3 rounded-lg bg-gradient-to-b from-[#10b981] to-[#059669] font-semibold"
+                    disabled={submittingListing}
+                    className="flex-1 py-3 rounded-lg bg-gradient-to-b from-[#10b981] to-[#059669] font-semibold disabled:opacity-70"
                   >
-                    List Item
+                    {submittingListing ? 'Listing...' : 'List Item'}
                   </button>
                   <button
                     onClick={() => setShowListModal(false)}
                     className="px-6 py-3 rounded-lg bg-white/10 hover:bg-white/15 font-semibold"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showReviewModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[210] flex items-end sm:items-center justify-center"
+            onClick={() => setShowReviewModal(false)}
+          >
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-md" />
+            <motion.div
+              initial={{ y: '100%', opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: '100%', opacity: 0 }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative w-full max-w-md rounded-t-[28px] p-[1px] bg-gradient-to-b from-white/30 to-white/10"
+            >
+              <div className="rounded-t-[28px] bg-gradient-to-b from-[#1a2642]/98 to-[#0f172a]/98 backdrop-blur-xl p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-bold">Rate This Listing</h3>
+                  <button
+                    onClick={() => setShowReviewModal(false)}
+                    className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10"
+                  >
+                    <X className="w-4 h-4" strokeWidth={2} />
+                  </button>
+                </div>
+
+                <div className="flex gap-2 mb-4">
+                  {[1, 2, 3, 4, 5].map((n) => (
+                    <button
+                      key={n}
+                      onClick={() => setReviewRating(n)}
+                      className={`p-2 rounded-lg border ${
+                        reviewRating >= n
+                          ? 'bg-amber-500/20 border-amber-400/40 text-amber-400'
+                          : 'bg-white/5 border-white/10 text-white/40'
+                      }`}
+                    >
+                      <Star className="w-4 h-4" strokeWidth={2} fill="currentColor" />
+                    </button>
+                  ))}
+                </div>
+
+                <textarea
+                  rows={4}
+                  placeholder="Share your experience to help other expats..."
+                  value={reviewBody}
+                  onChange={(e) => setReviewBody(e.target.value)}
+                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 outline-none focus:border-[#10b981]/50 resize-none"
+                />
+
+                <div className="flex gap-2 mt-4">
+                  <button
+                    onClick={handleSubmitReview}
+                    disabled={submittingReview}
+                    className="flex-1 py-3 rounded-lg bg-gradient-to-b from-[#10b981] to-[#059669] font-semibold disabled:opacity-70"
+                  >
+                    {submittingReview ? 'Submitting...' : 'Submit Review'}
+                  </button>
+                  <button
+                    onClick={() => setShowReviewModal(false)}
+                    className="px-6 py-3 rounded-lg bg-white/10 font-semibold"
                   >
                     Cancel
                   </button>

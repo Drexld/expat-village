@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Toaster, toast } from 'sonner';
 import { Navigation } from './components/Navigation';
 import { MorningBriefing } from './components/MorningBriefing';
@@ -10,6 +10,7 @@ import { Discover } from './components/Discover';
 import { WarsawWhisperNetwork } from './components/WarsawWhisperNetwork';
 import { PremiumProfile } from './components/PremiumProfile';
 import { PersonalityOnboarding } from './components/PersonalityOnboarding';
+import { useDailyBriefing, useHomePulse, useMeProfileProgress } from './services/api/hooks';
 
 function getInitialUser() {
   const defaultUser = {
@@ -42,6 +43,25 @@ export default function App() {
   const [userMood, setUserMood] = useState<string>(() => sessionStorage.getItem('mood-check-selected') || '');
   const [showOnboarding, setShowOnboarding] = useState(() => sessionStorage.getItem('onboarding-complete') !== 'true');
   const [user, setUser] = useState(getInitialUser);
+  const homePulse = useHomePulse({ enabled: !showOnboarding });
+  const dailyBriefing = useDailyBriefing({ enabled: !showOnboarding });
+  const meProfileProgress = useMeProfileProgress({ enabled: !showOnboarding });
+
+  const effectiveUser = useMemo(
+    () => ({
+      ...user,
+      name: meProfileProgress.profile?.displayName || user.name,
+      level: meProfileProgress.progress?.level || meProfileProgress.profile?.level || user.level,
+      points: meProfileProgress.progress?.points ?? meProfileProgress.profile?.points ?? user.points,
+      streak: meProfileProgress.progress?.streak ?? meProfileProgress.profile?.streak ?? user.streak,
+      completedTasks: meProfileProgress.progress?.completedTasks ?? user.completedTasks,
+      totalTasks: meProfileProgress.progress?.totalTasks ?? user.totalTasks,
+      badges:
+        meProfileProgress.progress?.badges?.filter((badge) => badge.unlocked).map((badge) => badge.id) ||
+        user.badges,
+    }),
+    [user, meProfileProgress.profile, meProfileProgress.progress],
+  );
 
   useEffect(() => {
     if (showOnboarding) return;
@@ -63,6 +83,28 @@ export default function App() {
       setTimeout(() => setShowBriefing(true), 1000);
     }
   }, [showOnboarding]);
+
+  useEffect(() => {
+    const handleOffline = () => {
+      toast.warning('Offline mode enabled', {
+        description: 'Live feeds will use cached data until connection returns.',
+      });
+    };
+
+    const handleOnline = () => {
+      toast.success('Back online', {
+        description: 'Refreshing live data in the background.',
+      });
+    };
+
+    window.addEventListener('offline', handleOffline);
+    window.addEventListener('online', handleOnline);
+
+    return () => {
+      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('online', handleOnline);
+    };
+  }, []);
 
   const handleCloseBriefing = () => {
     setShowBriefing(false);
@@ -125,17 +167,42 @@ export default function App() {
   const renderContent = () => {
     switch (activeTab) {
       case 'home':
-        return <Home user={user} onOpenBriefing={handleOpenBriefing} userMood={userMood} />;
+        return (
+          <Home
+            user={effectiveUser}
+            onOpenBriefing={handleOpenBriefing}
+            userMood={userMood}
+            homePulseData={homePulse.data}
+            homePulseLive={homePulse.isLive}
+            journeyData={meProfileProgress.progress}
+          />
+        );
       case 'checklist':
-        return <EnhancedChecklist user={user} />;
+        return <EnhancedChecklist user={effectiveUser} />;
       case 'discover':
         return <Discover />;
       case 'community':
         return <WarsawWhisperNetwork />;
       case 'profile':
-        return <PremiumProfile user={user} />;
+        return (
+          <PremiumProfile
+            user={effectiveUser}
+            progressData={meProfileProgress.progress}
+            profileData={meProfileProgress.profile}
+            profileLive={meProfileProgress.isLive}
+          />
+        );
       default:
-        return <Home user={user} onOpenBriefing={handleOpenBriefing} userMood={userMood} />;
+        return (
+          <Home
+            user={effectiveUser}
+            onOpenBriefing={handleOpenBriefing}
+            userMood={userMood}
+            homePulseData={homePulse.data}
+            homePulseLive={homePulse.isLive}
+            journeyData={meProfileProgress.progress}
+          />
+        );
     }
   };
 
@@ -151,11 +218,16 @@ export default function App() {
       {/* Mood Check Modal */}
       <MoodCheck isOpen={showMoodCheck} onClose={handleMoodChange} />
       
-      <MorningBriefing isOpen={showBriefing} onDismiss={handleCloseBriefing} />
+      <MorningBriefing
+        isOpen={showBriefing}
+        onDismiss={handleCloseBriefing}
+        briefingData={dailyBriefing.data}
+        homePulseData={homePulse.data}
+      />
       
       {/* Voice Bubble - Only show on home tab */}
       {activeTab === 'home' && (
-        <VoiceBubble userName={user.name} onVoiceCommand={() => {}} />
+        <VoiceBubble userName={effectiveUser.name} onVoiceCommand={() => {}} />
       )}
       
       <main className="pb-20 min-h-screen max-w-md mx-auto">

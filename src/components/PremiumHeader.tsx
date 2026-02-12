@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Bell, Mic, ChevronDown, Volume2 } from 'lucide-react';
 import { BrandAsset } from './BrandAssets';
@@ -15,13 +15,24 @@ interface PremiumHeaderProps {
   isListening: boolean;
   onVoiceCommand: () => void;
   voiceTranscript?: string;
+  weatherOverride?: {
+    temp: number;
+    condition: string;
+  };
 }
 
-export function PremiumHeader({ user, notifications, isListening, onVoiceCommand, voiceTranscript }: PremiumHeaderProps) {
+export function PremiumHeader({
+  user,
+  notifications,
+  isListening,
+  onVoiceCommand,
+  voiceTranscript,
+  weatherOverride,
+}: PremiumHeaderProps) {
   const [showAvatarMenu, setShowAvatarMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showVoiceTooltip, setShowVoiceTooltip] = useState(true);
-  const [weather, setWeather] = useState({ temp: -3, condition: 'cold' });
+  const weather = weatherOverride ?? { temp: -3, condition: 'cold' };
 
   const getEmotionalGreeting = () => {
     const hour = new Date().getHours();

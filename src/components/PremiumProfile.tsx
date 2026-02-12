@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Camera, MapPin, Share2, Award, TrendingUp, Users, Settings, ChevronRight, Lock, Bell, Globe, HelpCircle, Crown, Sparkles, Calendar, MessageCircle, Zap, QrCode } from 'lucide-react';
 import { toast } from 'sonner';
+import type { MeBadgeProgress, MeConnectionSummary, MeInsights, MeJourneyEvent, MeProfile, MeProgress } from '../services/api/types';
 
 interface PremiumProfileProps {
   user: {
@@ -13,45 +14,61 @@ interface PremiumProfileProps {
     totalTasks: number;
     badges: string[];
   };
+  profileData?: MeProfile | null;
+  progressData?: MeProgress | null;
+  profileLive?: boolean;
 }
 
-export function PremiumProfile({ user }: PremiumProfileProps) {
+export function PremiumProfile({ user, profileData, progressData, profileLive }: PremiumProfileProps) {
   const [showSettings, setShowSettings] = useState(false);
   const [showQRCode, setShowQRCode] = useState(false);
   const [editingBio, setEditingBio] = useState(false);
-  const [bio, setBio] = useState('From NYC, Week 2 in Warsaw. Seeking Language Buddies! 🇵🇱');
+  const [bio, setBio] = useState(profileData?.bio || 'From NYC, Week 2 in Warsaw. Seeking Language Buddies!');
 
-  const badges = [
-    { id: 'early-adopter', name: 'Early Adopter', emoji: '🚀', category: 'Arrival', unlocked: true, progress: 100 },
-    { id: 'first-steps', name: 'First Steps', emoji: '👣', category: 'Arrival', unlocked: true, progress: 100 },
-    { id: 'week-one', name: 'Week One Warrior', emoji: '🗡️', category: 'Daily', unlocked: true, progress: 100 },
-    { id: 'helpful', name: 'Helpful', emoji: '🤝', category: 'Community', unlocked: false, progress: 60 },
-    { id: 'social-butterfly', name: 'Social Butterfly', emoji: '🦋', category: 'Community', unlocked: false, progress: 40 },
-    { id: 'warsaw-insider', name: 'Warsaw Insider', emoji: '🏆', category: 'Long-Term', unlocked: false, progress: 20 },
-    { id: 'village-elder', name: 'Village Elder', emoji: '👑', category: 'Long-Term', unlocked: false, progress: 5 },
-    { id: 'polish-curator', name: 'Polish Playlist Curator', emoji: '🎵', category: 'Vibes', unlocked: false, progress: 75 },
+  const defaultBadges: MeBadgeProgress[] = [
+    { id: 'early-adopter', name: 'Early Adopter', emoji: '??', category: 'Arrival', unlocked: true, progress: 100 },
+    { id: 'first-steps', name: 'First Steps', emoji: '??', category: 'Arrival', unlocked: true, progress: 100 },
+    { id: 'week-one', name: 'Week One Warrior', emoji: '???', category: 'Daily', unlocked: true, progress: 100 },
+    { id: 'helpful', name: 'Helpful', emoji: '??', category: 'Community', unlocked: false, progress: 60 },
+    { id: 'social-butterfly', name: 'Social Butterfly', emoji: '??', category: 'Community', unlocked: false, progress: 40 },
+    { id: 'warsaw-insider', name: 'Warsaw Insider', emoji: '??', category: 'Long-Term', unlocked: false, progress: 20 },
+    { id: 'village-elder', name: 'Village Elder', emoji: '??', category: 'Long-Term', unlocked: false, progress: 5 },
+    { id: 'polish-curator', name: 'Polish Playlist Curator', emoji: '??', category: 'Vibes', unlocked: false, progress: 75 },
   ];
 
-  const journey = [
-    { date: 'Jan 28, 2026', event: 'Arrived in Warsaw', icon: '✈️', completed: true },
-    { date: 'Jan 29, 2026', event: 'First SIM card', icon: '📱', completed: true },
-    { date: 'Jan 30, 2026', event: 'Bank account opened', icon: '🏦', completed: true },
-    { date: 'Feb 9, 2026', event: 'PESEL appointment', icon: '📋', completed: false },
-    { date: 'Feb 15, 2026', event: 'Residence permit', icon: '🏠', completed: false },
+  const defaultJourney: MeJourneyEvent[] = [
+    { date: 'Jan 28, 2026', event: 'Arrived in Warsaw', icon: '??', completed: true },
+    { date: 'Jan 29, 2026', event: 'First SIM card', icon: '??', completed: true },
+    { date: 'Jan 30, 2026', event: 'Bank account opened', icon: '??', completed: true },
+    { date: 'Feb 9, 2026', event: 'PESEL appointment', icon: '??', completed: false },
+    { date: 'Feb 15, 2026', event: 'Residence permit', icon: '??', completed: false },
   ];
 
-  const connections = [
+  const defaultConnections: MeConnectionSummary[] = [
     { name: 'Sarah M.', status: 'Online', avatar: 'S', country: 'UK', sharedTasks: 3 },
     { name: 'Luca R.', status: 'Offline', avatar: 'L', country: 'Italy', sharedTasks: 5 },
     { name: 'Priya S.', status: 'Online', avatar: 'P', country: 'India', sharedTasks: 2 },
   ];
 
-  const insights = {
+  const defaultInsights: MeInsights = {
     aheadOfAverage: 20,
     activityBreakdown: { checklist: 60, community: 25, vibes: 15 },
     forecast: { daysToSettled: 21, confidence: 85 },
-    streakCalendar: Array(28).fill(0).map((_, i) => i < 7)
+    streakCalendar: Array(28)
+      .fill(0)
+      .map((_, i) => i < 7),
   };
+
+  const badges = progressData?.badges || defaultBadges;
+  const journey = progressData?.journey || defaultJourney;
+  const connections = progressData?.connections || defaultConnections;
+  const insights = progressData?.insights || defaultInsights;
+
+  useEffect(() => {
+    if (profileData?.bio) {
+      setBio(profileData.bio);
+    }
+  }, [profileData?.bio]);
 
   const handleShareStory = () => {
     toast.success('📤 Story shared!', {
@@ -88,7 +105,12 @@ export function PremiumProfile({ user }: PremiumProfileProps) {
         <div className="relative px-5 pt-8 pb-6">
           {/* Top Actions */}
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold">Profile</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-bold">Profile</h1>
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/10 text-white/70 font-semibold">
+                {profileLive ? 'LIVE' : 'PREVIEW'}
+              </span>
+            </div>
             <button
               onClick={() => setShowSettings(true)}
               className="p-2.5 rounded-full bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-colors"
@@ -227,7 +249,7 @@ export function PremiumProfile({ user }: PremiumProfileProps) {
             <div className="relative">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-bold">Your Warsaw Journey</h3>
-                <span className="text-xs text-white/50">Week 2</span>
+                <span className="text-xs text-white/50">{progressData?.weekLabel || 'Week 2'}</span>
               </div>
 
               <div className="space-y-3">
@@ -464,3 +486,5 @@ export function PremiumProfile({ user }: PremiumProfileProps) {
     </div>
   );
 }
+
+

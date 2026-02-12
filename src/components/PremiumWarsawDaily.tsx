@@ -7,6 +7,14 @@ interface PremiumWarsawDailyProps {
   streak: number;
 }
 
+interface DailyChallenge {
+  question: string;
+  options: string[];
+  correctIndex: number;
+  type: 'weather' | 'wisdom';
+  reward?: string;
+}
+
 export function PremiumWarsawDaily({ streak }: PremiumWarsawDailyProps) {
   const [hasPlayed, setHasPlayed] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
@@ -14,7 +22,7 @@ export function PremiumWarsawDaily({ streak }: PremiumWarsawDailyProps) {
   const [mode, setMode] = useState<'weather' | 'wisdom'>('weather');
   const [isVoiceMode, setIsVoiceMode] = useState(false);
   
-  const challenges = {
+  const challenges: Record<'weather' | 'wisdom', DailyChallenge> = {
     weather: {
       question: "What's tomorrow's high in Warsaw?",
       options: ['-2°C', '3°C', '7°C', '12°C'],

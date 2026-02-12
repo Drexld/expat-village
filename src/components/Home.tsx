@@ -17,6 +17,7 @@ import { PremiumJourney } from './PremiumJourney';
 import { PremiumWarsawDaily } from './PremiumWarsawDaily';
 import { PremiumCommunityCards } from './PremiumCommunityCards';
 import { toast } from 'sonner';
+import type { HomePulse as HomePulseData, MeProgress } from '../services/api/types';
 
 interface HomeProps {
   user: {
@@ -29,9 +30,12 @@ interface HomeProps {
   };
   onOpenBriefing?: () => void;
   userMood?: string;
+  homePulseData?: HomePulseData | null;
+  homePulseLive?: boolean;
+  journeyData?: MeProgress | null;
 }
 
-export function Home({ user, onOpenBriefing, userMood }: HomeProps) {
+export function Home({ user, onOpenBriefing, userMood, homePulseData, homePulseLive, journeyData }: HomeProps) {
   const [notifications] = useState(3);
   const [isListening, setIsListening] = useState(false);
   const [voiceTranscript, setVoiceTranscript] = useState('');
@@ -66,6 +70,14 @@ export function Home({ user, onOpenBriefing, userMood }: HomeProps) {
         isListening={isListening}
         onVoiceCommand={handleVoiceCommand}
         voiceTranscript={voiceTranscript}
+        weatherOverride={
+          homePulseData
+            ? {
+                temp: Math.round(homePulseData.weather.temperatureC),
+                condition: homePulseData.weather.condition,
+              }
+            : undefined
+        }
       />
 
       <div className="px-5 pb-8">
@@ -103,12 +115,17 @@ export function Home({ user, onOpenBriefing, userMood }: HomeProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05 }}
           >
-            <PremiumDailyPulse onOpenBriefing={onOpenBriefing} userMood={userMood} />
+            <PremiumDailyPulse
+              onOpenBriefing={onOpenBriefing}
+              userMood={userMood}
+              pulseData={homePulseData}
+              pulseLive={homePulseLive}
+            />
           </motion.div>
         )}
 
         <motion.div style={{ y: y1 }} className="mb-4">
-          <PremiumJourney user={user} />
+          <PremiumJourney user={user} journeyData={journeyData} />
         </motion.div>
 
         <motion.div style={{ y: y2 }} className="grid grid-cols-2 gap-4 mb-4">
