@@ -1,6 +1,16 @@
 import { useState, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
-import { Mic, MessageSquare, Calendar, Users, Zap, BrainCircuit, UtensilsCrossed } from 'lucide-react';
+import {
+  Mic,
+  MessageSquare,
+  Calendar,
+  Users,
+  Zap,
+  BrainCircuit,
+  UtensilsCrossed,
+  Sun,
+  ChevronRight,
+} from 'lucide-react';
 import { PremiumHeader } from './PremiumHeader';
 import { PremiumDailyPulse } from './PremiumDailyPulse';
 import { PremiumJourney } from './PremiumJourney';
@@ -59,6 +69,32 @@ export function Home({ user, onOpenBriefing, userMood }: HomeProps) {
       />
 
       <div className="px-5 pb-8">
+        {onOpenBriefing && (
+          <motion.button
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.02 }}
+            onClick={onOpenBriefing}
+            className="w-full mb-3 relative rounded-[16px] p-[1px] bg-gradient-to-b from-[#3b9eff]/35 to-[#2d7dd2]/10"
+          >
+            <div className="relative rounded-[16px] bg-gradient-to-b from-[#1a2642]/90 to-[#0f172a]/95 p-3.5">
+              <div className="absolute inset-0 rounded-[16px] bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none" />
+              <div className="relative flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-full bg-[#3b9eff]/20 flex items-center justify-center">
+                    <Sun className="w-4 h-4 text-[#3b9eff]" strokeWidth={2} />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-sm font-semibold">Open Morning Briefing</p>
+                    <p className="text-[11px] text-white/55">Review your Warsaw pulse any time</p>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-white/50" strokeWidth={2} />
+              </div>
+            </div>
+          </motion.button>
+        )}
+
         {onOpenBriefing && (
           <motion.div
             style={{ y: y1 }}

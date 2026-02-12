@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Toaster } from 'sonner';
+import { Toaster, toast } from 'sonner';
 import { Navigation } from './components/Navigation';
 import { MorningBriefing } from './components/MorningBriefing';
 import { MoodCheck } from './components/MoodCheck';
@@ -9,23 +9,43 @@ import { EnhancedChecklist } from './components/EnhancedChecklist';
 import { Discover } from './components/Discover';
 import { WarsawWhisperNetwork } from './components/WarsawWhisperNetwork';
 import { PremiumProfile } from './components/PremiumProfile';
+import { PersonalityOnboarding } from './components/PersonalityOnboarding';
 
-export default function App() {
-  const [activeTab, setActiveTab] = useState('home');
-  const [showBriefing, setShowBriefing] = useState(false);
-  const [showMoodCheck, setShowMoodCheck] = useState(false);
-  const [userMood, setUserMood] = useState<string>(() => sessionStorage.getItem('mood-check-selected') || '');
-  const [user] = useState({
+function getInitialUser() {
+  const defaultUser = {
     name: 'Alex',
     level: 'Newcomer',
     points: 340,
     streak: 7,
     completedTasks: 8,
     totalTasks: 24,
-    badges: ['early-adopter', 'first-steps', 'week-one']
-  });
+    badges: ['early-adopter', 'first-steps', 'week-one'],
+  };
+
+  try {
+    const raw = sessionStorage.getItem('onboarding-profile');
+    if (!raw) return defaultUser;
+    const parsed = JSON.parse(raw);
+    return {
+      ...defaultUser,
+      name: typeof parsed?.name === 'string' && parsed.name.trim() ? parsed.name.trim() : defaultUser.name,
+    };
+  } catch {
+    return defaultUser;
+  }
+}
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState('home');
+  const [showBriefing, setShowBriefing] = useState(false);
+  const [showMoodCheck, setShowMoodCheck] = useState(false);
+  const [userMood, setUserMood] = useState<string>(() => sessionStorage.getItem('mood-check-selected') || '');
+  const [showOnboarding, setShowOnboarding] = useState(() => sessionStorage.getItem('onboarding-complete') !== 'true');
+  const [user, setUser] = useState(getInitialUser);
 
   useEffect(() => {
+    if (showOnboarding) return;
+
     const currentHour = new Date().getHours();
     const today = new Date().toDateString();
     const briefingSeenDate = sessionStorage.getItem('briefing-seen-date');
@@ -42,7 +62,7 @@ export default function App() {
     if (isMorningWindow && briefingSeenDate !== today) {
       setTimeout(() => setShowBriefing(true), 1000);
     }
-  }, []);
+  }, [showOnboarding]);
 
   const handleCloseBriefing = () => {
     setShowBriefing(false);
@@ -70,6 +90,38 @@ export default function App() {
     sessionStorage.setItem('mood-check-date', new Date().toDateString());
   };
 
+  const handleOnboardingComplete = (payload: {
+    name: string;
+    tribe: string;
+    interest: string;
+    badge: string;
+    score: number;
+    total: number;
+  }) => {
+    const profile = {
+      name: payload.name,
+      tribe: payload.tribe,
+      interest: payload.interest,
+      badge: payload.badge,
+      score: payload.score,
+      total: payload.total,
+      completedAt: new Date().toISOString(),
+    };
+
+    sessionStorage.setItem('onboarding-profile', JSON.stringify(profile));
+    sessionStorage.setItem('onboarding-complete', 'true');
+
+    setUser((prev) => ({
+      ...prev,
+      name: payload.name,
+      badges: [...new Set([payload.badge, ...prev.badges])],
+    }));
+    setShowOnboarding(false);
+    toast.success('Welcome to Expat Village', {
+      description: `Badge unlocked: ${payload.badge}`,
+    });
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case 'home':
@@ -90,6 +142,11 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#000000] via-[#0a0e1a] to-[#000000] text-white">
       <Toaster position="top-center" theme="dark" />
+
+      {showOnboarding ? (
+        <PersonalityOnboarding onComplete={handleOnboardingComplete} />
+      ) : (
+        <>
       
       {/* Mood Check Modal */}
       <MoodCheck isOpen={showMoodCheck} onClose={handleMoodChange} />
@@ -106,6 +163,8 @@ export default function App() {
       </main>
       
       <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
+        </>
+      )}
     </div>
   );
 }

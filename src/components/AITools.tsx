@@ -1,14 +1,47 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Upload, FileText, AlertCircle, CheckCircle, Brain, Share2, Users, X, Edit3, AlertTriangle, Info } from 'lucide-react';
+import { Upload, FileText, AlertCircle, CheckCircle, Brain, Share2, Users, X, Edit3, AlertTriangle, Info, Scale, ShieldCheck, Clock3 } from 'lucide-react';
 import { toast } from 'sonner';
+
+type Severity = 'high' | 'medium' | 'low';
+
+interface ContractIssue {
+  severity: Severity;
+  title: string;
+  description: string;
+  suggestion: string;
+  location: string;
+  legalReference: string;
+}
+
+interface LegalCheck {
+  title: string;
+  status: 'pass' | 'review' | 'missing';
+  detail: string;
+  legalReference: string;
+}
+
+interface ContractAnalysisResult {
+  score: number;
+  issues: ContractIssue[];
+  positives: string[];
+  warsawTips: string[];
+  legalChecks: LegalCheck[];
+}
 
 export function AITools() {
   const [activeTab, setActiveTab] = useState<'contract' | 'document' | 'nestquest'>('contract');
   const [analyzing, setAnalyzing] = useState(false);
-  const [contractResults, setContractResults] = useState<any>(null);
+  const [contractResults, setContractResults] = useState<ContractAnalysisResult | null>(null);
   const [documentResults, setDocumentResults] = useState<any>(null);
   const [editingClause, setEditingClause] = useState(false);
+  const [showLawyerModal, setShowLawyerModal] = useState(false);
+  const [requestingLawyer, setRequestingLawyer] = useState(false);
+  const [lawyerForm, setLawyerForm] = useState({
+    email: '',
+    priority: 'standard',
+    note: '',
+  });
 
   const handleFileUpload = (type: 'contract' | 'document') => {
     setAnalyzing(true);
@@ -31,21 +64,24 @@ export function AITools() {
               title: 'No registration clause found',
               description: 'Contract lacks clause requiring landlord to register tenancy - common scam in Warsaw',
               suggestion: 'Add: "Landlord agrees to register this tenancy with tax authorities within 14 days"',
-              location: 'Section 3.2'
+              location: 'Section 3.2',
+              legalReference: 'Polish tax-registration duties for rental income (landlord side)'
             },
             {
               severity: 'medium',
               title: 'Deposit terms unclear',
               description: 'Return conditions not specified',
               suggestion: 'Specify: "Deposit returned within 30 days after move-out, minus documented damages"',
-              location: 'Section 5.1'
+              location: 'Section 5.1',
+              legalReference: 'Civil Code fairness principle for clear obligations'
             },
             {
               severity: 'low',
               title: 'Utilities payment method',
               description: 'Could be more specific about billing cycle',
               suggestion: 'Consider monthly pre-payment system',
-              location: 'Section 6'
+              location: 'Section 6',
+              legalReference: 'Consumer transparency practice for recurring charges'
             }
           ],
           positives: [
@@ -57,6 +93,32 @@ export function AITools() {
             'In Warsaw, landlords must register tenancy or face fines',
             'Average security deposit is 1-2 months rent',
             'Utilities usually average 400-600 PLN/month for studio'
+          ],
+          legalChecks: [
+            {
+              title: 'Landlord identity and ownership traceability',
+              status: 'review',
+              detail: 'No explicit ownership verification clause was found.',
+              legalReference: 'Polish Civil Code due-diligence best practice'
+            },
+            {
+              title: 'Deposit return and damage deduction terms',
+              status: 'review',
+              detail: 'Deposit process exists but timeline and evidence requirements are vague.',
+              legalReference: 'Contract clarity requirement under Civil Code principles'
+            },
+            {
+              title: 'Termination and notice clauses',
+              status: 'pass',
+              detail: 'Termination window appears defined and bilateral.',
+              legalReference: 'General contractual balance standards'
+            },
+            {
+              title: 'Utilities and additional charges transparency',
+              status: 'missing',
+              detail: 'No detailed monthly settlement method or invoice evidence path.',
+              legalReference: 'Consumer-rights transparency expectations'
+            }
           ]
         });
 
@@ -120,10 +182,24 @@ export function AITools() {
   };
 
   const handleContactLawyer = () => {
-    toast.info('👨‍⚖️ Connecting you...', {
-      description: 'Verified expat lawyers in Warsaw',
-      duration: 2000,
-    });
+    setShowLawyerModal(true);
+  };
+
+  const handleSubmitLawyerRequest = () => {
+    if (!lawyerForm.email.trim() || !lawyerForm.email.includes('@')) {
+      toast.error('Enter a valid email for lawyer follow-up');
+      return;
+    }
+
+    setRequestingLawyer(true);
+    setTimeout(() => {
+      setRequestingLawyer(false);
+      setShowLawyerModal(false);
+      toast.success('Lawyer review requested', {
+        description: 'A verified Warsaw lawyer will review flagged clauses and contact you.',
+        duration: 3000,
+      });
+    }, 1200);
   };
 
   return (
@@ -245,7 +321,7 @@ export function AITools() {
                     </button>
 
                     <p className="text-xs text-white/40 leading-relaxed">
-                      AI will check for common scams, unfair clauses, and Warsaw-specific issues
+                      AI screens clauses against Polish law expectations and Warsaw rental red flags.
                     </p>
                   </div>
                 </div>
@@ -276,27 +352,41 @@ export function AITools() {
                       <div className="text-5xl font-bold bg-gradient-to-r from-[#f59e0b] to-[#f59e0b] bg-clip-text text-transparent mb-2">
                         {contractResults.score}/100
                       </div>
+                      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#3b9eff]/15 border border-[#3b9eff]/30 mb-2">
+                        <Scale className="w-3.5 h-3.5 text-[#3b9eff]" strokeWidth={2} />
+                        <span className="text-[10px] font-semibold text-[#3b9eff] uppercase">Polish Law Mode</span>
+                      </div>
                       <p className="text-sm text-white/60">
                         {contractResults.score >= 80 ? 'Good contract' : 
                          contractResults.score >= 60 ? 'Needs improvements' : 
                          'Serious issues found'}
                       </p>
+                      <p className="text-[11px] text-white/45 mt-1">
+                        Preliminary AI screening. Not a substitute for legal advice.
+                      </p>
                     </div>
 
-                    <div className="flex gap-2">
+                    <div className="grid grid-cols-3 gap-2">
                       <button
                         onClick={handleWhatIfSimulator}
-                        className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg bg-[#8b5cf6]/20 hover:bg-[#8b5cf6]/30 text-sm font-semibold text-[#8b5cf6] transition-all"
+                        className="flex items-center justify-center gap-1.5 py-2.5 rounded-lg bg-[#8b5cf6]/20 hover:bg-[#8b5cf6]/30 text-xs font-semibold text-[#8b5cf6] transition-all"
                       >
                         <Edit3 className="w-4 h-4" strokeWidth={2} />
-                        What-If Editor
+                        What-If
                       </button>
                       <button
                         onClick={handleShareWithForum}
-                        className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg bg-white/5 hover:bg-white/10 text-sm font-semibold transition-all"
+                        className="flex items-center justify-center gap-1.5 py-2.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-semibold transition-all"
                       >
                         <Share2 className="w-4 h-4" strokeWidth={2} />
                         Share
+                      </button>
+                      <button
+                        onClick={handleContactLawyer}
+                        className="flex items-center justify-center gap-1.5 py-2.5 rounded-lg bg-[#3b9eff]/20 hover:bg-[#3b9eff]/30 text-xs font-semibold text-[#3b9eff] transition-all"
+                      >
+                        <Scale className="w-4 h-4" strokeWidth={2} />
+                        Lawyer
                       </button>
                     </div>
                   </div>
@@ -304,9 +394,9 @@ export function AITools() {
 
                 {/* Issues */}
                 <div>
-                  <h3 className="font-bold mb-3">Issues Found ({contractResults.issues.length})</h3>
+                  <h3 className="font-bold mb-3">Clauses Requiring Review ({contractResults.issues.length})</h3>
                   <div className="space-y-3">
-                    {contractResults.issues.map((issue: any, index: number) => (
+                    {contractResults.issues.map((issue, index: number) => (
                       <div
                         key={index}
                         className={`relative rounded-[16px] p-[1px] ${
@@ -349,11 +439,60 @@ export function AITools() {
                               </div>
 
                               <p className="text-[10px] text-white/40">Location: {issue.location}</p>
+                              <p className="text-[10px] text-[#3b9eff]/75 mt-1">Legal basis: {issue.legalReference}</p>
                             </div>
                           </div>
                         </div>
                       </div>
                     ))}
+                  </div>
+                </div>
+
+                {/* Good Clauses */}
+                <div className="relative rounded-[20px] p-[1px] bg-gradient-to-b from-green-500/30 to-green-600/10">
+                  <div className="relative rounded-[20px] bg-gradient-to-br from-[#1a2642]/90 to-[#0f172a]/95 backdrop-blur-xl p-4">
+                    <h3 className="font-bold mb-3 flex items-center gap-2">
+                      <ShieldCheck className="w-5 h-5 text-green-400" strokeWidth={2} />
+                      Good Clauses Detected
+                    </h3>
+                    <ul className="space-y-2">
+                      {contractResults.positives.map((item: string, index: number) => (
+                        <li key={index} className="text-sm text-white/80 flex items-start gap-2">
+                          <CheckCircle className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" strokeWidth={2} />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Polish Law Checks */}
+                <div className="relative rounded-[20px] p-[1px] bg-gradient-to-b from-[#3b9eff]/30 to-[#8b5cf6]/10">
+                  <div className="relative rounded-[20px] bg-gradient-to-br from-[#1a2642]/90 to-[#0f172a]/95 backdrop-blur-xl p-4">
+                    <h3 className="font-bold mb-3 flex items-center gap-2">
+                      <Scale className="w-5 h-5 text-[#3b9eff]" strokeWidth={2} />
+                      Polish Law Checks
+                    </h3>
+                    <div className="space-y-2.5">
+                      {contractResults.legalChecks.map((check, index: number) => (
+                        <div key={index} className="p-3 rounded-[12px] bg-white/5 border border-white/10">
+                          <div className="flex items-center gap-2 mb-1.5">
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
+                              check.status === 'pass'
+                                ? 'bg-green-500/20 text-green-400'
+                                : check.status === 'review'
+                                  ? 'bg-amber-500/20 text-amber-400'
+                                  : 'bg-red-500/20 text-red-400'
+                            }`}>
+                              {check.status}
+                            </span>
+                            <p className="text-sm font-semibold">{check.title}</p>
+                          </div>
+                          <p className="text-xs text-white/65 leading-relaxed">{check.detail}</p>
+                          <p className="text-[10px] text-[#3b9eff]/70 mt-1.5">Legal basis: {check.legalReference}</p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
@@ -380,17 +519,17 @@ export function AITools() {
                   <div className="relative rounded-[20px] bg-gradient-to-br from-[#1a2642]/90 to-[#0f172a]/95 backdrop-blur-xl p-4">
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#3b9eff] to-[#8b5cf6] flex items-center justify-center">
-                        <Users className="w-6 h-6 text-white" strokeWidth={2} />
+                        <Scale className="w-6 h-6 text-white" strokeWidth={2} />
                       </div>
                       <div className="flex-1">
-                        <h4 className="font-semibold text-sm mb-1">Need a Human Review?</h4>
-                        <p className="text-xs text-white/50">Connect with verified expat lawyers in Warsaw</p>
+                        <h4 className="font-semibold text-sm mb-1">Request Human Lawyer Review</h4>
+                        <p className="text-xs text-white/50">Send this contract for manual review by a verified Warsaw lawyer.</p>
                       </div>
                       <button
                         onClick={handleContactLawyer}
                         className="px-4 py-2 rounded-lg bg-[#3b9eff]/20 hover:bg-[#3b9eff]/30 text-xs font-semibold text-[#3b9eff] transition-all"
                       >
-                        Contact
+                        Request
                       </button>
                     </div>
                   </div>
@@ -734,6 +873,114 @@ export function AITools() {
           </motion.div>
         )}
       </div>
+
+      <AnimatePresence>
+        {showLawyerModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[220] flex items-end sm:items-center justify-center"
+            onClick={() => setShowLawyerModal(false)}
+          >
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-md" />
+            <motion.div
+              initial={{ y: '100%', opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: '100%', opacity: 0 }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative w-full max-w-md rounded-t-[28px] p-[1px] bg-gradient-to-b from-white/30 to-white/10"
+            >
+              <div className="rounded-t-[28px] bg-gradient-to-b from-[#1a2642]/98 to-[#0f172a]/98 backdrop-blur-xl p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-bold flex items-center gap-2">
+                    <Scale className="w-5 h-5 text-[#3b9eff]" strokeWidth={2} />
+                    Request Lawyer Review
+                  </h3>
+                  <button onClick={() => setShowLawyerModal(false)} className="p-1 rounded-lg bg-white/5 hover:bg-white/10">
+                    <X className="w-4 h-4" strokeWidth={2} />
+                  </button>
+                </div>
+
+                <p className="text-sm text-white/65 mb-4">
+                  A verified lawyer will review high-risk and unclear clauses with Polish law context.
+                </p>
+
+                <div className="space-y-3">
+                  <input
+                    type="email"
+                    placeholder="Your email for follow-up"
+                    value={lawyerForm.email}
+                    onChange={(e) => setLawyerForm((prev) => ({ ...prev, email: e.target.value }))}
+                    className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 outline-none focus:border-[#3b9eff]/50"
+                  />
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => setLawyerForm((prev) => ({ ...prev, priority: 'standard' }))}
+                      className={`py-2.5 rounded-lg border text-xs font-semibold transition-all ${
+                        lawyerForm.priority === 'standard'
+                          ? 'bg-[#3b9eff]/20 border-[#3b9eff]/30 text-[#3b9eff]'
+                          : 'bg-white/5 border-white/10 text-white/65'
+                      }`}
+                    >
+                      <span className="inline-flex items-center gap-1.5">
+                        <Clock3 className="w-3.5 h-3.5" strokeWidth={2} />
+                        Standard (24h)
+                      </span>
+                    </button>
+                    <button
+                      onClick={() => setLawyerForm((prev) => ({ ...prev, priority: 'urgent' }))}
+                      className={`py-2.5 rounded-lg border text-xs font-semibold transition-all ${
+                        lawyerForm.priority === 'urgent'
+                          ? 'bg-red-500/20 border-red-400/30 text-red-400'
+                          : 'bg-white/5 border-white/10 text-white/65'
+                      }`}
+                    >
+                      <span className="inline-flex items-center gap-1.5">
+                        <AlertTriangle className="w-3.5 h-3.5" strokeWidth={2} />
+                        Urgent (6h)
+                      </span>
+                    </button>
+                  </div>
+
+                  <textarea
+                    rows={3}
+                    placeholder="Optional note: specific clause you want reviewed first."
+                    value={lawyerForm.note}
+                    onChange={(e) => setLawyerForm((prev) => ({ ...prev, note: e.target.value }))}
+                    className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 outline-none focus:border-[#3b9eff]/50 resize-none"
+                  />
+                </div>
+
+                <div className="mt-4 p-3 rounded-lg bg-amber-500/10 border border-amber-400/20">
+                  <p className="text-xs text-amber-300">
+                    AI screening is preliminary. Final legal interpretation comes from a human lawyer review.
+                  </p>
+                </div>
+
+                <div className="flex gap-2 mt-4">
+                  <button
+                    onClick={handleSubmitLawyerRequest}
+                    disabled={requestingLawyer}
+                    className="flex-1 py-3 rounded-lg bg-gradient-to-b from-[#3b9eff] to-[#2d7dd2] font-semibold shadow-[0_4px_16px_rgba(59,158,255,0.4)] disabled:opacity-70"
+                  >
+                    {requestingLawyer ? 'Submitting...' : 'Submit Request'}
+                  </button>
+                  <button
+                    onClick={() => setShowLawyerModal(false)}
+                    className="px-5 py-3 rounded-lg bg-white/10 font-semibold"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
+
