@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+﻿import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Search,
@@ -122,12 +122,12 @@ const FALLBACK_BUSINESSES: Business[] = [
 ];
 
 const CATEGORY_META: Record<string, { icon: string; rank: number }> = {
-  banks: { icon: '??', rank: 1 },
-  immigration: { icon: '??', rank: 2 },
-  lawyers: { icon: '??', rank: 2 },
-  language: { icon: '??', rank: 3 },
-  health: { icon: '??', rank: 4 },
-  moving: { icon: '??', rank: 5 },
+  banks: { icon: '🏦', rank: 1 },
+  immigration: { icon: '📋', rank: 2 },
+  lawyers: { icon: '⚖️', rank: 2 },
+  language: { icon: '🗣️', rank: 3 },
+  health: { icon: '🩺', rank: 4 },
+  moving: { icon: '🚚', rank: 5 },
 };
 
 function normalizeCategoryId(name: string): string {
@@ -240,12 +240,12 @@ export function PremiumDirectory() {
     }, {});
 
     return [
-      { id: 'all', name: 'For You', icon: '?', count: businesses.length, rank: 0 },
+      { id: 'all', name: 'For You', icon: '✨', count: businesses.length, rank: 0 },
       ...Object.entries(grouped)
         .map(([id, value]) => ({
           id,
           name: value.name,
-          icon: CATEGORY_META[id]?.icon || '??',
+          icon: CATEGORY_META[id]?.icon || '🏷️',
           count: value.count,
           rank: CATEGORY_META[id]?.rank ?? 99,
         }))

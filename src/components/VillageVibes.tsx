@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+﻿import { useMemo, useState } from 'react';
 import { motion } from 'motion/react';
 import { Music, Tv, Play, Trophy, Share2, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
@@ -90,7 +90,7 @@ export function VillageVibes() {
               transition={{ duration: 2, repeat: Infinity }}
               className="text-2xl"
             >
-              ??
+              🎵
             </motion.div>
           </div>
           <p className="text-sm text-white/50">Shape our community culture together</p>
@@ -107,9 +107,9 @@ export function VillageVibes() {
                   : 'bg-white/5 text-white/60 hover:bg-white/10'
               }`}
             >
-              {tab === 'daily' && '?? '}
-              {tab === 'monthly' && '?? '}
-              {tab === 'results' && '?? '}
+              {tab === 'daily' && '🎵 '}
+              {tab === 'monthly' && '🎬 '}
+              {tab === 'results' && '🏆 '}
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
             </button>
           ))}
@@ -224,12 +224,12 @@ export function VillageVibes() {
                             <p className="font-semibold text-sm">{option.title}</p>
                             {option.artist && (
                               <p className="text-xs text-white/50">
-                                {option.artist} � {option.year}
+                                {option.artist} • {option.year}
                               </p>
                             )}
                             {hasVoted && (
                               <p className="text-xs text-[#3b9eff] font-medium mt-1">
-                                {percentage}% � {option.votes} votes
+                                {percentage}% • {option.votes} votes
                               </p>
                             )}
                           </div>
@@ -295,13 +295,13 @@ export function VillageVibes() {
                                   : 'text-orange-400'
                             }`}
                           >
-                            {item.rank === 1 ? '??' : item.rank === 2 ? '??' : '??'}
+                            {item.rank === 1 ? '🥇' : item.rank === 2 ? '🥈' : '🥉'}
                           </span>
 
                           <div className="flex-1">
                             <p className="text-sm font-semibold">{item.name}</p>
                             <p className="text-xs text-white/50">
-                              {item.votes} votes � {item.streak} day streak
+                              {item.votes} votes • {item.streak} day streak
                             </p>
                           </div>
                         </div>
@@ -378,3 +378,4 @@ export function VillageVibes() {
     </div>
   );
 }
+

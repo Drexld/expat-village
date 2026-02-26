@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+ï»¿import { useMemo, useState } from 'react';
 import { motion } from 'motion/react';
 import { Users, Calendar, Tag, MessageCircle, Heart, X, ChevronRight, MapPin, Plus } from 'lucide-react';
 import { toast } from 'sonner';
@@ -34,7 +34,7 @@ export function StudentHubs() {
         id: 'hub-default',
         name: 'University Hub',
         shortName: 'HUB',
-        logo: '??',
+        logo: 'ðŸŽ“',
         activeStudents: 0,
         totalMembers: 0,
         recentTopics: [],
@@ -242,9 +242,9 @@ export function StudentHubs() {
                       <h3 className="font-semibold text-base mb-1">{university.name}</h3>
                       <div className="flex items-center gap-2 text-xs text-white/50">
                         <span>{university.activeStudents} active</span>
-                        <span>•</span>
+                        <span>â€¢</span>
                         <span>{university.totalMembers} total members</span>
-                        <span>•</span>
+                        <span>â€¢</span>
                         <span>{university.location}</span>
                       </div>
                       <div className="flex items-center gap-2 text-xs text-white/50">
@@ -295,7 +295,7 @@ export function StudentHubs() {
                           <div className="flex items-center gap-2 text-sm text-white/70">
                             <Calendar className="w-4 h-4" strokeWidth={2} />
                             <span>
-                              {event.date} • {event.time}
+                              {event.date} â€¢ {event.time}
                             </span>
                           </div>
                           <div className="flex items-center gap-2 text-sm text-white/70">
@@ -343,7 +343,7 @@ export function StudentHubs() {
                       </div>
                       {roommates[swipeIndex].verified && (
                         <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-green-500 border-2 border-[#0f172a] flex items-center justify-center">
-                          <span className="text-sm">?</span>
+                          <span className="text-sm">âœ“</span>
                         </div>
                       )}
                     </div>
@@ -432,9 +432,9 @@ export function StudentHubs() {
                       <p className="text-sm text-[#10b981] font-medium mb-1">{discount.discount}</p>
                       <div className="flex items-center gap-2 text-xs text-white/50">
                         <span>{discount.category}</span>
-                        <span>•</span>
+                        <span>â€¢</span>
                         <span>{discount.distance}</span>
-                        <span>•</span>
+                        <span>â€¢</span>
                         <span>Until {discount.validUntil}</span>
                       </div>
                     </div>
@@ -473,7 +473,7 @@ export function StudentHubs() {
                         </div>
                         <div className="flex items-center gap-2 text-xs text-white/50">
                           <span>{group.members} members</span>
-                          <span>•</span>
+                          <span>â€¢</span>
                           <span className="px-2 py-0.5 rounded bg-white/10">{group.category}</span>
                         </div>
                       </div>
@@ -496,3 +496,4 @@ export function StudentHubs() {
     </div>
   );
 }
+

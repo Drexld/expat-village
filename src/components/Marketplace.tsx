@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+﻿import { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Search,
@@ -23,13 +23,13 @@ import type { MarketplaceListingSummary } from '../services/api/types';
 type Listing = MarketplaceListingSummary;
 
 const categoryIconById: Record<string, string> = {
-  all: '???',
-  furniture: '???',
-  electronics: '??',
-  home: '??',
-  clothing: '??',
-  bikes: '??',
-  moving: '??',
+  all: '✨',
+  furniture: '🛋️',
+  electronics: '💻',
+  home: '🏠',
+  clothing: '👕',
+  bikes: '🚲',
+  moving: '📦',
 };
 
 function normalizeCategory(value: string): string {
@@ -74,7 +74,7 @@ export function Marketplace() {
       ...Array.from(counts.entries()).map(([id, count]) => ({
         id,
         name: toCategoryLabel(id),
-        icon: categoryIconById[id] || '??',
+        icon: categoryIconById[id] || '🏷️',
         count,
       })),
     ];
@@ -242,7 +242,7 @@ export function Marketplace() {
         </div>
       </div>
 
-      <div className="px-5 pb-24 space-y-4">
+      <div className="px-5 pb-[calc(8rem+env(safe-area-inset-bottom))] space-y-4">
         <div className="relative rounded-[20px] p-[1px] bg-gradient-to-b from-green-400/30 to-green-500/10">
           <div className="relative rounded-[20px] bg-gradient-to-br from-[#1a2642]/90 to-[#0f172a]/95 backdrop-blur-xl p-4">
             <div className="flex items-center gap-3">
@@ -250,7 +250,7 @@ export function Marketplace() {
               <div className="flex-1">
                 <h3 className="font-semibold text-sm mb-1">AI Scam Shield Active</h3>
                 <p className="text-xs text-white/60 leading-relaxed">
-                  Every listing verified with escrow protection � {isLive ? 'Live backend sync active' : 'Preview mode active'}
+                  Every listing verified with escrow protection • {isLive ? 'Live backend sync active' : 'Preview mode active'}
                 </p>
               </div>
             </div>
@@ -358,7 +358,7 @@ export function Marketplace() {
                           <MapPin className="w-3 h-3" strokeWidth={2} />
                           <span>{listing.distance}</span>
                         </div>
-                        <span>�</span>
+                        <span>|</span>
                         <span>{listing.postedAt}</span>
                       </div>
                     </div>
@@ -511,7 +511,7 @@ export function Marketplace() {
 
                 <div className="p-3 rounded-lg bg-green-500/10 border border-green-400/20 mb-4">
                   <p className="text-xs text-green-400 leading-relaxed">
-                    <span className="font-semibold">? AI auto-categorizes</span> � Escrow available � Earn +10 points for listing, +50 for sale
+                    <span className="font-semibold">AI auto-categorizes</span> • Escrow available • Earn +10 points for listing, +50 for sale
                   </p>
                 </div>
 
@@ -612,3 +612,4 @@ export function Marketplace() {
     </div>
   );
 }
+

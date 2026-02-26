@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+﻿import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Search, Mic, ThumbsUp, Eye, Clock, Sparkles, Play, ChevronRight, TrendingUp, User } from 'lucide-react';
 import { toast } from 'sonner';
@@ -298,7 +298,7 @@ export function EnhancedGuides() {
                   : 'bg-white/5 text-white/60 hover:bg-white/10'
               }`}
             >
-              {sort === 'trending' && '?? '}
+              {sort === 'trending' && '🔥 '}
               {sort.charAt(0).toUpperCase() + sort.slice(1)}
             </button>
           ))}
@@ -461,3 +461,4 @@ export function EnhancedGuides() {
     </div>
   );
 }
+

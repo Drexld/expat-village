@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+﻿import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   CheckCircle2,
@@ -248,10 +248,10 @@ export function EnhancedChecklist({ user }: EnhancedChecklistProps) {
   const filteredTasks = activeCategory === 'All' ? tasks : tasks.filter((t) => t.category === activeCategory);
 
   const badges = [
-    { id: 'first-steps', name: 'First Steps', emoji: '??', unlocked: true },
-    { id: 'week-one', name: 'Week One Warrior', emoji: '???', unlocked: true },
-    { id: 'social-butterfly', name: 'Social Butterfly', emoji: '??', unlocked: false },
-    { id: 'warsaw-insider', name: 'Warsaw Insider', emoji: '??', unlocked: false },
+    { id: 'first-steps', name: 'First Steps', emoji: '👣', unlocked: true },
+    { id: 'week-one', name: 'Week One Warrior', emoji: '🔥', unlocked: true },
+    { id: 'social-butterfly', name: 'Social Butterfly', emoji: '🦋', unlocked: false },
+    { id: 'warsaw-insider', name: 'Warsaw Insider', emoji: '📍', unlocked: false },
   ];
 
   const topUrgent = tasks.find((task) => task.urgent && !task.completed);
@@ -270,7 +270,7 @@ export function EnhancedChecklist({ user }: EnhancedChecklistProps) {
 
     setTasks((prev) => prev.map((item) => (item.id === task.id ? { ...item, completed: true } : item)));
 
-    toast.success(`?? +${task.points} points earned!`, {
+    toast.success(`+${task.points} points earned!`, {
       description: `Great job! ${user.streak + 1} day streak!`,
       duration: 3000,
     });
@@ -290,7 +290,7 @@ export function EnhancedChecklist({ user }: EnhancedChecklistProps) {
 
     if (completedBefore + 1 === 3) {
       window.setTimeout(() => {
-        toast.success('??? New badge unlocked: Week One Warrior!', {
+        toast.success('New badge unlocked: Week One Warrior!', {
           description: 'Share your progress with friends',
           duration: 4000,
         });
@@ -301,7 +301,7 @@ export function EnhancedChecklist({ user }: EnhancedChecklistProps) {
   const handleVoiceGuide = (task: Task) => {
     if (!task.voiceGuide) return;
 
-    toast.info('??? Playing voice guide...', {
+    toast.info('Playing voice guide...', {
       description: 'Tap to stop',
       duration: 2000,
     });
@@ -320,7 +320,7 @@ export function EnhancedChecklist({ user }: EnhancedChecklistProps) {
   };
 
   const handleShare = () => {
-    toast.success('?? Progress shared!', {
+    toast.success('Progress shared!', {
       description: '+5 bonus points earned',
       duration: 2000,
     });
@@ -459,12 +459,12 @@ export function EnhancedChecklist({ user }: EnhancedChecklistProps) {
 
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-xs text-white/50">{task.category}</span>
-                        <span className="text-white/30">�</span>
+                        <span className="text-white/30">•</span>
                         <span className="text-xs font-semibold text-[#3b9eff]">+{task.points} pts</span>
 
                         {task.location && (
                           <>
-                            <span className="text-white/30">�</span>
+                            <span className="text-white/30">•</span>
                             <div className="flex items-center gap-1">
                               <MapPin className="w-3 h-3 text-white/40" strokeWidth={2} />
                               <span className="text-xs text-white/40">{task.location.distance}</span>

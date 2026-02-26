@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Camera, MapPin, Share2, Award, TrendingUp, Users, Settings, ChevronRight, Lock, Bell, Globe, HelpCircle, Crown, Sparkles, Calendar, MessageCircle, Zap, QrCode } from 'lucide-react';
 import { toast } from 'sonner';
@@ -26,22 +26,22 @@ export function PremiumProfile({ user, profileData, progressData, profileLive }:
   const [bio, setBio] = useState(profileData?.bio || 'From NYC, Week 2 in Warsaw. Seeking Language Buddies!');
 
   const defaultBadges: MeBadgeProgress[] = [
-    { id: 'early-adopter', name: 'Early Adopter', emoji: '??', category: 'Arrival', unlocked: true, progress: 100 },
-    { id: 'first-steps', name: 'First Steps', emoji: '??', category: 'Arrival', unlocked: true, progress: 100 },
-    { id: 'week-one', name: 'Week One Warrior', emoji: '???', category: 'Daily', unlocked: true, progress: 100 },
-    { id: 'helpful', name: 'Helpful', emoji: '??', category: 'Community', unlocked: false, progress: 60 },
-    { id: 'social-butterfly', name: 'Social Butterfly', emoji: '??', category: 'Community', unlocked: false, progress: 40 },
-    { id: 'warsaw-insider', name: 'Warsaw Insider', emoji: '??', category: 'Long-Term', unlocked: false, progress: 20 },
-    { id: 'village-elder', name: 'Village Elder', emoji: '??', category: 'Long-Term', unlocked: false, progress: 5 },
-    { id: 'polish-curator', name: 'Polish Playlist Curator', emoji: '??', category: 'Vibes', unlocked: false, progress: 75 },
+    { id: 'early-adopter', name: 'Early Adopter', emoji: '🚀', category: 'Arrival', unlocked: true, progress: 100 },
+    { id: 'first-steps', name: 'First Steps', emoji: '👣', category: 'Arrival', unlocked: true, progress: 100 },
+    { id: 'week-one', name: 'Week One Warrior', emoji: '🔥', category: 'Daily', unlocked: true, progress: 100 },
+    { id: 'helpful', name: 'Helpful', emoji: '🤝', category: 'Community', unlocked: false, progress: 60 },
+    { id: 'social-butterfly', name: 'Social Butterfly', emoji: '🦋', category: 'Community', unlocked: false, progress: 40 },
+    { id: 'warsaw-insider', name: 'Warsaw Insider', emoji: '📍', category: 'Long-Term', unlocked: false, progress: 20 },
+    { id: 'village-elder', name: 'Village Elder', emoji: '🏛️', category: 'Long-Term', unlocked: false, progress: 5 },
+    { id: 'polish-curator', name: 'Polish Playlist Curator', emoji: '🎵', category: 'Vibes', unlocked: false, progress: 75 },
   ];
 
   const defaultJourney: MeJourneyEvent[] = [
-    { date: 'Jan 28, 2026', event: 'Arrived in Warsaw', icon: '??', completed: true },
-    { date: 'Jan 29, 2026', event: 'First SIM card', icon: '??', completed: true },
-    { date: 'Jan 30, 2026', event: 'Bank account opened', icon: '??', completed: true },
-    { date: 'Feb 9, 2026', event: 'PESEL appointment', icon: '??', completed: false },
-    { date: 'Feb 15, 2026', event: 'Residence permit', icon: '??', completed: false },
+    { date: 'Jan 28, 2026', event: 'Arrived in Warsaw', icon: '✈️', completed: true },
+    { date: 'Jan 29, 2026', event: 'First SIM card', icon: '📱', completed: true },
+    { date: 'Jan 30, 2026', event: 'Bank account opened', icon: '🏦', completed: true },
+    { date: 'Feb 9, 2026', event: 'PESEL appointment', icon: '📝', completed: false },
+    { date: 'Feb 15, 2026', event: 'Residence permit', icon: '📄', completed: false },
   ];
 
   const defaultConnections: MeConnectionSummary[] = [
@@ -71,7 +71,7 @@ export function PremiumProfile({ user, profileData, progressData, profileLive }:
   }, [profileData?.bio]);
 
   const handleShareStory = () => {
-    toast.success('📤 Story shared!', {
+    toast.success('Story shared!', {
       description: 'Your Warsaw journey is inspiring others',
       duration: 2000,
     });
@@ -79,7 +79,7 @@ export function PremiumProfile({ user, profileData, progressData, profileLive }:
 
   const handleQRCode = () => {
     setShowQRCode(true);
-    toast.info('🔗 Your Expat ID Card', {
+    toast.info('Your Expat ID Card', {
       description: 'Scan to connect at meetups',
       duration: 2000,
     });
@@ -189,7 +189,7 @@ export function PremiumProfile({ user, profileData, progressData, profileLive }:
       </div>
 
       {/* Main Content */}
-      <div className="px-5 pb-24 space-y-4">
+      <div className="px-5 pb-[calc(8rem+env(safe-area-inset-bottom))] space-y-4">
         {/* Stats Overview */}
         <div className="grid grid-cols-3 gap-3">
           <div className="relative rounded-[16px] p-[1px] bg-gradient-to-b from-white/20 to-white/5">
@@ -226,7 +226,7 @@ export function PremiumProfile({ user, profileData, progressData, profileLive }:
               <div className="space-y-3">
                 <div className="p-3 rounded-[12px] bg-white/5 border border-white/5">
                   <p className="text-sm text-white/90 leading-relaxed">
-                    🚀 <span className="font-semibold">You're {insights.aheadOfAverage}% ahead</span> of average expats in admin tasks—great job!
+                    🚀 <span className="font-semibold">You're {insights.aheadOfAverage}% ahead</span> of average expats in admin tasks-great job!
                   </p>
                 </div>
 
@@ -365,7 +365,7 @@ export function PremiumProfile({ user, profileData, progressData, profileLive }:
                     
                     <div className="flex-1">
                       <p className="text-sm font-semibold">{conn.name}</p>
-                      <p className="text-xs text-white/50">From {conn.country} • {conn.sharedTasks} shared tasks</p>
+                      <p className="text-xs text-white/50">From {conn.country} | {conn.sharedTasks} shared tasks</p>
                     </div>
 
                     <button className="p-2 rounded-lg bg-[#3b9eff]/20 hover:bg-[#3b9eff]/30 transition-colors">
@@ -486,5 +486,6 @@ export function PremiumProfile({ user, profileData, progressData, profileLive }:
     </div>
   );
 }
+
 
 
