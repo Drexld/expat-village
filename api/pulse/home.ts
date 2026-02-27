@@ -1,0 +1,23 @@
+import { RATE_LIMIT_POLICIES, methodNotAllowed, withSecurity } from '../_lib/security';
+import { getHomePulseData } from '../_lib/data/pulseData';
+
+export const config = {
+  runtime: 'edge',
+};
+
+const handler = withSecurity(
+  {
+    routeId: 'pulse_home',
+    requireAuth: false,
+    rateLimit: RATE_LIMIT_POLICIES.read,
+  },
+  async (request) => {
+    if (request.method !== 'GET') {
+      throw methodNotAllowed();
+    }
+
+    return getHomePulseData();
+  },
+);
+
+export default handler;
