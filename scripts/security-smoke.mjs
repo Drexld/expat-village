@@ -93,15 +93,17 @@ async function checkValidationOrAuthRejection() {
 }
 
 async function checkRateLimit() {
+  // Use a public, rate-limited route so the limiter is actually exercised.
+  // Default read limit is 120/min, so burst above that threshold.
   let saw429 = false;
-  for (let i = 0; i < 50; i += 1) {
-    const response = await fetch(`${baseUrl}/api/community/posts`, {
-      method: 'POST',
+  let attempts = 0;
+  for (let i = 0; i < 220; i += 1) {
+    attempts += 1;
+    const response = await fetch(`${baseUrl}/api/pulse/home`, {
+      method: 'GET',
       headers: {
         Origin: sameOrigin,
-        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({}),
     });
 
     if (response.status === 429) {
@@ -110,7 +112,7 @@ async function checkRateLimit() {
     }
   }
 
-  assert(saw429, 'Did not observe 429 under burst test');
+  assert(saw429, `Did not observe 429 under burst test after ${attempts} requests`);
 }
 
 async function main() {
