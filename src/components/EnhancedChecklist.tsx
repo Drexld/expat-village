@@ -44,159 +44,8 @@ interface EnhancedChecklistProps {
   };
 }
 
-const STATIC_CATEGORIES = ['All', 'Essentials', 'Admin', 'Finance', 'Social'];
-
-function getFallbackTasks(nationality?: string): Task[] {
-  const baseTasks: Task[] = [
-    {
-      id: 'fallback-1',
-      title: 'Get SIM card',
-      category: 'Essentials',
-      points: 10,
-      completed: true,
-      urgent: false,
-      location: {
-        name: 'Orange Store - Mokotow',
-        distance: '0.3 km',
-        coords: { lat: 52.2297, lng: 21.0122 },
-      },
-    },
-    {
-      id: 'fallback-2',
-      title: 'Open Polish bank account',
-      category: 'Finance',
-      points: 20,
-      completed: true,
-      urgent: false,
-      location: {
-        name: 'PKO BP - Centrum',
-        distance: '0.8 km',
-        coords: { lat: 52.2297, lng: 21.0122 },
-      },
-      voiceGuide:
-        'Opening a bank account in Poland is simple. Bring your passport, proof of address, and PESEL number if you have one.',
-    },
-    {
-      id: 'fallback-3',
-      title: 'Get PESEL number',
-      category: 'Admin',
-      points: 30,
-      completed: false,
-      urgent: true,
-      location: {
-        name: 'Urzad Dzielnicy Mokotow',
-        distance: '1.2 km',
-        coords: { lat: 52.2297, lng: 21.0122 },
-      },
-      voiceGuide:
-        'PESEL is your Polish ID number. Book an appointment online, bring passport and proof of address. Processing takes around two weeks.',
-    },
-    {
-      id: 'fallback-4',
-      title: 'Register residence permit',
-      category: 'Admin',
-      points: 50,
-      completed: false,
-      urgent: false,
-      location: {
-        name: 'Mazowiecki Urzad Wojewodzki',
-        distance: '3.5 km',
-        coords: { lat: 52.2297, lng: 21.0122 },
-      },
-    },
-    {
-      id: 'fallback-5',
-      title: 'Find housing',
-      category: 'Essentials',
-      points: 40,
-      completed: false,
-      urgent: false,
-      collaborative: true,
-    },
-    {
-      id: 'fallback-6',
-      title: 'Explore Mokotow neighborhood',
-      category: 'Social',
-      points: 15,
-      completed: false,
-      urgent: false,
-      collaborative: true,
-      location: {
-        name: 'Mokotow District',
-        distance: '0.5 km',
-        coords: { lat: 52.2297, lng: 21.0122 },
-      },
-    },
-  ];
-
-  if (nationality === 'EU') {
-    return [...baseTasks].sort((a, b) => {
-      if (a.category === 'Finance' && b.category === 'Admin') return -1;
-      return 0;
-    });
-  }
-
-  return baseTasks;
-}
-
-function enrichTask(base: Task): Task {
-  const t = base.title.toLowerCase();
-
-  if (t.includes('pesel')) {
-    return {
-      ...base,
-      urgent: true,
-      location:
-        base.location || {
-          name: 'Urzad Dzielnicy Mokotow',
-          distance: '1.2 km',
-          coords: { lat: 52.2297, lng: 21.0122 },
-        },
-      voiceGuide:
-        base.voiceGuide ||
-        'PESEL is your Polish identifier. Prepare passport and proof of address before your visit.',
-    };
-  }
-
-  if (t.includes('bank')) {
-    return {
-      ...base,
-      location:
-        base.location || {
-          name: 'PKO BP - Centrum',
-          distance: '0.8 km',
-          coords: { lat: 52.2297, lng: 21.0122 },
-        },
-      voiceGuide:
-        base.voiceGuide ||
-        'Bring passport and address confirmation to open a Polish bank account smoothly.',
-    };
-  }
-
-  if (t.includes('sim')) {
-    return {
-      ...base,
-      location:
-        base.location || {
-          name: 'Orange Store - Mokotow',
-          distance: '0.3 km',
-          coords: { lat: 52.2297, lng: 21.0122 },
-        },
-    };
-  }
-
-  if (t.includes('housing') || t.includes('apartment') || t.includes('roommate')) {
-    return {
-      ...base,
-      collaborative: true,
-    };
-  }
-
-  return base;
-}
-
 function mapApiTask(apiTask: ApiChecklistTask, categoryName: string): Task {
-  const mapped: Task = {
+  return {
     id: apiTask.id,
     title: apiTask.title,
     category: categoryName || 'General',
@@ -204,8 +53,6 @@ function mapApiTask(apiTask: ApiChecklistTask, categoryName: string): Task {
     completed: apiTask.status === 'done',
     urgent: apiTask.urgency === 'urgent',
   };
-
-  return enrichTask(mapped);
 }
 
 export function EnhancedChecklist({ user }: EnhancedChecklistProps) {
@@ -213,7 +60,7 @@ export function EnhancedChecklist({ user }: EnhancedChecklistProps) {
   const [showBadges, setShowBadges] = useState(false);
   const [showARMap, setShowARMap] = useState(false);
   const [selectedTaskForAR, setSelectedTaskForAR] = useState<Task | null>(null);
-  const [tasks, setTasks] = useState<Task[]>(() => getFallbackTasks(user.nationality));
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [activeCategory, setActiveCategory] = useState('All');
 
   const checklist = useChecklistTasks();
@@ -223,10 +70,7 @@ export function EnhancedChecklist({ user }: EnhancedChecklistProps) {
 
     const categoryById = new Map(checklist.data.categories.map((cat) => [cat.id, cat.name]));
     const liveTasks = checklist.data.tasks.map((task) => mapApiTask(task, categoryById.get(task.categoryId) || 'General'));
-
-    if (liveTasks.length > 0) {
-      setTasks(liveTasks);
-    }
+    setTasks(liveTasks);
   }, [checklist.data]);
 
   const completed = tasks.filter((t) => t.completed).length;
@@ -235,7 +79,7 @@ export function EnhancedChecklist({ user }: EnhancedChecklistProps) {
 
   const categories = useMemo(() => {
     const dynamic = Array.from(new Set(tasks.map((t) => t.category).filter(Boolean)));
-    if (!dynamic.length) return STATIC_CATEGORIES;
+    if (!dynamic.length) return ['All'];
     return ['All', ...dynamic];
   }, [tasks]);
 
@@ -257,10 +101,17 @@ export function EnhancedChecklist({ user }: EnhancedChecklistProps) {
   const topUrgent = tasks.find((task) => task.urgent && !task.completed);
   const aiTip = topUrgent
     ? `AI Tip: Prioritize "${topUrgent.title}" next to avoid delays and unlock +${topUrgent.points} points.`
-    : 'AI Tip: Great momentum. Complete one social task today to keep your streak growing.';
+    : 'AI Tip: Your next personalized recommendation appears after tasks are synced.';
 
   const handleTaskComplete = async (task: Task) => {
     if (task.completed) return;
+    if (!checklist.isLive) {
+      toast.warning('Live checklist not ready', {
+        description: 'Task updates require live API sync.',
+        duration: 2500,
+      });
+      return;
+    }
 
     if ('vibrate' in navigator) {
       navigator.vibrate([50, 100, 50]);
@@ -275,17 +126,15 @@ export function EnhancedChecklist({ user }: EnhancedChecklistProps) {
       duration: 3000,
     });
 
-    if (checklist.isLive) {
-      try {
-        await checklist.updateStatus(task.id, 'done');
-      } catch {
-        setTasks((prev) => prev.map((item) => (item.id === task.id ? { ...item, completed: false } : item)));
-        toast.error('Could not sync task status', {
-          description: 'Please retry. Your UI was reverted to keep data consistent.',
-          duration: 3500,
-        });
-        return;
-      }
+    try {
+      await checklist.updateStatus(task.id, 'done');
+    } catch {
+      setTasks((prev) => prev.map((item) => (item.id === task.id ? { ...item, completed: false } : item)));
+      toast.error('Could not sync task status', {
+        description: 'Please retry. Your UI was reverted to keep data consistent.',
+        duration: 3500,
+      });
+      return;
     }
 
     if (completedBefore + 1 === 3) {
@@ -413,6 +262,16 @@ export function EnhancedChecklist({ user }: EnhancedChecklistProps) {
       </div>
 
       <div className="px-5 pb-24 space-y-3">
+        {!checklist.isLoading && filteredTasks.length === 0 && (
+          <div className="rounded-[20px] p-[1px] bg-gradient-to-b from-white/20 to-white/5">
+            <div className="rounded-[20px] bg-gradient-to-b from-[#1a2642]/90 to-[#0f172a]/95 p-5 border border-white/5">
+              <p className="text-sm font-semibold text-white/90 mb-1">No live tasks yet</p>
+              <p className="text-xs text-white/60">
+                Your checklist is connected. Tasks will appear once assigned from the backend.
+              </p>
+            </div>
+          </div>
+        )}
         <AnimatePresence>
           {filteredTasks.map((task, index) => (
             <motion.div

@@ -24,83 +24,31 @@ export function PremiumDailyPulse({ onOpenBriefing, userMood, pulseData, pulseLi
   const [expandedAI, setExpandedAI] = useState(false);
   const [showExchange, setShowExchange] = useState(false);
 
-  const temp = pulseData?.weather?.temperatureC ?? -3;
-  const weatherCondition = pulseData?.weather?.condition || 'Overcast and cold';
+  const temp = pulseData?.weather?.temperatureC ?? null;
+  const weatherCondition = pulseData?.weather?.condition || null;
   const exchangeBase = pulseData?.exchange?.base || 'USD';
   const exchangeQuote = pulseData?.exchange?.quote || 'PLN';
-  const exchangeRate = pulseData?.exchange?.rate ?? 4.05;
-  const exchangeChange = pulseData?.exchange?.change24h ?? 0.02;
-  const exchangePositive = exchangeChange >= 0;
+  const exchangeRate = pulseData?.exchange?.rate ?? null;
+  const exchangeChange = pulseData?.exchange?.change24h ?? null;
+  const exchangePositive = (exchangeChange ?? 0) >= 0;
   const liveInsights = pulseData?.highlights || [];
+  const cityHighlight = liveInsights.find((item) => item.kind === 'city');
 
   const suggestion = useMemo(() => {
-    if (userMood === 'homesick') {
-      return {
-        message: 'Comfort food time with warm hospitality',
-        cafe: 'Cafe Vinyl',
-        tag: 'Cozy vibes',
-        photo: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400&h=300&fit=crop',
-      };
-    }
-
-    if (userMood === 'adventurous') {
-      return {
-        message: 'Hidden gem in Praga district',
-        cafe: 'Kawiarnia Kafka',
-        tag: 'Local secret',
-        photo: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=400&h=300&fit=crop',
-      };
-    }
-
-    if (temp < 5 || weatherCondition.toLowerCase().includes('cold')) {
-      return {
-        message: 'Perfect weather for hot chocolate',
-        cafe: 'Cafe Relaks',
-        tag: 'Warm and cozy',
-        photo: 'https://images.unsplash.com/photo-1511920170033-f8396924c348?w=400&h=300&fit=crop',
-      };
-    }
-
+    if (!cityHighlight) return null;
     return {
-      message: 'Great day for iced coffee',
-      cafe: 'Cafe Karma',
-      tag: 'Refreshing',
-      photo: 'https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=400&h=300&fit=crop',
+      message: cityHighlight.summary,
+      title: cityHighlight.title,
+      tag: userMood ? `${userMood} mode` : 'Live city insight',
+      photo: 'https://images.unsplash.com/photo-1511920170033-f8396924c348?w=400&h=300&fit=crop',
     };
-  }, [userMood, temp, weatherCondition]);
+  }, [cityHighlight, userMood]);
 
-  const cityHighlight = liveInsights.find((item) => item.kind === 'city');
-  const hiddenGem = {
-    name: cityHighlight?.title || 'Underrated pierogi spot in Mokotow',
-    location: cityHighlight?.summary || 'Pierozki u Vincenta',
-    distance: '1.2 km away',
-    exclusive: true,
-  };
-
-  const aiCards =
-    liveInsights.length > 0
-      ? liveInsights.slice(0, 3).map((item) => ({
-          id: item.id,
-          title: `${kindLabelMap[item.kind]} update`,
-          body: item.summary,
-        }))
-      : [
-          {
-            id: 'fx-fallback',
-            title: 'Money update',
-            body: 'PLN is stable today. Compare transfer providers before sending funds.',
-          },
-          {
-            id: 'legal-fallback',
-            title: 'Immigration note',
-            body: 'PESEL and residence appointments are usually busiest mid-week. Book early.',
-          },
-          {
-            id: 'city-fallback',
-            title: 'Weekend idea',
-            body: 'Museum schedules and free-entry windows can change quickly. Check before you go.',
-          },
-        ];
+  const aiCards = liveInsights.slice(0, 3).map((item) => ({
+    id: item.id,
+    title: `${kindLabelMap[item.kind]} update`,
+    body: item.summary,
+  }));
 
   return (
     <div className="relative rounded-[24px] p-[1px] bg-gradient-to-b from-white/25 via-white/10 to-transparent">
@@ -148,25 +96,37 @@ export function PremiumDailyPulse({ onOpenBriefing, userMood, pulseData, pulseLi
                   <Cloud className="w-9 h-9 text-white/90 drop-shadow-[0_2px_8px_rgba(255,255,255,0.3)]" strokeWidth={1.5} />
                 </motion.div>
 
-                <div className="text-3xl font-bold drop-shadow-[0_2px_6px_rgba(0,0,0,0.4)] mb-1">{Math.round(temp)} C</div>
-                <p className="text-[10px] text-white/70 line-clamp-1">{weatherCondition}</p>
+                <div className="text-3xl font-bold drop-shadow-[0_2px_6px_rgba(0,0,0,0.4)] mb-1">
+                  {temp === null ? '--' : `${Math.round(temp)} C`}
+                </div>
+                <p className="text-[10px] text-white/70 line-clamp-1">
+                  {weatherCondition || 'Waiting for live weather update'}
+                </p>
               </div>
             </div>
 
             <div className="relative rounded-[16px] p-[1px] bg-gradient-to-b from-white/20 to-white/5">
               <div className="relative overflow-hidden rounded-[16px] h-full">
-                <img src={suggestion.photo} alt={suggestion.cafe} className="absolute inset-0 w-full h-full object-cover" />
+                <img
+                  src={suggestion?.photo || 'https://images.unsplash.com/photo-1478515463067-8d640f4d6873?w=400&h=300&fit=crop'}
+                  alt={suggestion?.title || 'City insight'}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0d1829]/98 via-[#1a2642]/85 to-transparent backdrop-blur-[2px]" />
                 <div className="absolute inset-0 rounded-[16px] shadow-[inset_0_1px_2px_rgba(255,255,255,0.15)] pointer-events-none" />
 
                 <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20">
-                  <p className="text-[9px] text-white/90 font-medium">{suggestion.tag}</p>
+                  <p className="text-[9px] text-white/90 font-medium">{suggestion?.tag || 'No insight yet'}</p>
                 </div>
 
                 <div className="relative p-4 h-full flex flex-col justify-end">
-                  <p className="text-xs font-semibold leading-tight mb-0.5 drop-shadow-sm">{suggestion.message}</p>
+                  <p className="text-xs font-semibold leading-tight mb-0.5 drop-shadow-sm">
+                    {suggestion?.message || 'City recommendations will appear when live insights are available.'}
+                  </p>
                   <div className="flex items-center gap-1">
-                    <p className="text-[10px] text-[#3b9eff] drop-shadow-[0_0_8px_rgba(59,158,255,0.6)] font-medium">{suggestion.cafe}</p>
+                    <p className="text-[10px] text-[#3b9eff] drop-shadow-[0_0_8px_rgba(59,158,255,0.6)] font-medium">
+                      {suggestion?.title || 'Live feed pending'}
+                    </p>
                     <ArrowUpRight className="w-3 h-3 text-[#3b9eff]" strokeWidth={2} />
                   </div>
                 </div>
@@ -193,10 +153,11 @@ export function PremiumDailyPulse({ onOpenBriefing, userMood, pulseData, pulseLi
 
                 <div className="flex items-center gap-2">
                   <div className="flex items-baseline gap-1.5">
-                    <span className="text-lg font-bold text-green-400 drop-shadow-[0_0_10px_rgba(34,197,94,0.4)]">{exchangeRate.toFixed(2)}</span>
+                    <span className="text-lg font-bold text-green-400 drop-shadow-[0_0_10px_rgba(34,197,94,0.4)]">
+                      {exchangeRate === null ? '--' : exchangeRate.toFixed(2)}
+                    </span>
                     <span className={`text-[11px] font-medium ${exchangePositive ? 'text-green-400/80' : 'text-red-400/80'}`}>
-                      {exchangePositive ? '+' : ''}
-                      {exchangeChange.toFixed(2)}
+                      {exchangeChange === null ? '--' : `${exchangePositive ? '+' : ''}${exchangeChange.toFixed(2)}`}
                     </span>
                     <motion.div
                       animate={{ scale: [1, 1.3, 1], opacity: [0.7, 1, 0.7] }}
@@ -239,7 +200,7 @@ export function PremiumDailyPulse({ onOpenBriefing, userMood, pulseData, pulseLi
 
           <div className="relative mb-3 p-[1px] rounded-[14px] bg-gradient-to-b from-amber-400/20 via-amber-500/10 to-transparent">
             <div className="relative rounded-[14px] bg-gradient-to-br from-[#1a2642]/80 to-[#0f172a]/95 backdrop-blur-lg p-3">
-              {hiddenGem.exclusive && (
+              {cityHighlight && (
                 <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-400/20 to-amber-500/20 border border-amber-400/30 backdrop-blur-sm">
                   <p className="text-[9px] text-amber-400 font-bold">EXCLUSIVE</p>
                 </div>
@@ -252,14 +213,22 @@ export function PremiumDailyPulse({ onOpenBriefing, userMood, pulseData, pulseLi
 
                 <div className="flex-1">
                   <p className="text-[10px] text-amber-400/80 uppercase tracking-wide font-bold mb-1">Warsaw Vibes</p>
-                  <p className="text-sm font-semibold leading-tight mb-1">{hiddenGem.name}</p>
+                  <p className="text-sm font-semibold leading-tight mb-1">
+                    {cityHighlight?.title || 'No city highlight yet'}
+                  </p>
                   <div className="flex items-center gap-2 text-[10px] text-white/50">
                     <div className="flex items-center gap-1">
                       <MapPin className="w-3 h-3" strokeWidth={2} />
-                      <span className="line-clamp-1">{hiddenGem.location}</span>
+                      <span className="line-clamp-1">
+                        {cityHighlight?.summary || 'Live city updates will appear here'}
+                      </span>
                     </div>
-                    <span>&bull;</span>
-                    <span>{hiddenGem.distance}</span>
+                    {cityHighlight?.publishedAt && (
+                      <>
+                        <span>&bull;</span>
+                        <span>{new Date(cityHighlight.publishedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                      </>
+                    )}
                   </div>
                 </div>
 
@@ -293,6 +262,13 @@ export function PremiumDailyPulse({ onOpenBriefing, userMood, pulseData, pulseLi
                 className="overflow-hidden"
               >
                 <div className="pt-3 space-y-2">
+                  {aiCards.length === 0 && (
+                    <div className="p-3 rounded-[12px] bg-white/5 border border-white/5">
+                      <p className="text-xs text-white/70 leading-relaxed">
+                        No live AI brief items yet. Pull to refresh or open Full Briefing.
+                      </p>
+                    </div>
+                  )}
                   {aiCards.map((card) => (
                     <div key={card.id} className="p-3 rounded-[12px] bg-white/5 border border-white/5">
                       <p className="text-xs text-white/80 leading-relaxed">
