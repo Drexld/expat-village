@@ -46,71 +46,6 @@ interface Post {
   isVIP?: boolean;
 }
 
-const FALLBACK_POSTS: Post[] = [
-  {
-    id: '1',
-    author: { name: 'Sarah M.', avatar: 'S', level: 12, verified: true },
-    title: 'PESEL appointment - current wait times?',
-    content:
-      'Just booked mine online and got a date 3 weeks out. Anyone have recent experience with walk-ins vs online booking?',
-    category: 'Moving & Admin',
-    timestamp: '2h ago',
-    likes: 34,
-    comments: 18,
-    views: 456,
-    isHot: true,
-    hasVoice: true,
-    aiSummary: 'TL;DR: PESEL wait is usually 2-4 weeks. Book early in the morning for better slots.',
-    culturalNote:
-      'In Poland, PESEL is your core ID number and is required for banking, utilities, and many public services.',
-  },
-  {
-    id: '2',
-    author: { name: 'Luca R.', avatar: 'L', level: 8, verified: true },
-    title: 'Red flags in rental contracts - what to watch for',
-    content: "After nearly getting scammed, here's my checklist. Number 1: registration clause...",
-    category: 'Housing',
-    timestamp: '4h ago',
-    likes: 67,
-    comments: 29,
-    views: 892,
-    isHot: true,
-    hasImage: true,
-    aiSummary:
-      'TL;DR: Must-have clauses include registration, deposit timeline, and utility breakdown. Beware vague damage terms.',
-    culturalNote: 'Landlord registration rules and tax compliance matter in Poland. Missing details are a major warning sign.',
-  },
-  {
-    id: '3',
-    author: { name: 'Maria K.', avatar: 'M', level: 15, verified: true },
-    title: 'Best Polish series to learn the language?',
-    content:
-      'Trying to improve my Polish. What shows do you recommend on Netflix that helped with conversational phrases?',
-    category: 'Culture',
-    timestamp: '1d ago',
-    likes: 45,
-    comments: 34,
-    views: 567,
-    isHot: false,
-    hasPoll: true,
-  },
-  {
-    id: '4',
-    author: { name: 'Alex P.', avatar: 'A', level: 20, verified: true },
-    title: '[VIP] Praga community event this weekend',
-    content: 'Exclusive expat event in Praga with limited spots and neighborhood networking.',
-    category: 'Events',
-    timestamp: '3h ago',
-    likes: 89,
-    comments: 42,
-    views: 234,
-    isHot: true,
-    isVIP: true,
-    hasImage: true,
-    aiSummary: 'Community meetup with RSVP flow and event details in-thread.',
-  },
-];
-
 function toApiFilter(tab: string): CommunityApiFilter {
   if (tab === 'hot') return 'hot';
   return 'all';
@@ -142,18 +77,21 @@ function inferCategory(title: string, preview: string): string {
   return 'Community';
 }
 
-function toUiPost(summary: CommunityPostSummary, fallback?: Post): Post {
+function toUiPost(summary: CommunityPostSummary): Post {
   const title = summary.title;
   const content = summary.preview;
-  const category = fallback?.category || inferCategory(title, content);
-  const isVip = fallback?.isVIP || title.toLowerCase().includes('[vip]');
+  const category = inferCategory(title, content);
+  const isVip = title.toLowerCase().includes('[vip]');
+  const level = Math.max(1, Math.min(25, Math.floor((summary.likes + summary.replies) / 4) + 1));
+  const authorName = summary.authorName || 'Expat User';
+  const generatedSummary = summary.preview.length > 120 ? `${summary.preview.slice(0, 117).trim()}...` : summary.preview;
 
   return {
     id: summary.id,
     author: {
-      name: summary.authorName || fallback?.author.name || 'Expat User',
-      avatar: (summary.authorName || fallback?.author.name || 'E')[0].toUpperCase(),
-      level: fallback?.author.level || Math.max(1, Math.min(25, Math.floor((summary.likes + summary.replies) / 4) + 1)),
+      name: authorName,
+      avatar: authorName[0]?.toUpperCase() || 'E',
+      level,
       verified: true,
     },
     title,
@@ -162,15 +100,9 @@ function toUiPost(summary: CommunityPostSummary, fallback?: Post): Post {
     timestamp: formatRelativeDate(summary.createdAt),
     likes: summary.likes,
     comments: summary.replies,
-    views: fallback?.views || Math.max(summary.likes + summary.replies, 1) * 8,
-    isHot: fallback?.isHot || summary.likes >= 30 || summary.replies >= 15,
-    hasVoice: fallback?.hasVoice,
-    hasImage: fallback?.hasImage,
-    hasPoll: fallback?.hasPoll,
-    aiSummary:
-      fallback?.aiSummary ||
-      (summary.preview.length > 120 ? `${summary.preview.slice(0, 117).trim()}...` : summary.preview),
-    culturalNote: fallback?.culturalNote,
+    views: Math.max(summary.likes + summary.replies, 1) * 8,
+    isHot: summary.likes >= 30 || summary.replies >= 15,
+    aiSummary: generatedSummary,
     isVIP: isVip,
   };
 }
@@ -193,7 +125,7 @@ export function WarsawWhisperNetwork() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [expandedPost, setExpandedPost] = useState<string | null>(null);
   const [voiceRecording, setVoiceRecording] = useState(false);
-  const [posts, setPosts] = useState<Post[]>(FALLBACK_POSTS);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [createTitle, setCreateTitle] = useState('');
   const [createCategory, setCreateCategory] = useState('Moving & Admin');
   const [createBody, setCreateBody] = useState('');
@@ -201,10 +133,8 @@ export function WarsawWhisperNetwork() {
   const community = useCommunity({ filter: toApiFilter(activeTab) });
 
   useEffect(() => {
-    if (!community.data || community.data.length === 0) return;
-
-    const fallbackByTitle = new Map(FALLBACK_POSTS.map((post) => [post.title.toLowerCase(), post]));
-    const mapped = community.data.map((item) => toUiPost(item, fallbackByTitle.get(item.title.toLowerCase())));
+    if (!community.data) return;
+    const mapped = community.data.map((item) => toUiPost(item));
     setPosts(mapped);
   }, [community.data]);
 
@@ -250,16 +180,14 @@ export function WarsawWhisperNetwork() {
       navigator.vibrate(30);
     }
 
-    if (community.isLive) {
-      try {
-        await community.reactToPost(postId, { reaction: 'like' });
-      } catch {
-        setPosts((prev) => prev.map((post) => (post.id === postId ? { ...post, likes: Math.max(0, post.likes - 1) } : post)));
-        toast.error('Could not sync reaction', {
-          description: 'Please retry.',
-          duration: 2500,
-        });
-      }
+    try {
+      await community.reactToPost(postId, { reaction: 'like' });
+    } catch {
+      setPosts((prev) => prev.map((post) => (post.id === postId ? { ...post, likes: Math.max(0, post.likes - 1) } : post)));
+      toast.error('Could not sync reaction', {
+        description: 'Please retry.',
+        duration: 2500,
+      });
     }
   };
 
@@ -271,16 +199,14 @@ export function WarsawWhisperNetwork() {
       duration: 2000,
     });
 
-    if (community.isLive) {
-      try {
-        await community.addComment(postId, { body: 'Following this thread.' });
-      } catch {
-        setPosts((prev) => prev.map((post) => (post.id === postId ? { ...post, comments: Math.max(0, post.comments - 1) } : post)));
-        toast.error('Could not sync thread join', {
-          description: 'Please retry.',
-          duration: 2500,
-        });
-      }
+    try {
+      await community.addComment(postId, { body: 'Following this thread.' });
+    } catch {
+      setPosts((prev) => prev.map((post) => (post.id === postId ? { ...post, comments: Math.max(0, post.comments - 1) } : post)));
+      toast.error('Could not sync thread join', {
+        description: 'Please retry.',
+        duration: 2500,
+      });
     }
   };
 
@@ -326,12 +252,12 @@ export function WarsawWhisperNetwork() {
         hasVoice: voiceRecording,
       });
 
-      const mapped = toUiPost(created, {
-        ...optimistic,
-        id: created.id,
-        author: { ...optimistic.author, name: created.authorName || 'You' },
+      const mappedBase = toUiPost(created);
+      const mapped: Post = {
+        ...mappedBase,
         category: createCategory,
-      });
+        hasVoice: voiceRecording,
+      };
 
       setPosts((prev) => prev.map((post) => (post.id === tempId ? mapped : post)));
 
@@ -426,6 +352,22 @@ export function WarsawWhisperNetwork() {
         )}
 
         <div className="space-y-3">
+          {!community.isLoading && community.error && (
+            <div className="rounded-[20px] p-[1px] bg-gradient-to-b from-red-500/30 to-red-500/10">
+              <div className="rounded-[20px] bg-gradient-to-b from-[#1a2642]/90 to-[#0f172a]/95 p-4 border border-red-400/20">
+                <p className="text-sm font-semibold text-red-300 mb-1">Community feed unavailable</p>
+                <p className="text-xs text-white/70">We could not load live posts. Please retry in a moment.</p>
+              </div>
+            </div>
+          )}
+          {!community.isLoading && !community.error && visiblePosts.length === 0 && (
+            <div className="rounded-[20px] p-[1px] bg-gradient-to-b from-white/20 to-white/5">
+              <div className="rounded-[20px] bg-gradient-to-b from-[#1a2642]/90 to-[#0f172a]/95 p-4 border border-white/10">
+                <p className="text-sm font-semibold text-white/90 mb-1">No live posts yet</p>
+                <p className="text-xs text-white/60">Be the first to start a discussion in this channel.</p>
+              </div>
+            </div>
+          )}
           {visiblePosts.map((post, index) => (
             <motion.div
               key={post.id}

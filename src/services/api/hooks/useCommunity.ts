@@ -74,26 +74,22 @@ export function useCommunity(options: UseCommunityOptions = {}): UseCommunityRes
 
   const createPost = async (input: CommunityCreatePostInput): Promise<CommunityPostSummary> => {
     if (!shouldFetch) {
-      return {
-        id: `local-${Date.now()}`,
-        authorName: 'You',
-        title: input.title,
-        preview: input.body,
-        likes: 0,
-        replies: 0,
-        createdAt: new Date().toISOString(),
-      };
+      throw new Error('Community API is not configured.');
     }
     return createCommunityPost(input);
   };
 
   const reactToPost = async (postId: string, input: CommunityReactInput) => {
-    if (!shouldFetch) return;
+    if (!shouldFetch) {
+      throw new Error('Community API is not configured.');
+    }
     await reactToCommunityPost(postId, input);
   };
 
   const addComment = async (postId: string, input: CommunityCreateCommentInput) => {
-    if (!shouldFetch) return;
+    if (!shouldFetch) {
+      throw new Error('Community API is not configured.');
+    }
     await createCommunityComment(postId, input);
   };
 
