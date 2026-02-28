@@ -15,8 +15,19 @@ import {
   Sparkles,
   MessageCircle,
   QrCode,
+  Mail,
+  LogIn,
+  LogOut,
+  KeyRound,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import {
+  getCurrentSupabaseAuthSession,
+  sendMagicLink,
+  signInWithPassword,
+  signOutSupabaseAuthSession,
+  signUpWithPassword,
+} from '../services/auth/supabaseAuth';
 import type {
   MeBadgeProgress,
   MeConnectionSummary,
@@ -73,6 +84,11 @@ export function PremiumProfile({
   );
   const [language, setLanguage] = useState(preferencesData?.language || 'en');
   const [isSavingSettings, setIsSavingSettings] = useState(false);
+  const [showAuthPanel, setShowAuthPanel] = useState(false);
+  const [authEmail, setAuthEmail] = useState('');
+  const [authPassword, setAuthPassword] = useState('');
+  const [isAuthLoading, setIsAuthLoading] = useState(false);
+  const [isSignedIn, setIsSignedIn] = useState(Boolean(getCurrentSupabaseAuthSession()));
 
   const badges: MeBadgeProgress[] = progressData?.badges || [];
   const journey: MeJourneyEvent[] = progressData?.journey || [];
@@ -87,6 +103,10 @@ export function PremiumProfile({
     setNotificationsEnabled(preferencesData?.notificationsEnabled ?? true);
     setLanguage(preferencesData?.language || 'en');
   }, [preferencesData?.language, preferencesData?.notificationsEnabled]);
+
+  useEffect(() => {
+    setIsSignedIn(Boolean(getCurrentSupabaseAuthSession()));
+  }, [showSettings]);
 
   const unlockedBadges = useMemo(
     () => badges.filter((badge) => badge.unlocked).length,
@@ -140,6 +160,75 @@ export function PremiumProfile({
   const handleQRCode = () => {
     setShowQRCode(true);
     toast.info('Your Expat ID card is ready');
+  };
+
+  const handleSignIn = async () => {
+    if (!authEmail.trim() || !authPassword.trim()) {
+      toast.error('Email and password are required');
+      return;
+    }
+    setIsAuthLoading(true);
+    try {
+      await signInWithPassword(authEmail, authPassword);
+      setIsSignedIn(true);
+      toast.success('Signed in successfully');
+      window.setTimeout(() => window.location.reload(), 250);
+    } catch (errorValue) {
+      const message = errorValue instanceof Error ? errorValue.message : 'Sign in failed';
+      toast.error(message);
+    } finally {
+      setIsAuthLoading(false);
+    }
+  };
+
+  const handleSignUp = async () => {
+    if (!authEmail.trim() || !authPassword.trim()) {
+      toast.error('Email and password are required');
+      return;
+    }
+    setIsAuthLoading(true);
+    try {
+      await signUpWithPassword(authEmail, authPassword);
+      setIsSignedIn(Boolean(getCurrentSupabaseAuthSession()));
+      toast.success('Account created. Check your email if confirmation is required.');
+    } catch (errorValue) {
+      const message = errorValue instanceof Error ? errorValue.message : 'Sign up failed';
+      toast.error(message);
+    } finally {
+      setIsAuthLoading(false);
+    }
+  };
+
+  const handleMagicLink = async () => {
+    if (!authEmail.trim()) {
+      toast.error('Email is required');
+      return;
+    }
+    setIsAuthLoading(true);
+    try {
+      await sendMagicLink(authEmail);
+      toast.success('Magic link sent. Open it on this device to sign in.');
+    } catch (errorValue) {
+      const message = errorValue instanceof Error ? errorValue.message : 'Could not send magic link';
+      toast.error(message);
+    } finally {
+      setIsAuthLoading(false);
+    }
+  };
+
+  const handleSignOut = async () => {
+    setIsAuthLoading(true);
+    try {
+      await signOutSupabaseAuthSession();
+      setIsSignedIn(false);
+      toast.success('Signed out');
+      window.setTimeout(() => window.location.reload(), 250);
+    } catch (errorValue) {
+      const message = errorValue instanceof Error ? errorValue.message : 'Sign out failed';
+      toast.error(message);
+    } finally {
+      setIsAuthLoading(false);
+    }
   };
 
   return (
@@ -477,13 +566,101 @@ export function PremiumProfile({
                     </select>
                   </div>
 
-                  <button className="w-full flex items-center justify-between p-4 rounded-[16px] bg-white/5 hover:bg-white/10 transition-colors">
+                  <button
+                    onClick={() => setShowAuthPanel((value) => !value)}
+                    className="w-full flex items-center justify-between p-4 rounded-[16px] bg-white/5 hover:bg-white/10 transition-colors"
+                  >
                     <div className="flex items-center gap-3">
                       <Lock className="w-5 h-5 text-[#3b9eff]" strokeWidth={2} />
                       <span className="font-medium">Account & Privacy</span>
                     </div>
                     <ChevronRight className="w-5 h-5 text-white/30" strokeWidth={2} />
                   </button>
+
+                  <AnimatePresence>
+                    {showAuthPanel && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        className="p-4 rounded-[16px] bg-white/5 border border-white/10 space-y-3"
+                      >
+                        <div className="flex items-center justify-between">
+                          <p className="text-sm font-semibold">Account Session</p>
+                          <span
+                            className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
+                              isSignedIn
+                                ? 'bg-green-500/20 text-green-300'
+                                : 'bg-amber-500/20 text-amber-300'
+                            }`}
+                          >
+                            {isSignedIn ? 'Signed In' : 'Signed Out'}
+                          </span>
+                        </div>
+
+                        <div className="relative">
+                          <Mail className="w-4 h-4 text-white/50 absolute left-3 top-1/2 -translate-y-1/2" />
+                          <input
+                            type="email"
+                            value={authEmail}
+                            onChange={(event) => setAuthEmail(event.target.value)}
+                            placeholder="Email"
+                            className="w-full bg-white/10 rounded-lg pl-9 pr-3 py-2 text-sm outline-none border border-white/10 focus:border-[#3b9eff]/40"
+                          />
+                        </div>
+
+                        <div className="relative">
+                          <KeyRound className="w-4 h-4 text-white/50 absolute left-3 top-1/2 -translate-y-1/2" />
+                          <input
+                            type="password"
+                            value={authPassword}
+                            onChange={(event) => setAuthPassword(event.target.value)}
+                            placeholder="Password"
+                            className="w-full bg-white/10 rounded-lg pl-9 pr-3 py-2 text-sm outline-none border border-white/10 focus:border-[#3b9eff]/40"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            disabled={isAuthLoading}
+                            onClick={() => void handleSignIn()}
+                            className="py-2 rounded-lg bg-[#3b9eff]/20 border border-[#3b9eff]/30 text-[#3b9eff] text-xs font-semibold disabled:opacity-60"
+                          >
+                            <span className="inline-flex items-center gap-1">
+                              <LogIn className="w-3.5 h-3.5" />
+                              Sign In
+                            </span>
+                          </button>
+                          <button
+                            disabled={isAuthLoading}
+                            onClick={() => void handleSignUp()}
+                            className="py-2 rounded-lg bg-white/10 border border-white/20 text-white text-xs font-semibold disabled:opacity-60"
+                          >
+                            Create Account
+                          </button>
+                        </div>
+
+                        <button
+                          disabled={isAuthLoading}
+                          onClick={() => void handleMagicLink()}
+                          className="w-full py-2 rounded-lg bg-white/10 border border-white/20 text-white text-xs font-semibold disabled:opacity-60"
+                        >
+                          Send Magic Link
+                        </button>
+
+                        <button
+                          disabled={isAuthLoading || !isSignedIn}
+                          onClick={() => void handleSignOut()}
+                          className="w-full py-2 rounded-lg bg-red-500/15 border border-red-400/30 text-red-300 text-xs font-semibold disabled:opacity-60"
+                        >
+                          <span className="inline-flex items-center gap-1">
+                            <LogOut className="w-3.5 h-3.5" />
+                            Sign Out
+                          </span>
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
 
                   <button className="w-full flex items-center justify-between p-4 rounded-[16px] bg-white/5 hover:bg-white/10 transition-colors">
                     <div className="flex items-center gap-3">
@@ -556,4 +733,3 @@ export function PremiumProfile({
     </div>
   );
 }
-

@@ -1,4 +1,4 @@
-import { getHomeSupportData } from '../_lib/data/homeSupportData';
+import { getHomeSupportBundleData } from '../_lib/data/homeSupportData';
 import { RATE_LIMIT_POLICIES, methodNotAllowed, withSecurity } from '../_lib/security';
 
 export const config = {
@@ -15,9 +15,8 @@ const handler = withSecurity(
     if (request.method !== 'GET') {
       throw methodNotAllowed();
     }
-    return getHomeSupportData(context.auth.userId);
+    return getHomeSupportBundleData(context.auth.userId);
   },
 );
 
 export default handler;
-

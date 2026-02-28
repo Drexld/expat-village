@@ -1,4 +1,5 @@
 import type { DailyBriefing, HomePulse } from '../../../src/services/api/types';
+import type { HandlerResultWithFreshness } from '../security';
 import { supabaseSelect } from './supabaseRest';
 
 interface WeatherSnapshotRow {
@@ -59,90 +60,16 @@ function safeIso(value?: string | null): string {
   return date.toISOString();
 }
 
-function fallbackHomePulse(): HomePulse {
-  return {
-    weather: {
-      temperatureC: -3,
-      feelsLikeC: -6,
-      condition: 'Overcast and cold',
-    },
-    exchange: {
-      base: 'USD',
-      quote: 'PLN',
-      rate: 4.05,
-      change24h: 0.02,
-    },
-    highlights: [
-      {
-        id: 'immigration-fallback',
-        kind: 'immigration',
-        title: 'Residence appointments',
-        summary: 'New slots open weekly. Book early for faster processing.',
-        severity: 'medium',
-        publishedAt: new Date().toISOString(),
-      },
-      {
-        id: 'transport-fallback',
-        kind: 'transport',
-        title: 'Metro service',
-        summary: 'Most metro lines are running normally this morning.',
-        severity: 'low',
-        publishedAt: new Date().toISOString(),
-      },
-      {
-        id: 'legal-fallback',
-        kind: 'legal',
-        title: 'Legal watch',
-        summary: 'Track ongoing updates affecting expat documentation and services.',
-        severity: 'medium',
-        publishedAt: new Date().toISOString(),
-      },
-    ],
-  };
+function latestIso(values: Array<string | null | undefined>): string {
+  const millis = values
+    .map((value) => (value ? new Date(value).getTime() : Number.NaN))
+    .filter((value) => Number.isFinite(value)) as number[];
+
+  if (!millis.length) return new Date().toISOString();
+  return new Date(Math.max(...millis)).toISOString();
 }
 
-function fallbackBriefing(): DailyBriefing {
-  const now = new Date();
-  return {
-    date: now.toISOString(),
-    city: 'Warsaw',
-    title: 'Daily Warsaw Briefing',
-    source: 'fallback',
-    updatedAt: now.toISOString(),
-    cards: [
-      {
-        id: 'weather',
-        kind: 'weather',
-        title: 'Weather mood',
-        body: 'Cold start today. Dress warm and plan indoor stops.',
-        severity: 'low',
-      },
-      {
-        id: 'transit',
-        kind: 'transit',
-        title: 'Transit pulse',
-        body: 'Core routes are stable with minor delays at peak times.',
-        severity: 'low',
-      },
-      {
-        id: 'legal',
-        kind: 'legal',
-        title: 'Legal note',
-        body: 'Monitor immigration and municipal updates before key appointments.',
-        severity: 'medium',
-      },
-      {
-        id: 'tip',
-        kind: 'tip',
-        title: 'Pro tip',
-        body: 'Complete one admin task early to keep your weekly momentum.',
-        severity: 'low',
-      },
-    ],
-  };
-}
-
-export async function getHomePulseData(): Promise<HomePulse> {
+export async function getHomePulseBundleData(): Promise<HandlerResultWithFreshness<HomePulse>> {
   const [weatherRows, fxRows, immigrationRows, transportRows, legalRows] = await Promise.all([
     supabaseSelect<WeatherSnapshotRow>(
       'weather_snapshots',
@@ -176,8 +103,6 @@ export async function getHomePulseData(): Promise<HomePulse> {
     ),
   ]);
 
-  const fallback = fallbackHomePulse();
-
   const weather = weatherRows[0]
     ? {
         temperatureC: Number(weatherRows[0].temperature_c),
@@ -185,18 +110,27 @@ export async function getHomePulseData(): Promise<HomePulse> {
           weatherRows[0].feels_like_c == null
             ? Number(weatherRows[0].temperature_c)
             : Number(weatherRows[0].feels_like_c),
-        condition: weatherRows[0].condition || fallback.weather.condition,
+        condition: weatherRows[0].condition || 'No live weather data',
       }
-    : fallback.weather;
+    : {
+        temperatureC: 0,
+        feelsLikeC: 0,
+        condition: 'No live weather data',
+      };
 
   const exchange = fxRows[0]
     ? {
-        base: fxRows[0].base_currency || fallback.exchange.base,
-        quote: fxRows[0].quote_currency || fallback.exchange.quote,
+        base: fxRows[0].base_currency || 'USD',
+        quote: fxRows[0].quote_currency || 'PLN',
         rate: Number(fxRows[0].rate),
         change24h: Number(fxRows[0].change_24h ?? 0),
       }
-    : fallback.exchange;
+    : {
+        base: 'USD',
+        quote: 'PLN',
+        rate: 0,
+        change24h: 0,
+      };
 
   const highlights = [
     ...immigrationRows.map((row) => ({
@@ -226,10 +160,28 @@ export async function getHomePulseData(): Promise<HomePulse> {
   ];
 
   return {
-    weather,
-    exchange,
-    highlights: highlights.length ? highlights : fallback.highlights,
+    data: {
+      weather,
+      exchange,
+      highlights,
+    },
+    freshness: {
+      source: 'poland-live-feeds',
+      updatedAt: latestIso([
+        weatherRows[0]?.fetched_at,
+        fxRows[0]?.fetched_at,
+        immigrationRows[0]?.fetched_at || immigrationRows[0]?.published_at,
+        transportRows[0]?.fetched_at || transportRows[0]?.starts_at,
+        legalRows[0]?.fetched_at || legalRows[0]?.published_at,
+      ]),
+      ttlSeconds: 900,
+    },
   };
+}
+
+export async function getHomePulseData(): Promise<HomePulse> {
+  const bundle = await getHomePulseBundleData();
+  return bundle.data;
 }
 
 export async function getDailyBriefingData(): Promise<DailyBriefing> {
@@ -245,7 +197,16 @@ export async function getDailyBriefingData(): Promise<DailyBriefing> {
     },
   );
 
-  if (!rows.length) return fallbackBriefing();
+  if (!rows.length) {
+    return {
+      date: today,
+      city: 'Warsaw',
+      title: 'No live briefing available yet',
+      source: 'supabase',
+      updatedAt: new Date().toISOString(),
+      cards: [],
+    };
+  }
   const row = rows[0];
 
   return {
@@ -261,6 +222,6 @@ export async function getDailyBriefingData(): Promise<DailyBriefing> {
         body: card.body || '',
         kind: card.kind || 'city',
         severity: card.severity,
-      })) || fallbackBriefing().cards,
+      })) || [],
   };
 }

@@ -59,9 +59,9 @@ export function MorningBriefing({ onDismiss, isOpen, briefingData, homePulseData
   const legalCard = briefingCards.find((card) => card.kind === 'legal');
   const cityCards = briefingCards.filter((card) => card.kind === 'city').slice(0, 2);
 
-  const weatherCondition = homePulseData?.weather?.condition || weatherCard?.title || 'Overcast clouds';
-  const weatherTemp = Math.round(homePulseData?.weather?.temperatureC ?? -3);
-  const weatherFeelsLike = Math.round(homePulseData?.weather?.feelsLikeC ?? weatherTemp - 2);
+  const weatherCondition = homePulseData?.weather?.condition || weatherCard?.title || 'No live weather update';
+  const weatherTemp = Math.round(homePulseData?.weather?.temperatureC ?? 0);
+  const weatherFeelsLike = Math.round(homePulseData?.weather?.feelsLikeC ?? weatherTemp);
 
   const transitHighlight =
     homePulseData?.highlights.find((item) => item.kind === 'transport') ||
@@ -79,22 +79,19 @@ export function MorningBriefing({ onDismiss, isOpen, briefingData, homePulseData
         .map((item) => item.summary);
     }
 
-    return [
-      'Live events will appear here as the city wakes up.',
-      'Add your interests to see hobby-matched events.',
-    ];
+    return [];
   }, [cityCards, homePulseData]);
 
   const proTipText =
     tipCard?.body ||
     legalCard?.body ||
-    'When shopping at local markets, avoid peak hours for better deals and a calmer experience.';
+    'No live pro tip available yet.';
 
   const todayInPoland =
     legalCard?.body ||
     homePulseData?.highlights.find((item) => item.kind === 'parliament' || item.kind === 'legal' || item.kind === 'immigration')
       ?.summary ||
-    'Track local city and legal updates in your daily pulse feed throughout the day.';
+    'No live legal/parliament update available yet.';
 
   if (!isOpen) return null;
 
@@ -184,7 +181,7 @@ export function MorningBriefing({ onDismiss, isOpen, briefingData, homePulseData
                   </div>
                   <h3 className="font-bold text-base mb-1 text-green-400">Clear routes</h3>
                   <p className="text-xs text-white/60 leading-relaxed line-clamp-2">
-                    {transitCard?.body || transitHighlight?.summary || 'Most lines are running normally this morning.'}
+                    {transitCard?.body || transitHighlight?.summary || 'No live transit update available yet.'}
                   </p>
                 </div>
               </div>
@@ -207,6 +204,15 @@ export function MorningBriefing({ onDismiss, isOpen, briefingData, homePulseData
                   </div>
                 </div>
               ))}
+              {cityPulseItems.length === 0 && (
+                <div className="relative rounded-[16px] p-[1px] bg-gradient-to-b from-white/10 via-white/5 to-transparent">
+                  <div className="relative overflow-hidden rounded-[16px] bg-gradient-to-b from-[#1a2642]/70 to-[#0f172a]/85 backdrop-blur-lg p-4">
+                    <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-white/5 to-transparent rounded-t-[16px] pointer-events-none" />
+                    <div className="absolute inset-0 rounded-[16px] shadow-[inset_0_1px_1px_rgba(255,255,255,0.06)] pointer-events-none" />
+                    <p className="relative text-sm text-white/70">No live city pulse items yet.</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -250,7 +256,7 @@ export function MorningBriefing({ onDismiss, isOpen, briefingData, homePulseData
             <ChevronUp className="w-4 h-4" strokeWidth={2} />
           </div>
 
-          <p className="text-center text-xs text-white/30 pb-2">Live data ready with static fallback</p>
+          <p className="text-center text-xs text-white/30 pb-2">Live feed only</p>
         </div>
       </motion.div>
     </motion.div>

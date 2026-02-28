@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { hasApiBaseUrl } from '../http';
-import { getHomeSupportPayload } from '../repositories/homeRepository';
-import type { HomeSupportPayload } from '../types';
+import { getHomeSupportPayloadEnvelope } from '../repositories/homeRepository';
+import type { FreshnessMeta, HomeSupportPayload } from '../types';
 
 interface UseHomeSupportOptions {
   enabled?: boolean;
@@ -10,6 +10,7 @@ interface UseHomeSupportOptions {
 
 interface UseHomeSupportResult {
   data: HomeSupportPayload | null;
+  freshness: FreshnessMeta | null;
   isLoading: boolean;
   error: Error | null;
   isLive: boolean;
@@ -19,6 +20,7 @@ interface UseHomeSupportResult {
 export function useHomeSupport(options: UseHomeSupportOptions = {}): UseHomeSupportResult {
   const { enabled = true, refreshIntervalMs = 2 * 60 * 1000 } = options;
   const [data, setData] = useState<HomeSupportPayload | null>(null);
+  const [freshness, setFreshness] = useState<FreshnessMeta | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(null);
@@ -33,11 +35,12 @@ export function useHomeSupport(options: UseHomeSupportOptions = {}): UseHomeSupp
     const fetchData = async () => {
       try {
         if (!data) setIsLoading(true);
-        const next = await getHomeSupportPayload();
+        const nextEnvelope = await getHomeSupportPayloadEnvelope();
         if (!mounted) return;
-        setData(next);
+        setData(nextEnvelope.data);
+        setFreshness(nextEnvelope.freshness || null);
         setError(null);
-        setLastSyncedAt(new Date().toISOString());
+        setLastSyncedAt(nextEnvelope.freshness?.updatedAt || new Date().toISOString());
       } catch (errorValue) {
         if (!mounted) return;
         setError(
@@ -63,11 +66,12 @@ export function useHomeSupport(options: UseHomeSupportOptions = {}): UseHomeSupp
   return useMemo(
     () => ({
       data,
+      freshness,
       isLoading,
       error,
       isLive: shouldFetch && Boolean(data),
       lastSyncedAt,
     }),
-    [data, error, isLoading, lastSyncedAt, shouldFetch],
+    [data, freshness, error, isLoading, lastSyncedAt, shouldFetch],
   );
 }

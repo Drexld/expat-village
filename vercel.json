@@ -1,5 +1,15 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "crons": [
+    {
+      "path": "/api/ingest/poland?kinds=weather,fx",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/ingest/poland?kinds=immigration,legal,transport",
+      "schedule": "*/30 * * * *"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",

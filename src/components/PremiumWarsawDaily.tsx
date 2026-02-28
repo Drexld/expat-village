@@ -15,40 +15,6 @@ interface PremiumWarsawDailyProps {
   isLive?: boolean;
 }
 
-function fallbackWeatherChallenge(): HomeWarsawDailyChallenge {
-  return {
-    id: 'weather-fallback',
-    question: "What's tomorrow's high in Warsaw?",
-    options: ['-2°C', '2°C', '6°C', '10°C'],
-    correctIndex: 2,
-    pointsReward: 10,
-  };
-}
-
-function fallbackWisdomChallenge(): HomeWarsawDailyChallenge {
-  return {
-    id: 'wisdom-fallback',
-    question: 'Which task should be prioritized next?',
-    options: [
-      'Register PESEL number',
-      'Open bank account',
-      'Validate transport ticket',
-      'Book residence appointment',
-    ],
-    correctIndex: 0,
-    pointsReward: 15,
-    rewardLabel: '15 bonus points',
-  };
-}
-
-function fallbackLeaderboard(): HomeWarsawDailyLeaderboardEntry[] {
-  return [
-    { rank: 1, name: 'Sarah M.', avatar: 'S', points: 280, streak: 14 },
-    { rank: 2, name: 'You', avatar: 'Y', points: 150, streak: 7 },
-    { rank: 3, name: 'Michael K.', avatar: 'M', points: 140, streak: 5 },
-  ];
-}
-
 export function PremiumWarsawDaily({
   streak,
   weatherChallenge,
@@ -64,17 +30,17 @@ export function PremiumWarsawDaily({
 
   const dailyChallenges = useMemo(
     () => ({
-      weather: weatherChallenge || fallbackWeatherChallenge(),
-      wisdom: wisdomChallenge || fallbackWisdomChallenge(),
+      weather: weatherChallenge ?? null,
+      wisdom: wisdomChallenge ?? null,
     }),
     [weatherChallenge, wisdomChallenge],
   );
 
-  const dailyLeaderboard = leaderboard?.length ? leaderboard : fallbackLeaderboard();
+  const dailyLeaderboard = leaderboard?.length ? leaderboard : [];
   const challenge = dailyChallenges[mode];
 
   const handleGuess = (index: number) => {
-    if (selectedAnswer !== null) return;
+    if (selectedAnswer !== null || !challenge) return;
 
     if ('vibrate' in navigator) {
       navigator.vibrate(50);
@@ -109,7 +75,7 @@ export function PremiumWarsawDaily({
   };
 
   const handleVoiceAnswer = () => {
-    if (selectedAnswer !== null) return;
+    if (selectedAnswer !== null || !challenge) return;
     setIsVoiceMode(true);
 
     setTimeout(() => {
@@ -197,10 +163,12 @@ export function PremiumWarsawDaily({
 
           <div className="mb-5">
             <div className="flex items-center justify-between mb-4">
-              <p className="text-white/90 text-center flex-1 py-2 font-medium">{challenge.question}</p>
+              <p className="text-white/90 text-center flex-1 py-2 font-medium">
+                {challenge?.question || 'No live challenge available yet'}
+              </p>
               <motion.button
                 onClick={handleVoiceAnswer}
-                disabled={isVoiceMode || selectedAnswer !== null}
+                disabled={isVoiceMode || selectedAnswer !== null || !challenge}
                 whileTap={{ scale: 0.9 }}
                 className={`ml-2 p-2.5 rounded-full transition-all ${
                   isVoiceMode
@@ -222,43 +190,49 @@ export function PremiumWarsawDaily({
               </motion.button>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              {challenge.options.map((option, index) => (
-                <motion.button
-                  key={`${challenge.id}-${index}`}
-                  onClick={() => handleGuess(index)}
-                  disabled={selectedAnswer !== null}
-                  whileTap={{ scale: 0.95 }}
-                  className={`relative p-4 rounded-[20px] font-semibold text-[15px] transition-all overflow-hidden ${
-                    showFeedback && selectedAnswer === index
-                      ? index === challenge.correctIndex
-                        ? 'bg-gradient-to-b from-[#10b981] to-[#059669] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_0_32px_rgba(16,185,129,0.6)] scale-105'
-                        : 'bg-gradient-to-b from-[#ef4444] to-[#dc2626] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_0_32px_rgba(239,68,68,0.6)]'
-                      : selectedAnswer !== null
+            {challenge ? (
+              <div className="grid grid-cols-2 gap-3">
+                {challenge.options.map((option, index) => (
+                  <motion.button
+                    key={`${challenge.id}-${index}`}
+                    onClick={() => handleGuess(index)}
+                    disabled={selectedAnswer !== null}
+                    whileTap={{ scale: 0.95 }}
+                    className={`relative p-4 rounded-[20px] font-semibold text-[15px] transition-all overflow-hidden ${
+                      showFeedback && selectedAnswer === index
                         ? index === challenge.correctIndex
-                          ? 'bg-gradient-to-b from-[#10b981] to-[#059669] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_0_32px_rgba(16,185,129,0.6)]'
-                          : 'bg-gradient-to-b from-[#1e293b] to-[#0f172a] text-white/30 shadow-[inset_0_2px_8px_rgba(0,0,0,0.3)]'
-                        : 'bg-gradient-to-b from-[#2d4a7c] via-[#1e3a5f] to-[#0f1f3d] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_4px_16px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_0_28px_rgba(45,116,213,0.4)]'
-                  }`}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent rounded-[20px] pointer-events-none" />
-                  <span className="relative z-10">{option}</span>
-                  <AnimatePresence>
-                    {showFeedback && selectedAnswer === index && (
-                      <motion.span
-                        initial={{ scale: 0, rotate: -180 }}
-                        animate={{ scale: 1, rotate: 0 }}
-                        exit={{ scale: 0 }}
-                        transition={{ type: 'spring', stiffness: 300 }}
-                        className="absolute -top-2 -right-2 text-lg"
-                      >
-                        {index === challenge.correctIndex ? 'OK' : 'NO'}
-                      </motion.span>
-                    )}
-                  </AnimatePresence>
-                </motion.button>
-              ))}
-            </div>
+                          ? 'bg-gradient-to-b from-[#10b981] to-[#059669] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_0_32px_rgba(16,185,129,0.6)] scale-105'
+                          : 'bg-gradient-to-b from-[#ef4444] to-[#dc2626] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_0_32px_rgba(239,68,68,0.6)]'
+                        : selectedAnswer !== null
+                          ? index === challenge.correctIndex
+                            ? 'bg-gradient-to-b from-[#10b981] to-[#059669] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_0_32px_rgba(16,185,129,0.6)]'
+                            : 'bg-gradient-to-b from-[#1e293b] to-[#0f172a] text-white/30 shadow-[inset_0_2px_8px_rgba(0,0,0,0.3)]'
+                          : 'bg-gradient-to-b from-[#2d4a7c] via-[#1e3a5f] to-[#0f1f3d] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_4px_16px_rgba(0,0,0,0.2)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_0_28px_rgba(45,116,213,0.4)]'
+                    }`}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent rounded-[20px] pointer-events-none" />
+                    <span className="relative z-10">{option}</span>
+                    <AnimatePresence>
+                      {showFeedback && selectedAnswer === index && (
+                        <motion.span
+                          initial={{ scale: 0, rotate: -180 }}
+                          animate={{ scale: 1, rotate: 0 }}
+                          exit={{ scale: 0 }}
+                          transition={{ type: 'spring', stiffness: 300 }}
+                          className="absolute -top-2 -right-2 text-lg"
+                        >
+                          {index === challenge.correctIndex ? '✓' : '✕'}
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
+                  </motion.button>
+                ))}
+              </div>
+            ) : (
+              <div className="p-4 rounded-[16px] bg-white/5 border border-white/10 text-sm text-white/60">
+                Challenge data is syncing from live backend.
+              </div>
+            )}
           </div>
 
           <div className="mb-4">
@@ -313,6 +287,11 @@ export function PremiumWarsawDaily({
                   </div>
                 </motion.div>
               ))}
+              {dailyLeaderboard.length === 0 && (
+                <div className="p-3 rounded-[12px] bg-white/5 border border-white/10 text-xs text-white/60">
+                  No live leaderboard entries yet.
+                </div>
+              )}
             </div>
           </div>
 
@@ -320,7 +299,7 @@ export function PremiumWarsawDaily({
             <span className="text-[13px] text-white/50">
               {selectedAnswer !== null ? 'Come back tomorrow' : 'First guess counts'}
             </span>
-            {mode === 'wisdom' && challenge.rewardLabel && (
+            {mode === 'wisdom' && challenge?.rewardLabel && (
               <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-amber-400/10 border border-amber-400/20">
                 <MapPin className="w-3 h-3 text-amber-400" strokeWidth={2} />
                 <span className="text-[10px] text-amber-400 font-semibold">{challenge.rewardLabel}</span>
@@ -332,4 +311,5 @@ export function PremiumWarsawDaily({
     </div>
   );
 }
+
 

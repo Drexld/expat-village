@@ -1,5 +1,5 @@
 import { RATE_LIMIT_POLICIES, methodNotAllowed, withSecurity } from '../_lib/security';
-import { getHomePulseData } from '../_lib/data/pulseData';
+import { getHomePulseBundleData } from '../_lib/data/pulseData';
 
 export const config = {
   runtime: 'edge',
@@ -16,7 +16,7 @@ const handler = withSecurity(
       throw methodNotAllowed();
     }
 
-    return getHomePulseData();
+    return getHomePulseBundleData();
   },
 );
 

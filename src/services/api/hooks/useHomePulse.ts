@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { hasApiBaseUrl } from '../http';
-import { getHomePulse } from '../repositories/homePulseRepository';
-import type { HomePulse } from '../types';
+import { getHomePulseEnvelope } from '../repositories/homePulseRepository';
+import type { FreshnessMeta, HomePulse } from '../types';
 
 interface UseHomePulseOptions {
   enabled?: boolean;
@@ -10,6 +10,7 @@ interface UseHomePulseOptions {
 
 interface UseHomePulseResult {
   data: HomePulse | null;
+  freshness: FreshnessMeta | null;
   isLoading: boolean;
   error: Error | null;
   isLive: boolean;
@@ -19,6 +20,7 @@ interface UseHomePulseResult {
 export function useHomePulse(options: UseHomePulseOptions = {}): UseHomePulseResult {
   const { enabled = true, refreshIntervalMs = 5 * 60 * 1000 } = options;
   const [data, setData] = useState<HomePulse | null>(null);
+  const [freshness, setFreshness] = useState<FreshnessMeta | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(null);
@@ -37,11 +39,12 @@ export function useHomePulse(options: UseHomePulseOptions = {}): UseHomePulseRes
         if (!data) {
           setIsLoading(true);
         }
-        const next = await getHomePulse();
+        const nextEnvelope = await getHomePulseEnvelope();
         if (!mounted) return;
-        setData(next);
+        setData(nextEnvelope.data);
+        setFreshness(nextEnvelope.freshness || null);
         setError(null);
-        setLastSyncedAt(new Date().toISOString());
+        setLastSyncedAt(nextEnvelope.freshness?.updatedAt || new Date().toISOString());
       } catch (err) {
         if (!mounted) return;
         setError(err instanceof Error ? err : new Error('Failed to load home pulse'));
@@ -63,11 +66,12 @@ export function useHomePulse(options: UseHomePulseOptions = {}): UseHomePulseRes
   return useMemo(
     () => ({
       data,
+      freshness,
       isLoading,
       error,
       isLive: shouldFetch && Boolean(data),
       lastSyncedAt,
     }),
-    [data, isLoading, error, shouldFetch, lastSyncedAt],
+    [data, freshness, isLoading, error, shouldFetch, lastSyncedAt],
   );
 }

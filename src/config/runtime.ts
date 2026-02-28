@@ -6,7 +6,6 @@ export interface RuntimeConfig {
   apiBaseUrl: string;
   supabaseUrl: string;
   supabaseAnonKey: string;
-  groqApiKey: string;
   sentryDsn: string;
 }
 
@@ -26,7 +25,6 @@ export const runtimeConfig: RuntimeConfig = {
   apiBaseUrl: readEnv('VITE_API_BASE_URL'),
   supabaseUrl: readEnv('VITE_SUPABASE_URL'),
   supabaseAnonKey: readEnv('VITE_SUPABASE_ANON_KEY'),
-  groqApiKey: readEnv('VITE_GROQ_API_KEY'),
   sentryDsn: readEnv('VITE_SENTRY_DSN'),
 };
 

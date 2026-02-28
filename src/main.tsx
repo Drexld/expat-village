@@ -2,6 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import './index.css';
+import { bootstrapSupabaseAuthSession } from './services/auth/supabaseAuth';
 
 async function clearStaleLocalServiceWorkers() {
   const host = window.location.hostname;
@@ -71,8 +72,10 @@ if (isLocalHost) {
   registerProductionServiceWorker();
 }
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-);
+void bootstrapSupabaseAuthSession().finally(() => {
+  createRoot(document.getElementById('root')!).render(
+    <StrictMode>
+      <App />
+    </StrictMode>,
+  );
+});

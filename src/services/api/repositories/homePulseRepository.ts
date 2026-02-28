@@ -1,8 +1,13 @@
-import { apiGet } from '../http';
-import type { DailyBriefing, HomePulse } from '../types';
+import { apiGet, apiGetEnvelope } from '../http';
+import type { ApiEnvelope, DailyBriefing, HomePulse } from '../types';
 
 export async function getHomePulse(): Promise<HomePulse> {
-  return apiGet<HomePulse>('/api/pulse/home');
+  const envelope = await getHomePulseEnvelope();
+  return envelope.data;
+}
+
+export async function getHomePulseEnvelope(): Promise<ApiEnvelope<HomePulse>> {
+  return apiGetEnvelope<HomePulse>('/api/pulse/home');
 }
 
 export async function getTodayBriefing(): Promise<DailyBriefing> {

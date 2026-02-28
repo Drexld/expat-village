@@ -1,7 +1,6 @@
-import { apiGet } from '../http';
-import type { HomeSupportPayload } from '../types';
+import { apiGetEnvelope } from '../http';
+import type { ApiEnvelope, HomeSupportPayload } from '../types';
 
-export async function getHomeSupportPayload(): Promise<HomeSupportPayload> {
-  return apiGet<HomeSupportPayload>('/api/home/support');
+export async function getHomeSupportPayloadEnvelope(): Promise<ApiEnvelope<HomeSupportPayload>> {
+  return apiGetEnvelope<HomeSupportPayload>('/api/home/support');
 }
-

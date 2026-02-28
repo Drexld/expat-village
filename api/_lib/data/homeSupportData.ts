@@ -1,10 +1,11 @@
-import type {
+﻿import type {
   HomeCommunityTopic,
   HomeQuickAction,
   HomeSupportPayload,
   HomeWarsawDailyChallenge,
   HomeWarsawDailyLeaderboardEntry,
 } from '../../../src/services/api/types';
+import type { HandlerResultWithFreshness } from '../security';
 import { supabaseSelect } from './supabaseRest';
 
 interface WeatherRow {
@@ -49,6 +50,7 @@ interface CommunityCommentRow {
 
 interface ReviewPromptRow {
   id: string;
+  created_at?: string;
 }
 
 function clamp(value: number, min: number, max: number): number {
@@ -77,6 +79,15 @@ function formatTempLabel(value: number): string {
   return `${value}°C`;
 }
 
+function latestIso(values: Array<string | null | undefined>): string {
+  const millis = values
+    .map((value) => (value ? new Date(value).getTime() : Number.NaN))
+    .filter((value) => Number.isFinite(value)) as number[];
+
+  if (!millis.length) return new Date().toISOString();
+  return new Date(Math.max(...millis)).toISOString();
+}
+
 function buildWeatherChallenge(temperatureC: number): HomeWarsawDailyChallenge {
   const target = Math.round(temperatureC + 2);
   const candidates = [
@@ -102,13 +113,13 @@ function buildWisdomChallenge(tasks: TaskRow[]): HomeWarsawDailyChallenge {
   const options = deduped.length
     ? deduped
     : [
-        'Register PESEL number',
-        'Open bank account',
-        'Validate transport ticket',
-        'Book residence appointment',
+        'Sync live checklist data',
+        'Complete profile setup',
+        'Join community discussion',
+        'Enable service reviews',
       ];
 
-  const rewardPoints = Number(tasks[0]?.points || 15);
+  const rewardPoints = Number(tasks[0]?.points || 10);
 
   return {
     id: 'wisdom-priority',
@@ -116,7 +127,7 @@ function buildWisdomChallenge(tasks: TaskRow[]): HomeWarsawDailyChallenge {
     options,
     correctIndex: 0,
     pointsReward: rewardPoints,
-    rewardLabel: `${rewardPoints} bonus points`,
+    rewardLabel: `${rewardPoints} points`,
   };
 }
 
@@ -216,70 +227,16 @@ function buildQuickActions(params: {
     .slice(0, 4);
 }
 
-function fallbackPayload(): HomeSupportPayload {
-  const weatherChallenge = buildWeatherChallenge(-3);
-  return {
-    warsawDaily: {
-      weatherChallenge,
-      wisdomChallenge: {
-        id: 'wisdom-priority',
-        question: 'Which task should be prioritized next?',
-        options: [
-          'Register PESEL number',
-          'Open bank account',
-          'Validate transport ticket',
-          'Book residence appointment',
-        ],
-        correctIndex: 0,
-        pointsReward: 15,
-        rewardLabel: '15 bonus points',
-      },
-      leaderboard: [
-        { rank: 1, name: 'Sarah M.', avatar: 'S', points: 280, streak: 14 },
-        { rank: 2, name: 'Alex', avatar: 'A', points: 150, streak: 7 },
-        { rank: 3, name: 'Michael K.', avatar: 'M', points: 140, streak: 5 },
-      ],
-    },
-    community: {
-      townHall: {
-        activeCount: 12,
-        viewingCount: 47,
-        previews: [
-          {
-            id: 'fallback-1',
-            authorAvatar: 'S',
-            title: 'PESEL appointment times?',
-            timestamp: '2m ago',
-            isNew: true,
-            replies: 0,
-          },
-          {
-            id: 'fallback-2',
-            authorAvatar: 'J',
-            title: 'Red flags in contract help!',
-            timestamp: '8m ago',
-            isNew: false,
-            replies: 3,
-          },
-        ],
-      },
-      hotTopics: [
-        { id: 'bank', label: 'Banking tips', count: 156, trend: 12, icon: 'bank' },
-        { id: 'district', label: 'District trends', count: 89, trend: 8, icon: 'pin' },
-        { id: 'job', label: 'Job hunting', count: 67, trend: 5, icon: 'briefcase' },
-      ],
-    },
-    quickActions: buildQuickActions({
-      pendingTasks: [{ id: '1', title: 'Register PESEL number' }],
-      communityPostsCount: 12,
-      pendingReviewCount: 0,
-    }),
-  };
-}
-
 export async function getHomeSupportData(
   userId?: string | null,
 ): Promise<HomeSupportPayload> {
+  const bundle = await getHomeSupportBundleData(userId);
+  return bundle.data;
+}
+
+export async function getHomeSupportBundleData(
+  userId?: string | null,
+): Promise<HandlerResultWithFreshness<HomeSupportPayload>> {
   const [weatherRows, taskRows, taskStatusRows, profileRows, userRows, postRows, commentRows, promptRows] =
     await Promise.all([
       supabaseSelect<WeatherRow>(
@@ -320,16 +277,12 @@ export async function getHomeSupportData(
         ascending: false,
       }),
       userId
-        ? supabaseSelect<ReviewPromptRow>('review_prompts', 'id', {
+        ? supabaseSelect<ReviewPromptRow>('review_prompts', 'id,created_at', {
             limit: 200,
             filters: [{ column: 'user_id', op: 'eq', value: userId }],
           })
         : Promise.resolve([] as ReviewPromptRow[]),
     ]);
-
-  if (!taskRows.length || !userRows.length) {
-    return fallbackPayload();
-  }
 
   const statusByTask = new Map(taskStatusRows.map((row) => [row.task_id, row.status]));
   const pendingTasks = taskRows.filter((task) => statusByTask.get(task.id) !== 'done');
@@ -376,33 +329,45 @@ export async function getHomeSupportData(
       .map((post) => post.user_id),
   );
   const activeCount = activeUserIds.size;
-  const viewingCount = Math.max(activeCount * 3 + previews.length * 4, 12);
+  const viewingCount = activeCount > 0 ? activeCount * 3 + previews.length * 4 : 0;
 
-  const weatherTemp = Number(weatherRows[0]?.temperature_c ?? -3);
+  const weatherTemp = Number(weatherRows[0]?.temperature_c ?? 0);
   const weatherChallenge = buildWeatherChallenge(weatherTemp);
   const wisdomChallenge = buildWisdomChallenge(prioritizedTasks);
 
   const topics = buildTopics(postRows);
 
   return {
-    warsawDaily: {
-      weatherChallenge,
-      wisdomChallenge,
-      leaderboard: leaderboard.length ? leaderboard : fallbackPayload().warsawDaily.leaderboard,
-    },
-    community: {
-      townHall: {
-        activeCount: Math.max(activeCount, 1),
-        viewingCount,
-        previews: previews.length ? previews : fallbackPayload().community.townHall.previews,
+    data: {
+      warsawDaily: {
+        weatherChallenge,
+        wisdomChallenge,
+        leaderboard,
       },
-      hotTopics: topics.length ? topics : fallbackPayload().community.hotTopics,
+      community: {
+        townHall: {
+          activeCount,
+          viewingCount,
+          previews,
+        },
+        hotTopics: topics,
+      },
+      quickActions: buildQuickActions({
+        pendingTasks: prioritizedTasks,
+        communityPostsCount: activeCount,
+        pendingReviewCount: promptRows.length,
+      }),
     },
-    quickActions: buildQuickActions({
-      pendingTasks: prioritizedTasks,
-      communityPostsCount: activeCount,
-      pendingReviewCount: promptRows.length,
-    }),
+    freshness: {
+      source: 'home-support-live',
+      updatedAt: latestIso([
+        weatherRows[0]?.fetched_at,
+        postRows[0]?.created_at,
+        promptRows[0]?.created_at,
+      ]),
+      ttlSeconds: 300,
+    },
   };
 }
+
 

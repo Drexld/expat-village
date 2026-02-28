@@ -31,29 +31,6 @@ interface UserRow {
   display_name: string;
 }
 
-function fallbackPosts(): CommunityPostSummary[] {
-  return [
-    {
-      id: 'fallback-community-1',
-      authorName: 'Sarah M.',
-      title: 'PESEL appointment wait times',
-      preview: 'Has anyone booked recently and seen faster slots?',
-      likes: 34,
-      replies: 18,
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 'fallback-community-2',
-      authorName: 'Luca R.',
-      title: 'Rental contract red flags in Warsaw',
-      preview: 'I listed the top clauses worth checking before signing.',
-      likes: 67,
-      replies: 29,
-      createdAt: new Date().toISOString(),
-    },
-  ];
-}
-
 function isQuestionPost(post: CommunityPostSummary): boolean {
   return post.title.includes('?') || post.preview.includes('?');
 }
@@ -104,9 +81,7 @@ export async function getCommunityPostsData(filter: CommunityFilter): Promise<Co
     }),
   ]);
 
-  if (!posts.length) {
-    return applyFilter(fallbackPosts(), filter);
-  }
+  if (!posts.length) return [];
 
   const repliesByPost = new Map<string, number>();
   comments.forEach((comment) => {
@@ -171,15 +146,7 @@ export async function createCommunityPostData(
 
   const row = created[0];
   if (!row) {
-    return {
-      id: `post-${Date.now()}`,
-      authorName: 'You',
-      title: input.title,
-      preview: trimPreview(input.body),
-      likes: 0,
-      replies: 0,
-      createdAt: new Date().toISOString(),
-    };
+    throw new Error('Community post creation failed to persist');
   }
 
   return {

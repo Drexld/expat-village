@@ -60,6 +60,25 @@ async function handleNavigation(request) {
 }
 
 async function handleApi(request) {
+  const hasAuth = request.headers.has('authorization');
+
+  if (hasAuth) {
+    try {
+      return await withTimeout(fetch(request), API_TIMEOUT_MS);
+    } catch {
+      return new Response(
+        JSON.stringify({
+          offline: true,
+          message: 'Authenticated API request failed while offline.',
+        }),
+        {
+          status: 503,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      );
+    }
+  }
+
   try {
     const networkResponse = await withTimeout(fetch(request), API_TIMEOUT_MS);
     await cachePutSafe(API_CACHE, request, networkResponse);

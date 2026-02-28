@@ -1,8 +1,15 @@
 export type JsonPrimitive = string | number | boolean | null;
 export type JsonValue = JsonPrimitive | JsonValue[] | { [key: string]: JsonValue };
 
+export interface FreshnessMeta {
+  source: string;
+  updatedAt: string;
+  ttlSeconds: number;
+}
+
 export interface ApiSuccessEnvelope<T> {
   data: T;
+  freshness?: FreshnessMeta;
 }
 
 export interface ApiErrorEnvelope {
@@ -35,6 +42,11 @@ export interface SecurityContext<TBody> {
   auth: AuthContext;
   body: TBody;
   startedAtMs: number;
+}
+
+export interface HandlerResultWithFreshness<T> {
+  data: T;
+  freshness: FreshnessMeta;
 }
 
 export type ApiHandler<TBody, TResult> = (

@@ -93,6 +93,26 @@ const checks = [
     label: 'RevenueCat secret key',
     required: false,
   },
+  {
+    key: 'INGEST_CRON_SECRET',
+    label: 'Secret for scheduled ingestion endpoint',
+    required: true,
+  },
+  {
+    key: 'INGEST_IMMIGRATION_FEED_URLS',
+    label: 'Poland immigration feed URLs (comma-separated)',
+    required: true,
+  },
+  {
+    key: 'INGEST_LEGAL_FEED_URLS',
+    label: 'Poland legal/parliament feed URLs (comma-separated)',
+    required: true,
+  },
+  {
+    key: 'INGEST_TRANSPORT_FEED_URLS',
+    label: 'Poland transport disruption feed URLs (comma-separated)',
+    required: true,
+  },
 ];
 
 let hasBlockingFailure = false;
@@ -116,6 +136,7 @@ console.log('1) Configure all BLOCKER env vars locally and in Vercel.');
 console.log('2) Deploy and verify /api/health + /api/pulse/home.');
 console.log('3) Run security smoke: npm run security:smoke -- https://<your-url>.');
 console.log('4) Enable AI keys, then billing keys.');
+console.log('5) Configure ingestion secret + Poland feed source URLs for live updates.');
 
 if (hasBlockingFailure) {
   process.exitCode = 1;

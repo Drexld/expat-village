@@ -6,8 +6,9 @@ import {
   Calendar,
   Users,
   Zap,
-  BrainCircuit,
-  UtensilsCrossed,
+  Activity,
+  Clock3,
+  TriangleAlert,
   Sun,
   ChevronRight,
 } from 'lucide-react';
@@ -17,7 +18,11 @@ import { PremiumJourney } from './PremiumJourney';
 import { PremiumWarsawDaily } from './PremiumWarsawDaily';
 import { PremiumCommunityCards } from './PremiumCommunityCards';
 import { toast } from 'sonner';
-import type { HomePulse as HomePulseData, MeProgress } from '../services/api/types';
+import type {
+  FreshnessMeta,
+  HomePulse as HomePulseData,
+  MeProgress,
+} from '../services/api/types';
 import { useHomeSupport, useServices } from '../services/api/hooks';
 
 interface HomeProps {
@@ -33,11 +38,19 @@ interface HomeProps {
   userMood?: string;
   homePulseData?: HomePulseData | null;
   homePulseLive?: boolean;
+  homePulseFreshness?: FreshnessMeta | null;
   journeyData?: MeProgress | null;
 }
 
-export function Home({ user, onOpenBriefing, userMood, homePulseData, homePulseLive, journeyData }: HomeProps) {
-  const [notifications] = useState(3);
+export function Home({
+  user,
+  onOpenBriefing,
+  userMood,
+  homePulseData,
+  homePulseLive,
+  homePulseFreshness,
+  journeyData,
+}: HomeProps) {
   const [isListening, setIsListening] = useState(false);
   const [voiceTranscript, setVoiceTranscript] = useState('');
   const [pendingReviewCount, setPendingReviewCount] = useState(0);
@@ -87,6 +100,101 @@ export function Home({ user, onOpenBriefing, userMood, homePulseData, homePulseL
 
   const quickActions = homeSupport.data?.quickActions || [];
 
+  const colorFromSeverity = (severity: 'low' | 'medium' | 'high'): 'blue' | 'green' | 'amber' | 'pink' => {
+    if (severity === 'high') return 'pink';
+    if (severity === 'medium') return 'amber';
+    return 'blue';
+  };
+
+  const colorFromIsNew = (isNew: boolean): 'blue' | 'green' | 'amber' | 'pink' => {
+    return isNew ? 'green' : 'blue';
+  };
+
+  const headerNotificationItems: Array<{
+    id: string;
+    text: string;
+    time: string;
+    color: 'blue' | 'green' | 'amber' | 'pink';
+  }> = [];
+
+  for (const highlight of (homePulseData?.highlights || []).slice(0, 2)) {
+    headerNotificationItems.push({
+      id: `pulse-${highlight.id}`,
+      text: highlight.title,
+      time: new Date(highlight.publishedAt).toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+      color: colorFromSeverity(highlight.severity),
+    });
+  }
+
+  for (const preview of (homeSupport.data?.community.townHall.previews || []).slice(0, 2)) {
+    headerNotificationItems.push({
+      id: `townhall-${preview.id}`,
+      text: preview.title,
+      time: preview.timestamp,
+      color: colorFromIsNew(preview.isNew),
+    });
+  }
+
+  if (pendingReviewCount > 0) {
+    headerNotificationItems.push({
+      id: 'review-prompts',
+      text: `${pendingReviewCount} pending service review ${pendingReviewCount === 1 ? 'prompt' : 'prompts'}`,
+      time: 'Now',
+      color: 'green',
+    });
+  }
+
+  const liveHeaderNotifications = headerNotificationItems.slice(0, 5);
+
+  const resolveFreshnessState = (
+    freshness?: FreshnessMeta | null,
+  ): {
+    label: string;
+    detail: string;
+    statusTone: 'good' | 'warn';
+  } => {
+    if (!freshness?.updatedAt) {
+      return {
+        label: 'Waiting for live feed',
+        detail: 'No backend freshness timestamp yet.',
+        statusTone: 'warn',
+      };
+    }
+
+    const updatedMs = new Date(freshness.updatedAt).getTime();
+    if (!Number.isFinite(updatedMs)) {
+      return {
+        label: 'Feed timestamp invalid',
+        detail: 'Backend returned an unreadable timestamp.',
+        statusTone: 'warn',
+      };
+    }
+
+    const ageSeconds = Math.max(0, Math.floor((Date.now() - updatedMs) / 1000));
+    const ttlSeconds = freshness.ttlSeconds || 0;
+    const isFresh = ttlSeconds > 0 ? ageSeconds <= ttlSeconds : ageSeconds <= 300;
+
+    if (isFresh) {
+      return {
+        label: 'Live',
+        detail: `Updated ${Math.floor(ageSeconds / 60)}m ago`,
+        statusTone: 'good',
+      };
+    }
+
+    return {
+      label: 'Stale',
+      detail: `Last update ${Math.floor(ageSeconds / 60)}m ago`,
+      statusTone: 'warn',
+    };
+  };
+
+  const pulseFreshnessState = resolveFreshnessState(homePulseFreshness);
+  const supportFreshnessState = resolveFreshnessState(homeSupport.freshness);
+
   const iconForQuickAction = (icon: 'calendar' | 'users' | 'message' | 'zap') => {
     if (icon === 'calendar') return Calendar;
     if (icon === 'users') return Users;
@@ -127,7 +235,7 @@ export function Home({ user, onOpenBriefing, userMood, homePulseData, homePulseL
     <div className="min-h-screen" ref={containerRef}>
       <PremiumHeader
         user={user}
-        notifications={notifications}
+        notificationItems={liveHeaderNotifications}
         isListening={isListening}
         onVoiceCommand={handleVoiceCommand}
         voiceTranscript={voiceTranscript}
@@ -248,32 +356,39 @@ export function Home({ user, onOpenBriefing, userMood, homePulseData, homePulseL
             <div className="relative rounded-[20px] bg-gradient-to-br from-[#1a2642]/90 to-[#0f172a]/95 p-4">
               <div className="absolute inset-0 bg-gradient-to-br from-white/8 via-transparent to-transparent rounded-[20px] pointer-events-none" />
               <div className="relative">
-                <p className="text-xs text-[#3b9eff] font-semibold mb-1">COMPLETE AI BUILD</p>
-                <h3 className="text-sm font-bold mb-2">New modules are live in Discover</h3>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    onClick={() =>
-                      toast.info('Open Discover > AI Hub', {
-                        description: 'Predictive, DNA, Advisor, Coach, Luck, Shadow, Student AI',
-                      })
-                    }
-                    className="p-2.5 rounded-[12px] bg-[#3b9eff]/15 border border-[#3b9eff]/25 text-left"
-                  >
-                    <BrainCircuit className="w-4 h-4 text-[#3b9eff] mb-1" strokeWidth={2} />
-                    <p className="text-xs font-semibold">AI Hub</p>
-                  </button>
-                  <button
-                    onClick={() =>
-                      toast.info('Open Discover > Flavor Days', {
-                        description: 'Daily cuisine, partner restaurants, challenges, and leaderboard',
-                      })
-                    }
-                    className="p-2.5 rounded-[12px] bg-[#10b981]/15 border border-[#10b981]/25 text-left"
-                  >
-                    <UtensilsCrossed className="w-4 h-4 text-[#10b981] mb-1" strokeWidth={2} />
-                    <p className="text-xs font-semibold">Flavor Days</p>
-                  </button>
+                <div className="flex items-center gap-2 mb-2">
+                  <Activity className="w-4 h-4 text-[#3b9eff]" strokeWidth={2} />
+                  <p className="text-xs text-[#3b9eff] font-semibold">POLAND LIVE FEEDS</p>
                 </div>
+                <h3 className="text-sm font-bold mb-2">Immigration, legal, transport, weather in English</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="p-2.5 rounded-[12px] bg-[#3b9eff]/15 border border-[#3b9eff]/25">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Clock3 className="w-3.5 h-3.5 text-[#3b9eff]" strokeWidth={2} />
+                      <p className="text-[11px] font-semibold">Pulse Feed</p>
+                    </div>
+                    <p className={`text-[10px] ${pulseFreshnessState.statusTone === 'good' ? 'text-green-300' : 'text-amber-300'}`}>
+                      {pulseFreshnessState.label}
+                    </p>
+                    <p className="text-[10px] text-white/60">{pulseFreshnessState.detail}</p>
+                  </div>
+                  <div className="p-2.5 rounded-[12px] bg-[#10b981]/15 border border-[#10b981]/25">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Clock3 className="w-3.5 h-3.5 text-[#10b981]" strokeWidth={2} />
+                      <p className="text-[11px] font-semibold">Home Support</p>
+                    </div>
+                    <p className={`text-[10px] ${supportFreshnessState.statusTone === 'good' ? 'text-green-300' : 'text-amber-300'}`}>
+                      {supportFreshnessState.label}
+                    </p>
+                    <p className="text-[10px] text-white/60">{supportFreshnessState.detail}</p>
+                  </div>
+                </div>
+                {(pulseFreshnessState.statusTone === 'warn' || supportFreshnessState.statusTone === 'warn') && (
+                  <div className="mt-2 flex items-center gap-1.5 text-[10px] text-amber-300">
+                    <TriangleAlert className="w-3.5 h-3.5" strokeWidth={2} />
+                    <span>Feed may be stale. Check ingestion jobs.</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>

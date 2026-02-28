@@ -291,6 +291,7 @@ export default function App() {
             userMood={userMood}
             homePulseData={homePulse.data}
             homePulseLive={homePulse.isLive}
+            homePulseFreshness={homePulse.freshness}
             journeyData={meProfileProgress.progress}
           />
         );
@@ -320,6 +321,7 @@ export default function App() {
             userMood={userMood}
             homePulseData={homePulse.data}
             homePulseLive={homePulse.isLive}
+            homePulseFreshness={homePulse.freshness}
             journeyData={meProfileProgress.progress}
           />
         );
@@ -350,7 +352,7 @@ export default function App() {
         <VoiceBubble userName={effectiveUser.name} onVoiceCommand={() => {}} />
       )}
       
-      <main className="pb-20 min-h-screen max-w-md mx-auto">
+      <main className="min-h-screen max-w-md mx-auto pb-[calc(6rem+env(safe-area-inset-bottom))]">
         {renderContent()}
       </main>
       

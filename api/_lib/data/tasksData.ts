@@ -22,47 +22,6 @@ interface UserTaskStatusRow {
   status: 'todo' | 'in_progress' | 'done';
 }
 
-function fallbackChecklistTasks(): ChecklistTasksResponse {
-  return {
-    total: 3,
-    completed: 1,
-    categories: [
-      { id: 'cat-admin', slug: 'admin', name: 'Admin' },
-      { id: 'cat-finance', slug: 'finance', name: 'Finance' },
-      { id: 'cat-essentials', slug: 'essentials', name: 'Essentials' },
-    ],
-    tasks: [
-      {
-        id: 'task-fallback-pesel',
-        categoryId: 'cat-admin',
-        title: 'Get PESEL number',
-        description: 'Required for most official registrations and services.',
-        urgency: 'urgent',
-        points: 30,
-        status: 'todo',
-      },
-      {
-        id: 'task-fallback-bank',
-        categoryId: 'cat-finance',
-        title: 'Open Polish bank account',
-        description: 'Needed for salary and local transfers.',
-        urgency: 'normal',
-        points: 20,
-        status: 'done',
-      },
-      {
-        id: 'task-fallback-sim',
-        categoryId: 'cat-essentials',
-        title: 'Get local SIM card',
-        description: 'Use local mobile plans for calls and data.',
-        urgency: 'normal',
-        points: 10,
-        status: 'todo',
-      },
-    ],
-  };
-}
-
 export async function getChecklistTasksData(userId?: string | null): Promise<ChecklistTasksResponse> {
   const [categoryRows, taskRows, statusRows] = await Promise.all([
     supabaseSelect<TaskCategoryRow>('task_categories', 'id,slug,name,display_order', {
@@ -91,7 +50,12 @@ export async function getChecklistTasksData(userId?: string | null): Promise<Che
   ]);
 
   if (!taskRows.length || !categoryRows.length) {
-    return fallbackChecklistTasks();
+    return {
+      total: 0,
+      completed: 0,
+      categories: [],
+      tasks: [],
+    };
   }
 
   const statusByTaskId = new Map(statusRows.map((row) => [row.task_id, row.status]));

@@ -1,5 +1,5 @@
 import { DEFAULT_CSP, HEADER_REQUEST_ID, SECURITY_HEADERS } from './constants';
-import type { ApiErrorEnvelope, ApiSuccessEnvelope, JsonValue } from './types';
+import type { ApiErrorEnvelope, ApiSuccessEnvelope, FreshnessMeta, JsonValue } from './types';
 
 function mergeHeaders(
   inputHeaders: HeadersInit | undefined,
@@ -27,9 +27,17 @@ function mergeHeaders(
 export function jsonOk<T>(
   data: T,
   requestId: string,
-  options?: { status?: number; headers?: HeadersInit; origin?: string | null },
+  options?: {
+    status?: number;
+    headers?: HeadersInit;
+    origin?: string | null;
+    freshness?: FreshnessMeta;
+  },
 ): Response {
   const payload: ApiSuccessEnvelope<T> = { data };
+  if (options?.freshness) {
+    payload.freshness = options.freshness;
+  }
   return new Response(JSON.stringify(payload), {
     status: options?.status ?? 200,
     headers: mergeHeaders(options?.headers, requestId, options?.origin),

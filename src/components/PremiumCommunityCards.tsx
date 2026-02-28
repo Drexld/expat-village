@@ -58,7 +58,7 @@ export function PremiumCommunityCards({ townHall, hotTopics, isLive = false }: P
                 <Users className="w-3.5 h-3.5 text-white/50" strokeWidth={2} />
                 <span className="text-[12px] text-white/70 font-medium">{townHall?.activeCount || 0} active</span>
               </div>
-              <span className="text-white/30">â€¢</span>
+              <span className="text-white/30">•</span>
               <div className="flex items-center gap-1">
                 <Eye className="w-3.5 h-3.5 text-white/50" strokeWidth={2} />
                 <span className="text-[12px] text-white/70 font-medium">{townHall?.viewingCount || 0} viewing</span>
@@ -161,4 +161,5 @@ export function PremiumCommunityCards({ townHall, hotTopics, isLive = false }: P
     </>
   );
 }
+
 

@@ -34,14 +34,14 @@ interface PersonalityOnboardingProps {
 }
 
 const tribes = [
-  { id: 'football', label: 'Football', emoji: '⚽' },
-  { id: 'nba', label: 'NBA', emoji: '🏀' },
-  { id: 'marvel', label: 'Marvel', emoji: '🦸' },
-  { id: 'dc', label: 'DC', emoji: '🦇' },
-  { id: 'anime', label: 'Anime', emoji: '🎌' },
-  { id: 'gaming', label: 'Gaming', emoji: '🎮' },
-  { id: 'f1', label: 'F1', emoji: '🏎️' },
-  { id: 'music', label: 'Music', emoji: '🎵' },
+  { id: 'football', label: 'Football', emoji: '\u26BD' },
+  { id: 'nba', label: 'NBA', emoji: '\u{1F3C0}' },
+  { id: 'marvel', label: 'Marvel', emoji: '\u{1F9B8}' },
+  { id: 'dc', label: 'DC', emoji: '\u{1F987}' },
+  { id: 'anime', label: 'Anime', emoji: '\u{1F3AC}' },
+  { id: 'gaming', label: 'Gaming', emoji: '\u{1F3AE}' },
+  { id: 'f1', label: 'F1', emoji: '\u{1F3CE}\uFE0F' },
+  { id: 'music', label: 'Music', emoji: '\u{1F3B5}' },
 ];
 
 export function PersonalityOnboarding({ onComplete }: PersonalityOnboardingProps) {
@@ -81,13 +81,18 @@ export function PersonalityOnboarding({ onComplete }: PersonalityOnboardingProps
     }
 
     setStep('generating');
-    const generated = await generateOnboardingContent({
-      userName: userName.trim(),
-      tribe: selectedTribe.label,
-      interest: interest.trim(),
-    });
-    setContent(generated);
-    setStep('banter');
+    try {
+      const generated = await generateOnboardingContent({
+        userName: userName.trim(),
+        tribe: selectedTribe.label,
+        interest: interest.trim(),
+      });
+      setContent(generated);
+      setStep('banter');
+    } catch {
+      toast.error('Live onboarding is temporarily unavailable. Please try again.');
+      setStep('interest');
+    }
   };
 
   const chooseAnswer = async (optionIndex: number) => {
@@ -114,20 +119,26 @@ export function PersonalityOnboarding({ onComplete }: PersonalityOnboardingProps
 
     setTimeout(async () => {
       setStep('generating');
-      const banter = await generateFinalBanter({
-        userName: userName.trim(),
-        tribe: selectedTribe?.label || 'Tribe',
-        interest: interest.trim(),
-        score: nextAnswers.reduce(
-          (count, answer, idx) => (answer === quiz[idx]?.correctIndex ? count + 1 : count),
-          0,
-        ),
-        total: totalQuestions,
-      });
-      setFinalBanter(banter);
-      setSelectedOption(null);
-      setShowAnswerFeedback(false);
-      setStep('result');
+      try {
+        const banter = await generateFinalBanter({
+          userName: userName.trim(),
+          tribe: selectedTribe?.label || 'Tribe',
+          interest: interest.trim(),
+          score: nextAnswers.reduce(
+            (count, answer, idx) => (answer === quiz[idx]?.correctIndex ? count + 1 : count),
+            0,
+          ),
+          total: totalQuestions,
+        });
+        setFinalBanter(banter);
+      } catch {
+        toast.error('Could not generate final AI banter.');
+        setFinalBanter('');
+      } finally {
+        setSelectedOption(null);
+        setShowAnswerFeedback(false);
+        setStep('result');
+      }
     }, 700);
   };
 
@@ -342,7 +353,9 @@ export function PersonalityOnboarding({ onComplete }: PersonalityOnboardingProps
                       </p>
                     </div>
                     <div className="p-4 rounded-[14px] bg-[#3b9eff]/10 border border-[#3b9eff]/20 mb-5">
-                      <p className="text-sm leading-relaxed">{finalBanter}</p>
+                      <p className="text-sm leading-relaxed">
+                        {finalBanter || 'Live final banter is unavailable right now.'}
+                      </p>
                     </div>
                     <button
                       onClick={() => setStep('badge')}
@@ -366,7 +379,7 @@ export function PersonalityOnboarding({ onComplete }: PersonalityOnboardingProps
                     <p className="text-sm text-white/60 mb-1">Your tribe badge</p>
                     <h2 className="text-2xl font-bold mb-2">{content.badgeName}</h2>
                     <p className="text-sm text-white/70 mb-6">
-                      {selectedTribe?.emoji} {selectedTribe?.label} • {interest}
+                      {selectedTribe?.emoji} {selectedTribe?.label} - {interest}
                     </p>
                     <button
                       disabled={submitting}
@@ -388,3 +401,4 @@ export function PersonalityOnboarding({ onComplete }: PersonalityOnboardingProps
     </div>
   );
 }
+

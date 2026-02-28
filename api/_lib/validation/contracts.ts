@@ -276,6 +276,63 @@ export const validateGuideVote: Validator<GuideVoteInput> = (input) =>
     return reject(['vote must be -1 or 1']);
   });
 
+export interface OnboardingContentInput {
+  userName: string;
+  tribe: string;
+  interest: string;
+}
+
+export const validateOnboardingContent: Validator<OnboardingContentInput> = (input) =>
+  objectInput(input, (payload) => {
+    const userName = requiredString(payload.userName, 'userName', 1, 80);
+    const tribe = requiredString(payload.tribe, 'tribe', 1, 80);
+    const interest = requiredString(payload.interest, 'interest', 1, 200);
+    const errors = [...errorsFrom(userName), ...errorsFrom(tribe), ...errorsFrom(interest)];
+    if (errors.length) return reject(errors);
+
+    return pass({
+      userName: valueFrom(userName),
+      tribe: valueFrom(tribe),
+      interest: valueFrom(interest),
+    });
+  });
+
+export interface OnboardingFinalBanterInput {
+  userName: string;
+  tribe: string;
+  interest: string;
+  score: number;
+  total: number;
+}
+
+export const validateOnboardingFinalBanter: Validator<OnboardingFinalBanterInput> = (input) =>
+  objectInput(input, (payload) => {
+    const userName = requiredString(payload.userName, 'userName', 1, 80);
+    const tribe = requiredString(payload.tribe, 'tribe', 1, 80);
+    const interest = requiredString(payload.interest, 'interest', 1, 200);
+    const score = requiredNumber(payload.score, 'score', { min: 0, max: 20, integer: true });
+    const total = requiredNumber(payload.total, 'total', { min: 1, max: 20, integer: true });
+    const errors = [
+      ...errorsFrom(userName),
+      ...errorsFrom(tribe),
+      ...errorsFrom(interest),
+      ...errorsFrom(score),
+      ...errorsFrom(total),
+    ];
+    if (valueFrom(score) > valueFrom(total)) {
+      errors.push('score must be less than or equal to total');
+    }
+    if (errors.length) return reject(errors);
+
+    return pass({
+      userName: valueFrom(userName),
+      tribe: valueFrom(tribe),
+      interest: valueFrom(interest),
+      score: valueFrom(score),
+      total: valueFrom(total),
+    });
+  });
+
 export interface ContractAnalyzeInput {
   documentName: string;
   documentText?: string;

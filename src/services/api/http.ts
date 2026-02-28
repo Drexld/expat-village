@@ -1,4 +1,5 @@
 import { runtimeConfig } from '../../config/runtime';
+import { getAccessToken } from '../auth/tokenStore';
 import type { ApiEnvelope } from './types';
 
 export class ApiClientError extends Error {
@@ -42,12 +43,18 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
     throw new ApiClientError('VITE_API_BASE_URL is not configured.');
   }
 
+  const token = getAccessToken();
+  const headers = new Headers(options.headers || {});
+  if (!headers.has('Content-Type')) {
+    headers.set('Content-Type', 'application/json');
+  }
+  if (token && !headers.has('Authorization')) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
+
   const response = await fetch(withBaseUrl(path), {
     ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(options.headers || {}),
-    },
+    headers,
   });
 
   if (!response.ok) {
@@ -62,8 +69,46 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   return payload as T;
 }
 
+export async function apiRequestEnvelope<T>(
+  path: string,
+  options: RequestOptions = {},
+): Promise<ApiEnvelope<T>> {
+  if (!hasApiBaseUrl()) {
+    throw new ApiClientError('VITE_API_BASE_URL is not configured.');
+  }
+
+  const token = getAccessToken();
+  const headers = new Headers(options.headers || {});
+  if (!headers.has('Content-Type')) {
+    headers.set('Content-Type', 'application/json');
+  }
+  if (token && !headers.has('Authorization')) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
+
+  const response = await fetch(withBaseUrl(path), {
+    ...options,
+    headers,
+  });
+
+  if (!response.ok) {
+    await parseError(response);
+  }
+
+  const payload = (await response.json()) as ApiEnvelope<T> | T;
+  if (payload && typeof payload === 'object' && 'data' in payload) {
+    return payload as ApiEnvelope<T>;
+  }
+
+  return { data: payload as T };
+}
+
 export function apiGet<T>(path: string, options: RequestOptions = {}): Promise<T> {
   return apiRequest<T>(path, { ...options, method: 'GET' });
+}
+
+export function apiGetEnvelope<T>(path: string, options: RequestOptions = {}): Promise<ApiEnvelope<T>> {
+  return apiRequestEnvelope<T>(path, { ...options, method: 'GET' });
 }
 
 export function apiPost<T>(path: string, body?: unknown, options: RequestOptions = {}): Promise<T> {

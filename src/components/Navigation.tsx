@@ -16,7 +16,7 @@ export function Navigation({ activeTab, onTabChange }: NavigationProps) {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pb-8 px-5">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 flex justify-center px-5 pb-[max(env(safe-area-inset-bottom),1rem)]">
       <div className="relative w-full max-w-md">
         <div className="relative rounded-[32px] bg-gradient-to-b from-[#1a2947] to-[#0d1829] shadow-[0_8px_32px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)] px-4 py-4">
           <div className="absolute inset-0 rounded-[32px] shadow-[inset_0_2px_12px_rgba(0,0,0,0.4)] pointer-events-none" />

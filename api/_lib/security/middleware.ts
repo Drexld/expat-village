@@ -15,6 +15,7 @@ import { logSecurityEvent } from './audit';
 import { parseJsonBody } from './validation';
 import { isValidationFailure } from './types';
 import type { ApiHandler, SecurityRouteConfig } from './types';
+import type { FreshnessMeta, HandlerResultWithFreshness } from './types';
 
 function envValue(name: string): string | undefined {
   const maybeProcess = globalThis as unknown as { process?: { env?: Record<string, string | undefined> } };
@@ -32,6 +33,22 @@ function toSecurityError(error: unknown): ApiSecurityError {
     return error as ApiSecurityError;
   }
   return internalError();
+}
+
+function isFreshnessMeta(value: unknown): value is FreshnessMeta {
+  if (!value || typeof value !== 'object') return false;
+  const candidate = value as Record<string, unknown>;
+  return (
+    typeof candidate.source === 'string' &&
+    typeof candidate.updatedAt === 'string' &&
+    typeof candidate.ttlSeconds === 'number'
+  );
+}
+
+function hasFreshnessResult<T>(value: unknown): value is HandlerResultWithFreshness<T> {
+  if (!value || typeof value !== 'object') return false;
+  const candidate = value as Record<string, unknown>;
+  return 'data' in candidate && isFreshnessMeta(candidate.freshness);
 }
 
 export function withSecurity<TBody, TResult>(
@@ -150,7 +167,7 @@ export function withSecurity<TBody, TResult>(
         body = parsed.value;
       }
 
-      const data = await handler(request, {
+      const rawResult = await handler(request, {
         requestId,
         ip,
         auth,
@@ -158,7 +175,12 @@ export function withSecurity<TBody, TResult>(
         startedAtMs,
       });
 
-      const response = jsonOk(data, requestId, { origin });
+      const data = hasFreshnessResult<TResult>(rawResult) ? rawResult.data : rawResult;
+      const freshness = hasFreshnessResult<TResult>(rawResult)
+        ? rawResult.freshness
+        : undefined;
+
+      const response = jsonOk(data, requestId, { origin, freshness });
       if (rateMeta) {
         response.headers.set(HEADER_RATE_LIMIT_REMAINING, String(rateMeta.remaining));
         response.headers.set(HEADER_RATE_LIMIT_RESET, String(rateMeta.resetAtEpochMs));

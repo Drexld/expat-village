@@ -491,6 +491,36 @@ export interface CommunityReactInput {
   reaction: string;
 }
 
+export interface OnboardingQuizQuestion {
+  question: string;
+  options: string[];
+  correctIndex: number;
+}
+
+export interface OnboardingContentInput {
+  userName: string;
+  tribe: string;
+  interest: string;
+}
+
+export interface OnboardingContent {
+  initialBanter: string;
+  quiz: OnboardingQuizQuestion[];
+  badgeName: string;
+}
+
+export interface OnboardingFinalBanterInput {
+  userName: string;
+  tribe: string;
+  interest: string;
+  score: number;
+  total: number;
+}
+
+export interface OnboardingFinalBanterResult {
+  banter: string;
+}
+
 export interface ContractAnalysisInput {
   documentName: string;
   documentText?: string;

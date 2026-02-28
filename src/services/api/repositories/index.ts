@@ -8,3 +8,4 @@ export * from './pollsRepository';
 export * from './servicesRepository';
 export * from './studentRepository';
 export * from './tasksRepository';
+export * from './onboardingRepository';
