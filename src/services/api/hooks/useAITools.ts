@@ -25,47 +25,6 @@ interface UseAIToolsResult {
   requestLawyerReview: (input: LawyerReviewRequestInput) => Promise<LawyerReviewRequestResult>;
 }
 
-function createMockContractAnalysis(): ContractAnalysisResult {
-  return {
-    id: `local-contract-${Date.now()}`,
-    riskScore: 25,
-    riskLevel: 'medium',
-    summary: 'Contract has acceptable structure but includes clauses that need legal clarification.',
-    redFlags: [
-      'No explicit landlord tax-registration clause',
-      'Deposit return timeline is not clearly defined',
-      'Utilities settlement method needs invoice-level detail',
-    ],
-    legalFramework: 'PL',
-  };
-}
-
-function createMockDocumentAnalysis(): DocumentAnalysisResult {
-  return {
-    id: `local-document-${Date.now()}`,
-    documentType: 'Tax Office Notice',
-    urgency: 'medium',
-    keyPoints: [
-      'Annual tax return (PIT) filing is expected.',
-      'Check your e-PIT account for prefilled data.',
-      'Validate submission before the filing deadline.',
-    ],
-    nextSteps: [
-      { title: 'Check e-PIT account', priority: 'high' },
-      { title: 'Gather supporting income documents', priority: 'medium' },
-      { title: 'Consult tax advisor if unclear', priority: 'low' },
-    ],
-  };
-}
-
-function createMockLawyerRequest(): LawyerReviewRequestResult {
-  return {
-    id: `local-lawyer-${Date.now()}`,
-    status: 'requested',
-    createdAt: new Date().toISOString(),
-  };
-}
-
 export function useAITools(options: UseAIToolsOptions = {}): UseAIToolsResult {
   const { enabled = true } = options;
   const shouldFetch = enabled && hasApiBaseUrl();
@@ -74,15 +33,15 @@ export function useAITools(options: UseAIToolsOptions = {}): UseAIToolsResult {
     () => ({
       isLive: shouldFetch,
       analyzeContract: async (input: ContractAnalysisInput) => {
-        if (!shouldFetch) return createMockContractAnalysis();
+        if (!shouldFetch) throw new Error('AI API is not configured.');
         return analyzeContractRequest(input);
       },
       analyzeDocument: async (input: DocumentAnalysisInput) => {
-        if (!shouldFetch) return createMockDocumentAnalysis();
+        if (!shouldFetch) throw new Error('AI API is not configured.');
         return analyzeDocumentRequest(input);
       },
       requestLawyerReview: async (input: LawyerReviewRequestInput) => {
-        if (!shouldFetch) return createMockLawyerRequest();
+        if (!shouldFetch) throw new Error('AI API is not configured.');
         return requestLawyerReviewRequest(input);
       },
     }),

@@ -26,39 +26,6 @@ interface GuideUpdateRow {
   created_at?: string | null;
 }
 
-const FALLBACK_GUIDES: GuideSummary[] = [
-  {
-    id: 'guide-fallback-pesel',
-    title: 'Getting Your PESEL Number',
-    category: 'Admin',
-    views: 2847,
-    upvotes: 184,
-    updatedAt: new Date().toISOString(),
-    trending: true,
-    realTimeData: 'Wait times vary by district office.',
-  },
-  {
-    id: 'guide-fallback-banking',
-    title: 'Opening a Polish Bank Account',
-    category: 'Finance',
-    views: 1923,
-    upvotes: 156,
-    updatedAt: new Date().toISOString(),
-    trending: false,
-    realTimeData: 'Bank onboarding usually requires passport and PESEL.',
-  },
-  {
-    id: 'guide-fallback-housing',
-    title: 'Finding Housing in Warsaw',
-    category: 'Housing',
-    views: 3421,
-    upvotes: 289,
-    updatedAt: new Date().toISOString(),
-    trending: true,
-    realTimeData: 'Compare total monthly costs, not rent only.',
-  },
-];
-
 function safeIso(value?: string | null): string {
   const date = value ? new Date(value) : new Date();
   if (Number.isNaN(date.getTime())) return new Date().toISOString();
@@ -92,7 +59,7 @@ export async function getGuidesData(): Promise<GuideSummary[]> {
     }),
   ]);
 
-  if (!guides.length) return FALLBACK_GUIDES;
+  if (!guides.length) return [];
 
   const voteTotals = buildVoteTotals(votes);
 
@@ -138,12 +105,7 @@ export async function getGuideUpdatesFeed(): Promise<GuideSummary[]> {
     }),
   ]);
 
-  if (!guides.length || !updates.length) {
-    return FALLBACK_GUIDES.map((guide) => ({
-      ...guide,
-      realTimeData: guide.realTimeData || 'Guide update feed is syncing.',
-    }));
-  }
+  if (!guides.length || !updates.length) return [];
 
   const guideById = new Map(guides.map((guide) => [guide.id, guide]));
   const voteTotals = buildVoteTotals(votes);

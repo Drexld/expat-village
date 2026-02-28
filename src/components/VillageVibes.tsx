@@ -6,7 +6,7 @@ import { usePolls } from '../services/api/hooks';
 import type { PollSummary } from '../services/api/types';
 
 export function VillageVibes() {
-  const { data, isLoading, isLive, submitVote } = usePolls();
+  const { data, isLoading, isLive, error, submitVote } = usePolls();
   const [activeTab, setActiveTab] = useState<'daily' | 'monthly' | 'results'>('daily');
   const [voted, setVoted] = useState<string[]>([]);
 
@@ -50,7 +50,7 @@ export function VillageVibes() {
       await submitVote(currentPoll.id, optionId);
 
       toast.success('Vote submitted!', {
-        description: isLive ? '+3 points earned. Vote synced live.' : '+3 points earned in preview mode.',
+        description: '+3 points earned. Vote synced live.',
         duration: 2200,
       });
 
@@ -92,6 +92,11 @@ export function VillageVibes() {
             >
               🎵
             </motion.div>
+            {isLive && (
+              <span className="px-2 py-0.5 rounded-full bg-green-500/20 border border-green-400/25 text-[10px] font-semibold text-green-400">
+                LIVE
+              </span>
+            )}
           </div>
           <p className="text-sm text-white/50">Shape our community culture together</p>
         </div>
@@ -141,6 +146,24 @@ export function VillageVibes() {
       </div>
 
       <div className="px-5 pb-24">
+        {!isLive && !isLoading && (
+          <div className="mb-4 relative rounded-[20px] p-[1px] bg-gradient-to-b from-red-500/30 to-red-500/10">
+            <div className="relative rounded-[20px] bg-gradient-to-b from-[#1a2642]/90 to-[#0f172a]/95 p-4 border border-red-400/20">
+              <p className="text-sm font-semibold text-red-300 mb-1">Polls API not connected</p>
+              <p className="text-xs text-white/70">Connect backend API to load active polls and vote live.</p>
+            </div>
+          </div>
+        )}
+
+        {error && (
+          <div className="mb-4 relative rounded-[20px] p-[1px] bg-gradient-to-b from-red-500/30 to-red-500/10">
+            <div className="relative rounded-[20px] bg-gradient-to-b from-[#1a2642]/90 to-[#0f172a]/95 p-4 border border-red-400/20">
+              <p className="text-sm font-semibold text-red-300 mb-1">Could not load polls</p>
+              <p className="text-xs text-white/70">{error.message}</p>
+            </div>
+          </div>
+        )}
+
         {(activeTab === 'daily' || activeTab === 'monthly') && currentPoll && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
             <div className="relative overflow-hidden rounded-[24px] p-[1px] bg-gradient-to-b from-white/25 to-white/10">

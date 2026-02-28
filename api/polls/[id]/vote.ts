@@ -40,7 +40,13 @@ const handler = withSecurity(
       throw unauthorized();
     }
 
-    await votePollData(pollId, context.body.optionId, context.auth.userId);
+    const result = await votePollData(pollId, context.body.optionId, context.auth.userId);
+    if (result === 'invalid_option') {
+      throw badRequest('Selected poll option is invalid.');
+    }
+    if (result === 'already_voted') {
+      throw badRequest('You already voted in this poll.');
+    }
     return null;
   },
 );

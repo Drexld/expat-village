@@ -1,5 +1,8 @@
-import { apiPost } from '../http';
+import { apiGet, apiPost } from '../http';
 import type {
+  AIHubAdvisorInput,
+  AIHubBundle,
+  AIHubDecisionAdvice,
   ContractAnalysisInput,
   ContractAnalysisResult,
   DocumentAnalysisInput,
@@ -18,4 +21,12 @@ export async function analyzeDocument(input: DocumentAnalysisInput): Promise<Doc
 
 export async function requestLawyerReview(input: LawyerReviewRequestInput): Promise<LawyerReviewRequestResult> {
   return apiPost<LawyerReviewRequestResult>('/api/ai/contract/lawyer-request', input);
+}
+
+export async function getAIHubBundle(): Promise<AIHubBundle> {
+  return apiGet<AIHubBundle>('/api/ai/hub');
+}
+
+export async function analyzeAIHubScenario(input: AIHubAdvisorInput): Promise<AIHubDecisionAdvice> {
+  return apiPost<AIHubDecisionAdvice>('/api/ai/hub/advisor', input);
 }

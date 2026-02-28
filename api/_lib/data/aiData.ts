@@ -6,7 +6,7 @@ import type {
   LawyerReviewRequestInput,
   LawyerReviewRequestResult,
 } from '../../../src/services/api/types';
-import { badRequest } from '../security';
+import { badRequest, internalError } from '../security';
 import { supabaseInsert, supabaseSelect } from './supabaseRest';
 
 type RiskLevel = 'low' | 'medium' | 'high';
@@ -247,8 +247,12 @@ export async function analyzeContractData(
     { returning: 'representation' },
   );
 
+  if (!rows[0]?.id) {
+    throw internalError('Contract analysis could not be persisted.');
+  }
+
   return {
-    id: rows[0]?.id || `contract-analysis-${Date.now()}`,
+    id: rows[0].id,
     riskScore: analysis.riskScore,
     riskLevel: analysis.riskLevel,
     summary: analysis.summary,
@@ -297,8 +301,12 @@ export async function analyzeDocumentData(
     { returning: 'representation' },
   );
 
+  if (!rows[0]?.id) {
+    throw internalError('Document analysis could not be persisted.');
+  }
+
   return {
-    id: rows[0]?.id || `document-analysis-${Date.now()}`,
+    id: rows[0].id,
     documentType,
     urgency,
     keyPoints,
@@ -358,9 +366,12 @@ export async function requestLawyerReviewData(
   );
 
   const row = rows[0];
+  if (!row?.id) {
+    throw internalError('Lawyer review request could not be persisted.');
+  }
   return {
-    id: row?.id || `lawyer-request-${Date.now()}`,
-    status: row?.status || 'requested',
-    createdAt: row?.created_at || new Date().toISOString(),
+    id: row.id,
+    status: row.status || 'requested',
+    createdAt: row.created_at || new Date().toISOString(),
   };
 }

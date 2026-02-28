@@ -1,6 +1,7 @@
 import type {
   MeBadgeProgress,
   MeConnectionSummary,
+  MePreferences,
   MeInsights,
   MeJourneyEvent,
   MeMilestone,
@@ -14,6 +15,9 @@ interface UserRow {
   id: string;
   display_name?: string | null;
   bio?: string | null;
+  tribe?: string | null;
+  interest?: string | null;
+  onboarding_completed?: boolean | null;
 }
 
 interface UserProfileRow {
@@ -29,6 +33,9 @@ interface UserPreferenceRow {
   user_id: string;
   mood?: string | null;
   language?: string | null;
+  notifications_enabled?: boolean | null;
+  morning_briefing_seen_on?: string | null;
+  mood_check_seen_on?: string | null;
 }
 
 interface UserProgressRow {
@@ -90,6 +97,9 @@ function defaultProfile(userId: string): MeProfile {
     points: 0,
     streak: 0,
     bio: '',
+    tribe: undefined,
+    interest: undefined,
+    onboardingCompleted: false,
   };
 }
 
@@ -161,10 +171,14 @@ function buildMilestoneFromTask(task?: TaskRow | null): MeMilestone | undefined 
 
 export async function getMeProfileData(userId: string): Promise<MeProfile> {
   const [userRows, profileRows] = await Promise.all([
-    supabaseSelect<UserRow>('users', 'id,display_name,bio', {
+    supabaseSelect<UserRow>(
+      'users',
+      'id,display_name,bio,tribe,interest,onboarding_completed',
+      {
       limit: 1,
       filters: [{ column: 'id', op: 'eq', value: userId }],
-    }),
+      },
+    ),
     supabaseSelect<UserProfileRow>(
       'user_profiles',
       'user_id,level,points,streak,completed_tasks,total_tasks',
@@ -190,6 +204,9 @@ export async function getMeProfileData(userId: string): Promise<MeProfile> {
     points: Number(profile?.points || 0),
     streak: Number(profile?.streak || 0),
     bio: user?.bio || '',
+    tribe: user?.tribe || undefined,
+    interest: user?.interest || undefined,
+    onboardingCompleted: Boolean(user?.onboarding_completed),
   };
 }
 
@@ -198,14 +215,22 @@ export async function updateMeProfileData(
   input: MeProfileUpdateInput,
 ): Promise<MeProfile> {
   const [existingUserRows, existingPreferenceRows] = await Promise.all([
-    supabaseSelect<UserRow>('users', 'id,display_name,bio', {
+    supabaseSelect<UserRow>(
+      'users',
+      'id,display_name,bio,tribe,interest,onboarding_completed',
+      {
       limit: 1,
       filters: [{ column: 'id', op: 'eq', value: userId }],
-    }),
-    supabaseSelect<UserPreferenceRow>('user_preferences', 'user_id,mood,language', {
+      },
+    ),
+    supabaseSelect<UserPreferenceRow>(
+      'user_preferences',
+      'user_id,mood,language,notifications_enabled,morning_briefing_seen_on,mood_check_seen_on',
+      {
       limit: 1,
       filters: [{ column: 'user_id', op: 'eq', value: userId }],
-    }),
+      },
+    ),
   ]);
 
   const existingUser = existingUserRows[0];
@@ -218,6 +243,12 @@ export async function updateMeProfileData(
         id: userId,
         display_name: input.displayName || existingUser?.display_name || 'Expat User',
         bio: input.bio ?? existingUser?.bio ?? '',
+        tribe: input.tribe ?? existingUser?.tribe ?? null,
+        interest: input.interest ?? existingUser?.interest ?? null,
+        onboarding_completed:
+          input.onboardingCompleted ??
+          existingUser?.onboarding_completed ??
+          false,
       },
       { onConflict: 'id' },
     ),
@@ -227,12 +258,87 @@ export async function updateMeProfileData(
         user_id: userId,
         mood: input.mood ?? existingPreference?.mood ?? null,
         language: input.language ?? existingPreference?.language ?? 'en',
+        notifications_enabled:
+          input.notificationsEnabled ??
+          existingPreference?.notifications_enabled ??
+          true,
+        morning_briefing_seen_on:
+          existingPreference?.morning_briefing_seen_on ?? null,
+        mood_check_seen_on: existingPreference?.mood_check_seen_on ?? null,
       },
       { onConflict: 'user_id' },
     ),
   ]);
 
   return getMeProfileData(userId);
+}
+
+export async function getMePreferencesData(userId: string): Promise<MePreferences> {
+  const rows = await supabaseSelect<UserPreferenceRow>(
+    'user_preferences',
+    'user_id,mood,language,notifications_enabled,morning_briefing_seen_on,mood_check_seen_on',
+    {
+      limit: 1,
+      filters: [{ column: 'user_id', op: 'eq', value: userId }],
+    },
+  );
+
+  const row = rows[0];
+  return {
+    mood: row?.mood || undefined,
+    language: row?.language || 'en',
+    notificationsEnabled:
+      typeof row?.notifications_enabled === 'boolean'
+        ? row.notifications_enabled
+        : true,
+    morningBriefingSeenDate: row?.morning_briefing_seen_on || undefined,
+    moodCheckSeenDate: row?.mood_check_seen_on || undefined,
+  };
+}
+
+export async function updateMePreferencesData(
+  userId: string,
+  input: {
+    mood?: string;
+    language?: string;
+    notificationsEnabled?: boolean;
+    morningBriefingSeenDate?: string;
+    moodCheckSeenDate?: string;
+  },
+): Promise<MePreferences> {
+  const existingRows = await supabaseSelect<UserPreferenceRow>(
+    'user_preferences',
+    'user_id,mood,language,notifications_enabled,morning_briefing_seen_on,mood_check_seen_on',
+    {
+      limit: 1,
+      filters: [{ column: 'user_id', op: 'eq', value: userId }],
+    },
+  );
+  const existing = existingRows[0];
+
+  await supabaseUpsert(
+    'user_preferences',
+    {
+      user_id: userId,
+      mood: input.mood ?? existing?.mood ?? null,
+      language: input.language ?? existing?.language ?? 'en',
+      notifications_enabled:
+        input.notificationsEnabled ??
+        existing?.notifications_enabled ??
+        true,
+      morning_briefing_seen_on:
+        input.morningBriefingSeenDate ??
+        existing?.morning_briefing_seen_on ??
+        null,
+      mood_check_seen_on:
+        input.moodCheckSeenDate ??
+        existing?.mood_check_seen_on ??
+        null,
+    },
+    { onConflict: 'user_id' },
+  );
+
+  return getMePreferencesData(userId);
 }
 
 export async function getMeProgressData(userId: string): Promise<MeProgress> {

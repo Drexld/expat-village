@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useServices } from '../services/api/hooks';
-import type { ServiceReview, ServiceSummary } from '../services/api/types';
+import type { ReviewPromptSummary, ServiceReview, ServiceSummary } from '../services/api/types';
 
 interface Business {
   id: string;
@@ -38,88 +38,6 @@ interface Business {
   hasAR?: boolean;
   featured?: boolean;
 }
-
-const FALLBACK_BUSINESSES: Business[] = [
-  {
-    id: '1',
-    name: 'mBank',
-    category: 'Banks',
-    expatScore: 4.8,
-    reviews: 247,
-    verified: true,
-    englishLevel: 'Fluent',
-    priceRange: '$',
-    distance: '0.5 km',
-    address: 'ul. Marszalkowska 142',
-    phone: '+48 22 123 4567',
-    website: 'mbank.pl',
-    topReview: 'Best English support, opened account in 30 minutes!',
-    studentFriendly: true,
-    hasAR: true,
-    featured: true,
-  },
-  {
-    id: '2',
-    name: 'LegalExpat Warsaw',
-    category: 'Immigration Lawyers',
-    expatScore: 4.9,
-    reviews: 189,
-    verified: true,
-    englishLevel: 'Fluent',
-    priceRange: '$$',
-    distance: '1.2 km',
-    address: 'ul. Nowy Swiat 45',
-    phone: '+48 22 987 6543',
-    website: 'legalexpat.pl',
-    topReview: 'Handled my visa extension perfectly, worth every zloty.',
-    hasAR: true,
-    featured: true,
-  },
-  {
-    id: '3',
-    name: 'Warsaw Language Hub',
-    category: 'Language Schools',
-    expatScore: 4.7,
-    reviews: 156,
-    verified: true,
-    englishLevel: 'Fluent',
-    priceRange: '$$',
-    distance: '0.8 km',
-    address: 'ul. Krakowskie Przedmiescie 13',
-    website: 'warsawlanguagehub.com',
-    topReview: 'Small classes, native speakers, rapid progress!',
-    studentFriendly: true,
-  },
-  {
-    id: '4',
-    name: 'Expat Dental Care',
-    category: 'Health',
-    expatScore: 4.6,
-    reviews: 134,
-    verified: true,
-    englishLevel: 'Fluent',
-    priceRange: '$$',
-    distance: '2.1 km',
-    address: 'al. Jerozolimskie 65',
-    phone: '+48 22 456 7890',
-    topReview: 'Modern equipment and no-pressure consultations.',
-    hasAR: true,
-  },
-  {
-    id: '5',
-    name: 'Warsaw Movers Pro',
-    category: 'Moving',
-    expatScore: 4.5,
-    reviews: 98,
-    verified: true,
-    englishLevel: 'Basic',
-    priceRange: '$',
-    distance: '3.5 km',
-    address: 'Mokotow district',
-    phone: '+48 500 123 456',
-    topReview: 'Careful with furniture, affordable rates.',
-  },
-];
 
 const CATEGORY_META: Record<string, { icon: string; rank: number }> = {
   banks: { icon: '🏦', rank: 1 },
@@ -149,24 +67,19 @@ function inferEnglishLevel(category: string): Business['englishLevel'] {
   return 'Basic';
 }
 
-function mapServiceSummary(service: ServiceSummary, fallback?: Business): Business {
+function mapServiceSummary(service: ServiceSummary): Business {
   return {
     id: service.id,
     name: service.name,
     category: service.category,
-    expatScore: service.expatScore ?? fallback?.expatScore ?? 4.4,
-    reviews: fallback?.reviews ?? 0,
+    expatScore: service.expatScore ?? 4.4,
+    reviews: 0,
     verified: service.verified,
-    englishLevel: fallback?.englishLevel ?? inferEnglishLevel(service.category),
-    priceRange: fallback?.priceRange ?? '$$',
-    distance: fallback?.distance ?? 'Nearby',
-    address: fallback?.address ?? service.district ?? 'Warsaw',
-    phone: fallback?.phone,
-    website: fallback?.website,
-    topReview: fallback?.topReview,
-    studentFriendly: fallback?.studentFriendly,
-    hasAR: fallback?.hasAR ?? false,
-    featured: fallback?.featured,
+    englishLevel: inferEnglishLevel(service.category),
+    priceRange: '$$',
+    distance: service.district ? 'District' : 'Nearby',
+    address: service.district ?? 'Warsaw',
+    hasAR: false,
   };
 }
 
@@ -181,18 +94,36 @@ export function PremiumDirectory() {
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewTitle, setReviewTitle] = useState('');
   const [reviewBody, setReviewBody] = useState('');
-  const [businesses, setBusinesses] = useState<Business[]>(FALLBACK_BUSINESSES);
+  const [businesses, setBusinesses] = useState<Business[]>([]);
   const [reviewsByBusiness, setReviewsByBusiness] = useState<Record<string, ServiceReview[]>>({});
+  const [pendingReviewPrompts, setPendingReviewPrompts] = useState<ReviewPromptSummary[]>([]);
 
   const servicesApi = useServices();
 
   useEffect(() => {
-    if (!servicesApi.data || servicesApi.data.length === 0) return;
-
-    const fallbackByName = new Map(FALLBACK_BUSINESSES.map((item) => [item.name.toLowerCase(), item]));
-    const mapped = servicesApi.data.map((service) => mapServiceSummary(service, fallbackByName.get(service.name.toLowerCase())));
+    if (!servicesApi.data) return;
+    const mapped = servicesApi.data.map((service) => mapServiceSummary(service));
     setBusinesses(mapped);
   }, [servicesApi.data]);
+
+  useEffect(() => {
+    if (!servicesApi.isLive) return;
+
+    let active = true;
+    servicesApi
+      .loadPendingReviewPrompts()
+      .then((prompts) => {
+        if (!active) return;
+        setPendingReviewPrompts(prompts);
+      })
+      .catch(() => {
+        if (!active) return;
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [servicesApi.isLive, servicesApi.loadPendingReviewPrompts]);
 
   useEffect(() => {
     if (!expandedBusiness || !servicesApi.isLive || reviewsByBusiness[expandedBusiness]) return;
@@ -227,7 +158,7 @@ export function PremiumDirectory() {
     return () => {
       active = false;
     };
-  }, [expandedBusiness, servicesApi, reviewsByBusiness]);
+  }, [expandedBusiness, servicesApi.isLive, servicesApi.loadReviews, reviewsByBusiness]);
 
   const categories = useMemo(() => {
     const grouped = businesses.reduce<Record<string, { name: string; count: number }>>((acc, business) => {
@@ -295,20 +226,28 @@ export function PremiumDirectory() {
   };
 
   const handlePatronize = async (business: Business) => {
+    if (!servicesApi.isLive) {
+      toast.warning('Live check-in unavailable', {
+        description: 'Connect to the live API before checking in.',
+        duration: 2500,
+      });
+      return;
+    }
+
     if ('vibrate' in navigator) {
       navigator.vibrate([30, 50, 30]);
     }
 
-    if (servicesApi.isLive) {
-      try {
-        await servicesApi.checkIn(business.id);
-      } catch {
-        toast.error('Check-in failed', {
-          description: 'Please retry in a moment.',
-          duration: 2500,
-        });
-        return;
-      }
+    try {
+      await servicesApi.checkIn(business.id);
+      const prompts = await servicesApi.loadPendingReviewPrompts();
+      setPendingReviewPrompts(prompts);
+    } catch {
+      toast.error('Check-in failed', {
+        description: 'Please retry in a moment.',
+        duration: 2500,
+      });
+      return;
     }
 
     toast.success(`Check-in at ${business.name}`, {
@@ -362,9 +301,7 @@ export function PremiumDirectory() {
       );
 
       toast.success('Review submitted', {
-        description: servicesApi.isLive
-          ? 'Thanks. Your feedback now helps rank this service for other expats.'
-          : 'Saved locally for now. It will sync after API setup.',
+        description: 'Thanks. Your feedback now helps rank this service for other expats.',
       });
 
       setShowReviewModal(false);
@@ -455,6 +392,37 @@ export function PremiumDirectory() {
       </div>
 
       <div className="px-5 pb-24 space-y-4">
+        {pendingReviewPrompts.length > 0 && (
+          <div className="rounded-[20px] p-[1px] bg-gradient-to-b from-[#10b981]/30 to-[#059669]/10">
+            <div className="rounded-[20px] bg-gradient-to-b from-[#1a2642]/90 to-[#0f172a]/95 p-4 border border-green-400/20">
+              <p className="text-sm font-semibold text-green-300 mb-1">Review reminders</p>
+              <p className="text-xs text-white/70 mb-3">
+                You have {pendingReviewPrompts.length} pending service review {pendingReviewPrompts.length === 1 ? 'prompt' : 'prompts'}.
+              </p>
+              <button
+                onClick={() => {
+                  const serviceId = pendingReviewPrompts[0]?.serviceId;
+                  if (!serviceId) return;
+                  const target = businesses.find((item) => item.id === serviceId);
+                  if (target) openReviewPrompt(target);
+                }}
+                className="px-3 py-1.5 rounded-lg bg-green-500/20 border border-green-400/30 text-xs font-semibold text-green-300"
+              >
+                Leave a review now
+              </button>
+            </div>
+          </div>
+        )}
+
+        {servicesApi.error && (
+          <div className="rounded-[20px] p-[1px] bg-gradient-to-b from-red-500/30 to-red-500/10">
+            <div className="rounded-[20px] bg-gradient-to-b from-[#1a2642]/90 to-[#0f172a]/95 p-4 border border-red-400/20">
+              <p className="text-sm font-semibold text-red-300 mb-1">Directory feed unavailable</p>
+              <p className="text-xs text-white/70">Live services could not load. Retry in a moment.</p>
+            </div>
+          </div>
+        )}
+
         {activeCategory === 'all' && (
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-3">

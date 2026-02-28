@@ -1,11 +1,11 @@
-ï»¿import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'motion/react';
 import { Users, Calendar, Tag, MessageCircle, Heart, X, ChevronRight, MapPin, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { UniversityModal } from './UniversityModal';
 import { AddUniversityModal } from './AddUniversityModal';
 import { useStudentHub } from '../services/api/hooks';
-import type { RoommateProfileSummary, StudentUniversitySummary } from '../services/api/types';
+import type { RoommateProfileSummary, StudentUniversityCreateInput, StudentUniversitySummary } from '../services/api/types';
 
 type Student = RoommateProfileSummary;
 type University = StudentUniversitySummary;
@@ -15,9 +15,14 @@ export function StudentHubs() {
     universities,
     events,
     roommates,
+    discounts,
+    groups,
     isLoading,
     isLive,
+    error,
     joinUniversity,
+    submitUniversity,
+    joinGroup,
     swipeRoommate,
   } = useStudentHub();
 
@@ -28,13 +33,19 @@ export function StudentHubs() {
   const [swipeIndex, setSwipeIndex] = useState(0);
   const [showAddUniversityModal, setShowAddUniversityModal] = useState(false);
 
+  useEffect(() => {
+    if (swipeIndex > roommates.length - 1) {
+      setSwipeIndex(Math.max(0, roommates.length - 1));
+    }
+  }, [roommates.length, swipeIndex]);
+
   const universityHub = useMemo(
     () =>
       universities[0] || {
         id: 'hub-default',
         name: 'University Hub',
         shortName: 'HUB',
-        logo: 'ðŸŽ“',
+        logo: 'H',
         activeStudents: 0,
         totalMembers: 0,
         recentTopics: [],
@@ -44,62 +55,26 @@ export function StudentHubs() {
     [universities],
   );
 
-  const discounts = [
-    {
-      id: '1',
-      name: 'Cafe Relaks',
-      discount: '15% off with student ID',
-      category: 'Food & Drink',
-      distance: '0.3 km',
-      validUntil: 'Feb 28, 2026',
-    },
-    {
-      id: '2',
-      name: 'Cinema City',
-      discount: '30% off Tue-Thu',
-      category: 'Entertainment',
-      distance: '1.2 km',
-      validUntil: 'Ongoing',
-    },
-    {
-      id: '3',
-      name: 'Empik Bookstore',
-      discount: '20% off books',
-      category: 'Books',
-      distance: '0.8 km',
-      validUntil: 'Mar 15, 2026',
-    },
-  ];
-
-  const groups = [
-    { id: '1', name: 'International Students in Mokotow', members: 234, category: 'Location', active: true },
-    { id: '2', name: 'Desi Students Warsaw', members: 89, category: 'Culture', active: true },
-    { id: '3', name: 'UW Tech & Coding', members: 156, category: 'Interest', active: false },
-    { id: '4', name: 'Warsaw Foodies', members: 312, category: 'Interest', active: true },
-  ];
-
   const handleHubJoin = async () => {
     if (!universityHub.id || universityHub.id === 'hub-default') {
-      toast.info('No university selected yet');
+      toast.info('No university available yet');
       return;
     }
 
     try {
       await joinUniversity(universityHub.id);
       toast.success('University joined', {
-        description: isLive
-          ? `You are now active in ${universityHub.shortName} student hub.`
-          : `Preview mode: join captured for ${universityHub.shortName}.`,
+        description: `You are now active in ${universityHub.shortName} student hub.`,
         duration: 2500,
       });
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Could not join university';
+    } catch (errorValue) {
+      const message = errorValue instanceof Error ? errorValue.message : 'Could not join university';
       toast.error('Join failed', { description: message });
     }
   };
 
   const handleSwipe = async (direction: 'left' | 'right') => {
-    const currentStudent = roommates[swipeIndex];
+    const currentStudent: Student | undefined = roommates[swipeIndex];
     if (!currentStudent) return;
 
     try {
@@ -107,12 +82,12 @@ export function StudentHubs() {
 
       if (direction === 'right') {
         toast.success(`Liked ${currentStudent.name}`, {
-          description: isLive ? 'Match notification sent!' : 'Preview mode: like recorded locally.',
+          description: 'Match notification sent.',
           duration: 2000,
         });
       }
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Could not submit swipe';
+    } catch (errorValue) {
+      const message = errorValue instanceof Error ? errorValue.message : 'Could not submit swipe';
       toast.error('Swipe failed', { description: message });
       return;
     }
@@ -121,7 +96,7 @@ export function StudentHubs() {
       setSwipeIndex((prev) => prev + 1);
     } else {
       toast.info('No more roommates', {
-        description: 'Check back tomorrow for new matches',
+        description: 'Check back later for new matches',
         duration: 2000,
       });
     }
@@ -132,10 +107,37 @@ export function StudentHubs() {
   };
 
   const handleRSVP = (eventId: string) => {
-    toast.success('RSVP confirmed!', {
-      description: `Event ${eventId} added to your student calendar`,
+    toast.success('RSVP confirmed', {
+      description: `Event ${eventId} added to your calendar`,
       duration: 2000,
     });
+  };
+
+  const handleAddUniversity = async (payload: StudentUniversityCreateInput) => {
+    try {
+      await submitUniversity(payload);
+      toast.success('University submitted', {
+        description: '+25 points. Submission is now in review.',
+        duration: 3000,
+      });
+    } catch (errorValue) {
+      const message = errorValue instanceof Error ? errorValue.message : 'Could not submit university';
+      toast.error('Submission failed', { description: message });
+      throw errorValue;
+    }
+  };
+
+  const handleJoinGroup = async (groupId: string) => {
+    try {
+      await joinGroup(groupId);
+      toast.success('Joined group', {
+        description: 'You are now in this student group.',
+        duration: 2200,
+      });
+    } catch (errorValue) {
+      const message = errorValue instanceof Error ? errorValue.message : 'Could not join group';
+      toast.error('Join failed', { description: message });
+    }
   };
 
   return (
@@ -167,13 +169,13 @@ export function StudentHubs() {
                     <span className="text-xs text-green-400 font-semibold">{universityHub.activeStudents} active</span>
                   </div>
                   <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/10 text-white/70 font-semibold">
-                    {isLive ? 'LIVE' : 'PREVIEW'}
+                    {isLive ? 'LIVE' : 'OFFLINE'}
                   </span>
                 </div>
               </div>
 
               <button
-                onClick={handleHubJoin}
+                onClick={() => void handleHubJoin()}
                 className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
               >
                 <span className="text-xs font-semibold">Join</span>
@@ -200,6 +202,24 @@ export function StudentHubs() {
       </div>
 
       <div className="px-5 pb-24">
+        {!isLive && !isLoading && (
+          <div className="mb-4 relative rounded-[20px] p-[1px] bg-gradient-to-b from-red-500/30 to-red-500/10">
+            <div className="relative rounded-[20px] bg-gradient-to-b from-[#1a2642]/90 to-[#0f172a]/95 p-4 border border-red-400/20">
+              <p className="text-sm font-semibold text-red-300 mb-1">Student hub API not connected</p>
+              <p className="text-xs text-white/70">Connect live backend to load universities, events, roommates, discounts, and groups.</p>
+            </div>
+          </div>
+        )}
+
+        {error && (
+          <div className="mb-4 relative rounded-[20px] p-[1px] bg-gradient-to-b from-red-500/30 to-red-500/10">
+            <div className="relative rounded-[20px] bg-gradient-to-b from-[#1a2642]/90 to-[#0f172a]/95 p-4 border border-red-400/20">
+              <p className="text-sm font-semibold text-red-300 mb-1">Student hub feed issue</p>
+              <p className="text-xs text-white/70">{error.message}</p>
+            </div>
+          </div>
+        )}
+
         {activeTab === 'universities' && (
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="space-y-3">
             <button
@@ -242,16 +262,16 @@ export function StudentHubs() {
                       <h3 className="font-semibold text-base mb-1">{university.name}</h3>
                       <div className="flex items-center gap-2 text-xs text-white/50">
                         <span>{university.activeStudents} active</span>
-                        <span>â€¢</span>
+                        <span>•</span>
                         <span>{university.totalMembers} total members</span>
-                        <span>â€¢</span>
+                        <span>•</span>
                         <span>{university.location}</span>
                       </div>
                       <div className="flex items-center gap-2 text-xs text-white/50">
-                        {university.recentTopics.map((topic, i) => (
+                        {university.recentTopics.slice(0, 2).map((topic, i) => (
                           <span key={i}>
                             {topic}
-                            {i < university.recentTopics.length - 1 ? ', ' : ''}
+                            {i < Math.min(university.recentTopics.length, 2) - 1 ? ', ' : ''}
                           </span>
                         ))}
                       </div>
@@ -262,6 +282,13 @@ export function StudentHubs() {
                 </div>
               </motion.button>
             ))}
+
+            {!isLoading && universities.length === 0 && (
+              <div className="text-center py-10 text-white/60">
+                <p className="font-semibold">No universities yet</p>
+                <p className="text-sm text-white/40 mt-1">Submit a university to start a hub.</p>
+              </div>
+            )}
           </motion.div>
         )}
 
@@ -295,7 +322,7 @@ export function StudentHubs() {
                           <div className="flex items-center gap-2 text-sm text-white/70">
                             <Calendar className="w-4 h-4" strokeWidth={2} />
                             <span>
-                              {event.date} â€¢ {event.time}
+                              {event.date} • {event.time}
                             </span>
                           </div>
                           <div className="flex items-center gap-2 text-sm text-white/70">
@@ -320,6 +347,13 @@ export function StudentHubs() {
                 </div>
               </motion.div>
             ))}
+
+            {!isLoading && events.length === 0 && (
+              <div className="text-center py-10 text-white/60">
+                <p className="font-semibold">No events yet</p>
+                <p className="text-sm text-white/40 mt-1">Events will appear when student hubs publish them.</p>
+              </div>
+            )}
           </motion.div>
         )}
 
@@ -343,7 +377,7 @@ export function StudentHubs() {
                       </div>
                       {roommates[swipeIndex].verified && (
                         <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-green-500 border-2 border-[#0f172a] flex items-center justify-center">
-                          <span className="text-sm">âœ“</span>
+                          <span className="text-sm">?</span>
                         </div>
                       )}
                     </div>
@@ -382,7 +416,7 @@ export function StudentHubs() {
                   <div className="flex items-center justify-center gap-6">
                     <motion.button
                       whileTap={{ scale: 0.9 }}
-                      onClick={() => handleSwipe('left')}
+                      onClick={() => void handleSwipe('left')}
                       className="w-16 h-16 rounded-full bg-gradient-to-b from-[#ef4444] to-[#dc2626] flex items-center justify-center shadow-[0_4px_20px_rgba(239,68,68,0.4)]"
                     >
                       <X className="w-8 h-8 text-white" strokeWidth={2.5} />
@@ -390,7 +424,7 @@ export function StudentHubs() {
 
                     <motion.button
                       whileTap={{ scale: 0.9 }}
-                      onClick={() => handleSwipe('right')}
+                      onClick={() => void handleSwipe('right')}
                       className="w-16 h-16 rounded-full bg-gradient-to-b from-[#10b981] to-[#059669] flex items-center justify-center shadow-[0_4px_20px_rgba(16,185,129,0.4)]"
                     >
                       <Heart className="w-8 h-8 text-white" strokeWidth={2.5} />
@@ -400,6 +434,13 @@ export function StudentHubs() {
               </div>
             </motion.div>
           </motion.div>
+        )}
+
+        {activeTab === 'roommates' && !isLoading && roommates.length === 0 && (
+          <div className="text-center py-10 text-white/60">
+            <p className="font-semibold">No roommate cards yet</p>
+            <p className="text-sm text-white/40 mt-1">Profiles will appear when users join roommate matching.</p>
+          </div>
         )}
 
         {activeTab === 'roommates' && roommates.length > 0 && swipeIndex >= roommates.length && (
@@ -432,9 +473,9 @@ export function StudentHubs() {
                       <p className="text-sm text-[#10b981] font-medium mb-1">{discount.discount}</p>
                       <div className="flex items-center gap-2 text-xs text-white/50">
                         <span>{discount.category}</span>
-                        <span>â€¢</span>
+                        <span>•</span>
                         <span>{discount.distance}</span>
-                        <span>â€¢</span>
+                        <span>•</span>
                         <span>Until {discount.validUntil}</span>
                       </div>
                     </div>
@@ -444,6 +485,13 @@ export function StudentHubs() {
                 </div>
               </motion.div>
             ))}
+
+            {!isLoading && discounts.length === 0 && (
+              <div className="text-center py-10 text-white/60">
+                <p className="font-semibold">No discounts yet</p>
+                <p className="text-sm text-white/40 mt-1">Partner discounts will appear here.</p>
+              </div>
+            )}
           </motion.div>
         )}
 
@@ -473,27 +521,46 @@ export function StudentHubs() {
                         </div>
                         <div className="flex items-center gap-2 text-xs text-white/50">
                           <span>{group.members} members</span>
-                          <span>â€¢</span>
+                          <span>•</span>
                           <span className="px-2 py-0.5 rounded bg-white/10">{group.category}</span>
                         </div>
                       </div>
                     </div>
 
-                    <button className="px-3 py-1.5 rounded-lg bg-[#3b9eff]/20 hover:bg-[#3b9eff]/30 text-xs font-semibold text-[#3b9eff] transition-colors">
+                    <button
+                      onClick={() => void handleJoinGroup(group.id)}
+                      className="px-3 py-1.5 rounded-lg bg-[#3b9eff]/20 hover:bg-[#3b9eff]/30 text-xs font-semibold text-[#3b9eff] transition-colors"
+                    >
                       Join
                     </button>
                   </div>
                 </div>
               </motion.div>
             ))}
+
+            {!isLoading && groups.length === 0 && (
+              <div className="text-center py-10 text-white/60">
+                <p className="font-semibold">No groups yet</p>
+                <p className="text-sm text-white/40 mt-1">Community groups will appear here.</p>
+              </div>
+            )}
           </motion.div>
         )}
       </div>
 
-      {selectedUniversity && <UniversityModal university={selectedUniversity} onClose={() => setSelectedUniversity(null)} />}
+      {selectedUniversity && (
+        <UniversityModal
+          university={selectedUniversity}
+          events={events.slice(0, 3)}
+          onClose={() => setSelectedUniversity(null)}
+        />
+      )}
 
-      <AddUniversityModal isOpen={showAddUniversityModal} onClose={() => setShowAddUniversityModal(false)} />
+      <AddUniversityModal
+        isOpen={showAddUniversityModal}
+        onClose={() => setShowAddUniversityModal(false)}
+        onSubmit={handleAddUniversity}
+      />
     </div>
   );
 }
-

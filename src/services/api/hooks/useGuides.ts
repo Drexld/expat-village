@@ -75,7 +75,9 @@ export function useGuides(options: UseGuidesOptions = {}): UseGuidesResult {
   }, [shouldFetch, refreshIntervalMs]);
 
   const submitVote = async (guideId: string, vote: -1 | 1) => {
-    if (!shouldFetch) return;
+    if (!shouldFetch) {
+      throw new Error('Guides API is not configured.');
+    }
     await voteGuide(guideId, vote);
   };
 

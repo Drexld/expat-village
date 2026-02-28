@@ -1,9 +1,14 @@
 import type {
   RoommateProfileSummary,
+  StudentDiscountSummary,
   StudentEventSummary,
+  StudentGroupSummary,
   StudentUniversitySummary,
 } from '../../../src/services/api/types';
-import type { StudentRoommateSwipeInput } from '../validation';
+import type {
+  StudentRoommateSwipeInput,
+  StudentUniversityCreateInput,
+} from '../validation';
 import { supabaseInsert, supabaseSelect, supabaseUpsert } from './supabaseRest';
 
 interface StudentUniversityRow {
@@ -48,86 +53,39 @@ interface StudentSwipeRow {
   profile_id: string;
 }
 
-function fallbackUniversities(): StudentUniversitySummary[] {
-  return [
-    {
-      id: 'student-uni-fallback-1',
-      name: 'University of Warsaw',
-      shortName: 'UW',
-      logo: 'UW',
-      activeStudents: 847,
-      totalMembers: 3421,
-      recentTopics: ['Spring semester registration', 'Erasmus application tips', 'Best cafes near campus'],
-      location: 'Krakowskie Przedmiescie',
-      verified: true,
-    },
-    {
-      id: 'student-uni-fallback-2',
-      name: 'Warsaw University of Technology',
-      shortName: 'WUT',
-      logo: 'WUT',
-      activeStudents: 623,
-      totalMembers: 2156,
-      recentTopics: ['Engineering project partners', 'Lab schedule changes', 'Tech events this month'],
-      location: 'Plac Politechniki',
-      verified: true,
-    },
-  ];
+interface StudentDiscountRow {
+  id: string;
+  name: string;
+  discount_text: string;
+  category: string;
+  distance_text?: string | null;
+  valid_until?: string | null;
 }
 
-function fallbackEvents(): StudentEventSummary[] {
-  return [
-    {
-      id: 'student-event-fallback-1',
-      title: 'International Students Meetup',
-      date: 'Feb 12, 2026',
-      time: '18:00',
-      location: 'Cafe Kulturalna',
-      attending: 89,
-      category: 'Networking',
-      rsvp: false,
-    },
-    {
-      id: 'student-event-fallback-2',
-      title: 'Study Group: Polish Language',
-      date: 'Feb 11, 2026',
-      time: '17:00',
-      location: 'UW Main Library',
-      attending: 34,
-      category: 'Academic',
-      rsvp: false,
-    },
-  ];
+interface StudentGroupRow {
+  id: string;
+  name: string;
+  category: string;
+  active?: boolean | null;
 }
 
-function fallbackRoommates(): RoommateProfileSummary[] {
-  return [
-    {
-      id: 'student-roommate-fallback-1',
-      name: 'Sofia Martinez',
-      university: 'University of Warsaw',
-      country: 'Spain',
-      lookingFor: 'Roommate in Mokotow',
-      budget: '1,500-2,000 PLN',
-      interests: ['Music', 'Travel', 'Cooking'],
-      avatar: 'S',
-      verified: true,
-    },
-    {
-      id: 'student-roommate-fallback-2',
-      name: 'Luca Rossi',
-      university: 'University of Warsaw',
-      country: 'Italy',
-      lookingFor: 'Studio share in Centrum',
-      budget: '2,000-2,500 PLN',
-      interests: ['Sports', 'Tech', 'Photography'],
-      avatar: 'L',
-      verified: true,
-    },
-  ];
+interface StudentGroupMembershipRow {
+  group_id: string;
+  created_at: string;
 }
 
 function formatDateLabel(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
+
+function formatDateOrOngoing(value?: string | null): string {
+  if (!value) return 'Ongoing';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
   return date.toLocaleDateString('en-US', {
@@ -160,7 +118,7 @@ export async function getStudentUniversitiesData(): Promise<StudentUniversitySum
     ),
   ]);
 
-  if (!universities.length) return fallbackUniversities();
+  if (!universities.length) return [];
 
   const totalByUniversity = new Map<string, number>();
   const activeByUniversity = new Map<string, number>();
@@ -215,6 +173,22 @@ export async function joinStudentUniversityData(universityId: string, userId: st
   );
 }
 
+export async function createStudentUniversityData(
+  userId: string,
+  input: StudentUniversityCreateInput,
+): Promise<void> {
+  await supabaseInsert('student_university_submissions', {
+    user_id: userId,
+    name: input.name,
+    short_name: input.shortName,
+    location: input.location,
+    website: input.website || null,
+    reason: input.reason || null,
+    status: 'pending',
+    created_at: new Date().toISOString(),
+  });
+}
+
 export async function getStudentEventsData(): Promise<StudentEventSummary[]> {
   const rows = await supabaseSelect<StudentEventRow>(
     'student_events',
@@ -227,7 +201,7 @@ export async function getStudentEventsData(): Promise<StudentEventSummary[]> {
     },
   );
 
-  if (!rows.length) return fallbackEvents();
+  if (!rows.length) return [];
 
   return rows.map((row) => ({
     id: row.id,
@@ -269,11 +243,11 @@ export async function getStudentRoommatesData(
       : Promise.resolve([]),
   ]);
 
-  if (!roommates.length) return fallbackRoommates();
+  if (!roommates.length) return [];
 
   const swipedProfileIds = new Set(swipes.map((swipe) => swipe.profile_id));
 
-  const mapped = roommates
+  return roommates
     .filter((row) => !viewerUserId || !swipedProfileIds.has(row.id))
     .map((row) => ({
       id: row.id,
@@ -286,8 +260,78 @@ export async function getStudentRoommatesData(
       avatar: (row.avatar || row.name.slice(0, 1) || 'U').slice(0, 2),
       verified: row.verified === true,
     }));
+}
 
-  return mapped.length ? mapped : fallbackRoommates();
+export async function getStudentDiscountsData(): Promise<StudentDiscountSummary[]> {
+  const rows = await supabaseSelect<StudentDiscountRow>(
+    'student_discounts',
+    'id,name,discount_text,category,distance_text,valid_until',
+    {
+      limit: 300,
+      orderBy: 'created_at',
+      ascending: false,
+      filters: [{ column: 'active', op: 'eq', value: true }],
+    },
+  );
+
+  return rows.map((row) => ({
+    id: row.id,
+    name: row.name,
+    discount: row.discount_text,
+    category: row.category,
+    distance: row.distance_text || 'Nearby',
+    validUntil: formatDateOrOngoing(row.valid_until),
+  }));
+}
+
+export async function getStudentGroupsData(): Promise<StudentGroupSummary[]> {
+  const [groups, memberships] = await Promise.all([
+    supabaseSelect<StudentGroupRow>(
+      'student_groups',
+      'id,name,category,active',
+      {
+        limit: 300,
+        orderBy: 'created_at',
+        ascending: false,
+      },
+    ),
+    supabaseSelect<StudentGroupMembershipRow>(
+      'student_group_memberships',
+      'group_id,created_at',
+      {
+        limit: 20000,
+        orderBy: 'created_at',
+        ascending: false,
+      },
+    ),
+  ]);
+
+  const membersByGroup = new Map<string, number>();
+  memberships.forEach((membership) => {
+    membersByGroup.set(membership.group_id, (membersByGroup.get(membership.group_id) || 0) + 1);
+  });
+
+  return groups.map((group) => ({
+    id: group.id,
+    name: group.name,
+    members: membersByGroup.get(group.id) || 0,
+    category: group.category,
+    active: group.active !== false,
+  }));
+}
+
+export async function joinStudentGroupData(groupId: string, userId: string): Promise<void> {
+  await supabaseUpsert(
+    'student_group_memberships',
+    {
+      group_id: groupId,
+      user_id: userId,
+      created_at: new Date().toISOString(),
+    },
+    {
+      onConflict: 'group_id,user_id',
+    },
+  );
 }
 
 export async function swipeStudentRoommateData(

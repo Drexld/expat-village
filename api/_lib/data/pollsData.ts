@@ -1,5 +1,5 @@
 import type { PollSummary } from '../../../src/services/api/types';
-import { supabaseSelect, supabaseUpsert } from './supabaseRest';
+import { supabaseInsert, supabaseSelect } from './supabaseRest';
 
 interface PollRow {
   id: string;
@@ -20,37 +20,10 @@ interface PollOptionRow {
 }
 
 interface PollVoteRow {
+  id?: string;
   poll_id: string;
   option_id: string;
-}
-
-function fallbackPolls(): PollSummary[] {
-  return [
-    {
-      id: 'poll-fallback-daily-song',
-      type: 'song',
-      period: 'daily',
-      question: 'Song of the Day',
-      options: [
-        { id: 'option-1', title: '5/6', artist: 'Daria Zawialow', year: '2019', votes: 342, preview: 'spotify' },
-        { id: 'option-2', title: 'Wehikul Czasu', artist: 'Dawid Podsiadlo', year: '2018', votes: 287, preview: 'spotify' },
-      ],
-      totalVotes: 629,
-      endsAt: 'Tonight at 23:59',
-    },
-    {
-      id: 'poll-fallback-monthly-series',
-      type: 'series',
-      period: 'monthly',
-      question: 'Series of the Month',
-      options: [
-        { id: 'option-3', title: 'The Office (US)', year: '2005', votes: 456 },
-        { id: 'option-4', title: 'Breaking Bad', year: '2008', votes: 389 },
-      ],
-      totalVotes: 845,
-      endsAt: 'End of month',
-    },
-  ];
+  user_id?: string;
 }
 
 function formatEndsAtLabel(isoValue: string): string {
@@ -85,9 +58,7 @@ export async function getActivePollsData(): Promise<PollSummary[]> {
     }),
   ]);
 
-  if (!polls.length || !options.length) {
-    return fallbackPolls();
-  }
+  if (!polls.length || !options.length) return [];
 
   const optionsByPoll = new Map<string, PollOptionRow[]>();
   options.forEach((option) => {
@@ -134,8 +105,36 @@ export async function votePollData(
   pollId: string,
   optionId: string,
   userId: string,
-): Promise<void> {
-  await supabaseUpsert(
+): Promise<'ok' | 'already_voted' | 'invalid_option'> {
+  const [existingVote, matchingOption] = await Promise.all([
+    supabaseSelect<PollVoteRow>('poll_votes', 'id', {
+      limit: 1,
+      filters: [
+        { column: 'poll_id', op: 'eq', value: pollId },
+        { column: 'user_id', op: 'eq', value: userId },
+      ],
+    }),
+    supabaseSelect<PollOptionRow>('poll_options', 'id,poll_id,title,artist,year,preview,sort_order', {
+      limit: 1,
+      filters: [
+        { column: 'id', op: 'eq', value: optionId },
+        { column: 'poll_id', op: 'eq', value: pollId },
+      ],
+    }),
+  ]);
+
+  if (!matchingOption.length) return 'invalid_option';
+  if (existingVote.length) return 'already_voted';
+
+  const inserted = await supabaseInsert<
+    {
+      poll_id: string;
+      option_id: string;
+      user_id: string;
+      created_at: string;
+    },
+    PollVoteRow
+  >(
     'poll_votes',
     {
       poll_id: pollId,
@@ -143,6 +142,9 @@ export async function votePollData(
       user_id: userId,
       created_at: new Date().toISOString(),
     },
-    { onConflict: 'poll_id,user_id' },
+    { returning: 'representation' },
   );
+
+  if (!inserted.length) return 'already_voted';
+  return 'ok';
 }

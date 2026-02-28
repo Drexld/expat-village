@@ -1,5 +1,5 @@
 import { apiGet, apiPost } from '../http';
-import type { ServiceReview, ServiceReviewInput, ServiceSummary } from '../types';
+import type { ReviewPromptSummary, ServiceReview, ServiceReviewInput, ServiceSummary } from '../types';
 
 export interface ServiceSearchParams {
   query?: string;
@@ -30,4 +30,8 @@ export async function getServiceReviews(serviceId: string): Promise<ServiceRevie
 
 export async function createServiceReview(serviceId: string, input: ServiceReviewInput): Promise<ServiceReview> {
   return apiPost<ServiceReview>(`/api/services/${serviceId}/reviews`, input);
+}
+
+export async function getPendingReviewPrompts(): Promise<ReviewPromptSummary[]> {
+  return apiGet<ReviewPromptSummary[]>('/api/review-prompts/pending');
 }

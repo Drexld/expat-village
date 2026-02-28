@@ -213,6 +213,38 @@ export interface StudentRoommateSwipeInput {
   direction: 'left' | 'right';
 }
 
+export interface StudentUniversityCreateInput {
+  name: string;
+  shortName: string;
+  location: string;
+  website?: string;
+  reason?: string;
+}
+
+export const validateStudentUniversityCreate: Validator<StudentUniversityCreateInput> = (input) =>
+  objectInput(input, (payload) => {
+    const name = requiredString(payload.name, 'name', 3, 180);
+    const shortName = requiredString(payload.shortName, 'shortName', 2, 24);
+    const location = requiredString(payload.location, 'location', 3, 240);
+    const website = optionalString(payload.website, 'website', 255);
+    const reason = optionalString(payload.reason, 'reason', 1500);
+    const errors = [
+      ...errorsFrom(name),
+      ...errorsFrom(shortName),
+      ...errorsFrom(location),
+      ...errorsFrom(website),
+      ...errorsFrom(reason),
+    ];
+    if (errors.length) return reject(errors);
+    return pass({
+      name: valueFrom(name),
+      shortName: valueFrom(shortName),
+      location: valueFrom(location),
+      website: valueFrom(website),
+      reason: valueFrom(reason),
+    });
+  });
+
 export const validateStudentRoommateSwipe: Validator<StudentRoommateSwipeInput> = (input) =>
   objectInput(input, (payload) => {
     const profileId = requiredString(payload.profileId, 'profileId', 1, 120);
@@ -260,6 +292,9 @@ export const validateContractAnalyze: Validator<ContractAnalyzeInput> = (input) 
       ...errorsFrom(documentText),
       ...errorsFrom(documentUrl),
     ];
+    if (!valueFrom(documentText) && !valueFrom(documentUrl)) {
+      errors.push('Provide documentText or documentUrl');
+    }
     if (errors.length) return reject(errors);
 
     return pass({
@@ -301,6 +336,14 @@ export const validateLawyerRequest: Validator<LawyerRequestInput> = (input) =>
       ...errorsFrom(contactPhone),
       ...errorsFrom(notes),
     ];
+    const emailValue = valueFrom(contactEmail)?.trim();
+    const phoneValue = valueFrom(contactPhone)?.trim();
+    if (!emailValue && !phoneValue) {
+      errors.push('Provide contactEmail or contactPhone');
+    }
+    if (emailValue && !emailValue.includes('@')) {
+      errors.push('contactEmail must be a valid email');
+    }
     if (errors.length) return reject(errors);
 
     return pass({
@@ -316,6 +359,10 @@ export interface MeProfileUpdateInput {
   mood?: string;
   language?: string;
   bio?: string;
+  notificationsEnabled?: boolean;
+  tribe?: string;
+  interest?: string;
+  onboardingCompleted?: boolean;
 }
 
 export const validateMeProfileUpdate: Validator<MeProfileUpdateInput> = (input) =>
@@ -324,12 +371,26 @@ export const validateMeProfileUpdate: Validator<MeProfileUpdateInput> = (input) 
     const mood = optionalString(payload.mood, 'mood', 40);
     const language = optionalString(payload.language, 'language', 10);
     const bio = optionalString(payload.bio, 'bio', 500);
+    const tribe = optionalString(payload.tribe, 'tribe', 80);
+    const interest = optionalString(payload.interest, 'interest', 200);
+    const notificationsEnabled = optionalBoolean(
+      payload.notificationsEnabled,
+      'notificationsEnabled',
+    );
+    const onboardingCompleted = optionalBoolean(
+      payload.onboardingCompleted,
+      'onboardingCompleted',
+    );
 
     const errors = [
       ...errorsFrom(displayName),
       ...errorsFrom(mood),
       ...errorsFrom(language),
       ...errorsFrom(bio),
+      ...errorsFrom(tribe),
+      ...errorsFrom(interest),
+      ...errorsFrom(notificationsEnabled),
+      ...errorsFrom(onboardingCompleted),
     ];
 
     if (errors.length) return reject(errors);
@@ -339,5 +400,78 @@ export const validateMeProfileUpdate: Validator<MeProfileUpdateInput> = (input) 
       mood: valueFrom(mood),
       language: valueFrom(language),
       bio: valueFrom(bio),
+      tribe: valueFrom(tribe),
+      interest: valueFrom(interest),
+      notificationsEnabled: valueFrom(notificationsEnabled),
+      onboardingCompleted: valueFrom(onboardingCompleted),
     });
+  });
+
+export interface MePreferencesUpdateInput {
+  mood?: string;
+  language?: string;
+  notificationsEnabled?: boolean;
+  morningBriefingSeenDate?: string;
+  moodCheckSeenDate?: string;
+}
+
+export const validateMePreferencesUpdate: Validator<MePreferencesUpdateInput> = (input) =>
+  objectInput(input, (payload) => {
+    const mood = optionalString(payload.mood, 'mood', 40);
+    const language = optionalString(payload.language, 'language', 10);
+    const notificationsEnabled = optionalBoolean(
+      payload.notificationsEnabled,
+      'notificationsEnabled',
+    );
+    const morningBriefingSeenDate = optionalString(
+      payload.morningBriefingSeenDate,
+      'morningBriefingSeenDate',
+      32,
+    );
+    const moodCheckSeenDate = optionalString(
+      payload.moodCheckSeenDate,
+      'moodCheckSeenDate',
+      32,
+    );
+    const errors = [
+      ...errorsFrom(mood),
+      ...errorsFrom(language),
+      ...errorsFrom(notificationsEnabled),
+      ...errorsFrom(morningBriefingSeenDate),
+      ...errorsFrom(moodCheckSeenDate),
+    ];
+
+    if (errors.length) return reject(errors);
+
+    return pass({
+      mood: valueFrom(mood),
+      language: valueFrom(language),
+      notificationsEnabled: valueFrom(notificationsEnabled),
+      morningBriefingSeenDate: valueFrom(morningBriefingSeenDate),
+      moodCheckSeenDate: valueFrom(moodCheckSeenDate),
+    });
+  });
+
+export interface AIHubAdvisorInput {
+  scenario: string;
+}
+
+export const validateAIHubAdvisor: Validator<AIHubAdvisorInput> = (input) =>
+  objectInput(input, (payload) => {
+    const scenario = requiredString(payload.scenario, 'scenario', 5, 2000);
+    const errors = errorsFrom(scenario);
+    if (errors.length) return reject(errors);
+    return pass({ scenario: valueFrom(scenario) });
+  });
+
+export interface FlavorCheckinInput {
+  restaurantId: string;
+}
+
+export const validateFlavorCheckin: Validator<FlavorCheckinInput> = (input) =>
+  objectInput(input, (payload) => {
+    const restaurantId = requiredString(payload.restaurantId, 'restaurantId', 1, 120);
+    const errors = errorsFrom(restaurantId);
+    if (errors.length) return reject(errors);
+    return pass({ restaurantId: valueFrom(restaurantId) });
   });

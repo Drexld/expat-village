@@ -34,37 +34,24 @@ interface ServiceSearchParams {
   district?: string;
 }
 
-function normalizeText(value: string): string {
-  return value.trim().toLowerCase();
+interface ReviewPromptRow {
+  id: string;
+  service_id: string;
+  prompt_status: string;
+  due_at?: string | null;
+  created_at: string;
 }
 
-function fallbackServices(): ServiceSummary[] {
-  return [
-    {
-      id: 'fallback-service-1',
-      name: 'mBank',
-      category: 'Banks',
-      district: 'Centrum',
-      verified: true,
-      expatScore: 4.8,
-    },
-    {
-      id: 'fallback-service-2',
-      name: 'LegalExpat Warsaw',
-      category: 'Immigration Lawyers',
-      district: 'Srodmiescie',
-      verified: true,
-      expatScore: 4.9,
-    },
-    {
-      id: 'fallback-service-3',
-      name: 'Expat Dental Care',
-      category: 'Health',
-      district: 'Mokotow',
-      verified: true,
-      expatScore: 4.6,
-    },
-  ];
+interface ReviewPromptSummary {
+  id: string;
+  serviceId: string;
+  serviceName: string;
+  dueAt: string | null;
+  createdAt: string;
+}
+
+function normalizeText(value: string): string {
+  return value.trim().toLowerCase();
 }
 
 function matchesFilters(service: ServiceSummary, filters: ServiceSearchParams): boolean {
@@ -95,10 +82,6 @@ export async function getServicesData(filters: ServiceSearchParams = {}): Promis
       ascending: true,
     }),
   ]);
-
-  if (!services.length) {
-    return fallbackServices().filter((service) => matchesFilters(service, filters));
-  }
 
   const categoryById = new Map(categories.map((category) => [category.id, category.name]));
   const mapped: ServiceSummary[] = services.map((service) => ({
@@ -233,4 +216,43 @@ export async function createServiceReviewData(
     tags: row.tags || [],
     createdAt: row.created_at,
   };
+}
+
+export async function getPendingReviewPromptsData(userId: string): Promise<ReviewPromptSummary[]> {
+  const rows = await supabaseSelect<ReviewPromptRow>(
+    'review_prompts',
+    'id,service_id,prompt_status,due_at,created_at',
+    {
+      limit: 50,
+      orderBy: 'created_at',
+      ascending: false,
+      filters: [
+        { column: 'user_id', op: 'eq', value: userId },
+        { column: 'prompt_status', op: 'eq', value: 'pending' },
+      ],
+    },
+  );
+
+  if (!rows.length) return [];
+
+  const serviceNames = new Map<string, string>();
+  const uniqueServiceIds = Array.from(new Set(rows.map((row) => row.service_id)));
+
+  await Promise.all(
+    uniqueServiceIds.map(async (serviceId) => {
+      const serviceRows = await supabaseSelect<{ id: string; name: string }>('services', 'id,name', {
+        limit: 1,
+        filters: [{ column: 'id', op: 'eq', value: serviceId }],
+      });
+      serviceNames.set(serviceId, serviceRows[0]?.name || 'Service');
+    }),
+  );
+
+  return rows.map((row) => ({
+    id: row.id,
+    serviceId: row.service_id,
+    serviceName: serviceNames.get(row.service_id) || 'Service',
+    dueAt: row.due_at || null,
+    createdAt: row.created_at,
+  }));
 }

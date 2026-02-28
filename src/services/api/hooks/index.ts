@@ -9,3 +9,6 @@ export * from './useMarketplace';
 export * from './useStudentHub';
 export * from './usePolls';
 export * from './useMeProfileProgress';
+export * from './useAIHub';
+export * from './useFlavorDays';
+export * from './useHomeSupport';

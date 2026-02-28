@@ -174,7 +174,7 @@ export function AITools() {
         setContractResults(toContractViewModel(result));
 
         toast.success('Analysis complete!', {
-          description: isAiLive ? 'Live AI contract screening completed' : 'Preview mode analysis completed',
+          description: 'Live AI contract screening completed.',
           duration: 3000,
         });
       } else {
@@ -187,9 +187,7 @@ export function AITools() {
         setDocumentResults(toDocumentViewModel(result));
 
         toast.success('Document analyzed!', {
-          description: isAiLive
-            ? 'Live AI document analysis completed'
-            : 'Preview mode document analysis completed',
+          description: 'Live AI document analysis completed.',
           duration: 3000,
         });
       }
@@ -205,7 +203,7 @@ export function AITools() {
   };
 
   const handleWhatIfSimulator = () => {
-    toast.info('🔮 What-If Simulator', {
+    toast.info('What-If Simulator', {
       description: 'Edit clause below and tap Re-analyze',
       duration: 2000,
     });
@@ -213,7 +211,7 @@ export function AITools() {
   };
 
   const handleShareWithForum = () => {
-    toast.success('📤 Shared with forum!', {
+    toast.success('Shared with forum', {
       description: 'Expat lawyers will review within 24h',
       duration: 2000,
     });
@@ -239,9 +237,7 @@ export function AITools() {
 
       setShowLawyerModal(false);
       toast.success('Lawyer review requested', {
-        description: isAiLive
-          ? 'A verified Warsaw lawyer will review flagged clauses and contact you.'
-          : 'Preview mode: lawyer request captured locally.',
+        description: 'A verified Warsaw lawyer will review flagged clauses and contact you.',
         duration: 3000,
       });
     } catch (error) {
@@ -259,10 +255,17 @@ export function AITools() {
       {/* Header */}
       <div className="sticky top-0 z-40 px-5 pt-8 pb-4 backdrop-blur-xl bg-gradient-to-b from-[#000000] to-transparent">
         <div className="mb-4">
-          <h1 className="text-2xl font-bold mb-1 flex items-center gap-2">
-            <Brain className="w-7 h-7 text-[#8b5cf6]" strokeWidth={2} />
-            AI Tools
-          </h1>
+          <div className="flex items-center gap-2 mb-1">
+            <h1 className="text-2xl font-bold flex items-center gap-2">
+              <Brain className="w-7 h-7 text-[#8b5cf6]" strokeWidth={2} />
+              AI Tools
+            </h1>
+            {isAiLive && (
+              <span className="px-2 py-0.5 rounded-full bg-green-500/20 border border-green-400/25 text-[10px] font-semibold text-green-400">
+                LIVE
+              </span>
+            )}
+          </div>
           <p className="text-sm text-white/50">Analyze before you sign or act</p>
         </div>
 
@@ -335,6 +338,17 @@ export function AITools() {
 
       {/* Content */}
       <div className="px-5 pb-24">
+        {!isAiLive && (
+          <div className="mb-4 relative rounded-[20px] p-[1px] bg-gradient-to-b from-red-500/30 to-red-500/10">
+            <div className="relative rounded-[20px] bg-gradient-to-b from-[#1a2642]/90 to-[#0f172a]/95 p-4 border border-red-400/20">
+              <p className="text-sm font-semibold text-red-300 mb-1">AI backend not connected</p>
+              <p className="text-xs text-white/70">
+                Contract analysis, document analysis, and lawyer request need live API configuration.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Contract Analyzer */}
         {activeTab === 'contract' && (
           <motion.div

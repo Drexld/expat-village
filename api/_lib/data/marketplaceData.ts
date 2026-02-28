@@ -42,43 +42,6 @@ interface ListingFilters {
   category?: string;
 }
 
-function fallbackListings(): MarketplaceListingSummary[] {
-  return [
-    {
-      id: 'fallback-listing-1',
-      title: 'IKEA MALM Bed Frame (King)',
-      price: 450,
-      category: 'Furniture',
-      condition: 'Like New',
-      seller: { name: 'Sarah M.', trustScore: 4.9, reviews: 23, verified: true },
-      distance: '1.2 km',
-      postedAt: '2 hours ago',
-      images: 4,
-      description: 'Moving back to UK, bought 6 months ago. Perfect condition.',
-      hasAR: true,
-      escrowAvailable: true,
-      featured: true,
-      aiScamScore: 5,
-    },
-    {
-      id: 'fallback-listing-2',
-      title: 'MacBook Air M2 (2023)',
-      price: 4200,
-      category: 'Electronics',
-      condition: 'Good',
-      seller: { name: 'Luca R.', trustScore: 4.7, reviews: 15, verified: true },
-      distance: '3.5 km',
-      postedAt: '1 day ago',
-      images: 6,
-      description: 'Original box and charger included.',
-      hasAR: false,
-      escrowAvailable: true,
-      featured: false,
-      aiScamScore: 8,
-    },
-  ];
-}
-
 function formatRelativeTime(value: string): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return 'recently';
@@ -138,7 +101,7 @@ export async function getMarketplaceListingsData(
   ]);
 
   if (!listings.length) {
-    return fallbackListings().filter((listing) => matchesListingFilters(listing, filters));
+    return [];
   }
 
   const userById = new Map(users.map((user) => [user.id, user.display_name]));
@@ -156,6 +119,7 @@ export async function getMarketplaceListingsData(
     const sellerName = userById.get(listing.user_id) || 'Expat Seller';
     const stats = sellerStats.get(listing.user_id) || { sum: 0, count: 0 };
     const trustScore = stats.count ? Number((stats.sum / stats.count).toFixed(1)) : 5;
+    const aiScamScore = Number(listing.ai_scam_score ?? 10);
     return {
       id: listing.id,
       title: listing.title,
@@ -175,7 +139,9 @@ export async function getMarketplaceListingsData(
       hasAR: Boolean(listing.has_ar),
       escrowAvailable: listing.escrow_available !== false,
       featured: Boolean(listing.featured),
-      aiScamScore: Number(listing.ai_scam_score ?? 10),
+      aiScamScore,
+      aiScamSource: 'rule-engine-v1',
+      aiScamConfidence: Number((1 - Math.min(aiScamScore, 100) / 200).toFixed(2)),
     };
   });
 
@@ -232,22 +198,7 @@ export async function createMarketplaceListingData(
 
   const row = rows[0];
   if (!row) {
-    return {
-      id: `listing-${Date.now()}`,
-      title: input.title,
-      price: input.price,
-      category: input.category,
-      condition: 'Good',
-      seller: { name: 'You', trustScore: 5, reviews: 0, verified: true },
-      distance: 'Nearby',
-      postedAt: 'just now',
-      images: 1,
-      description: input.description,
-      hasAR: false,
-      escrowAvailable: input.escrowRequested !== false,
-      featured: false,
-      aiScamScore: 10,
-    };
+    throw new Error('Listing was not created');
   }
 
   return {
@@ -265,6 +216,8 @@ export async function createMarketplaceListingData(
     escrowAvailable: row.escrow_available !== false,
     featured: Boolean(row.featured),
     aiScamScore: Number(row.ai_scam_score ?? 10),
+    aiScamSource: 'rule-engine-v1',
+    aiScamConfidence: 0.95,
   };
 }
 
@@ -322,14 +275,7 @@ export async function createMarketplaceReviewData(
 
   const row = rows[0];
   if (!row) {
-    return {
-      id: `listing-review-${Date.now()}`,
-      listingId,
-      userId,
-      rating: input.rating,
-      body: input.body,
-      createdAt: new Date().toISOString(),
-    };
+    throw new Error('Review was not created');
   }
 
   return {

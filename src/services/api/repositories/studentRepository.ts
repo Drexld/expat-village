@@ -1,8 +1,11 @@
 import { apiGet, apiPost } from '../http';
 import type {
   RoommateProfileSummary,
+  StudentDiscountSummary,
   StudentEventSummary,
+  StudentGroupSummary,
   StudentRoommateSwipeInput,
+  StudentUniversityCreateInput,
   StudentUniversitySummary,
 } from '../types';
 
@@ -22,7 +25,22 @@ export async function getStudentRoommates(): Promise<RoommateProfileSummary[]> {
   return apiGet<RoommateProfileSummary[]>('/api/student/roommates');
 }
 
+export async function getStudentDiscounts(): Promise<StudentDiscountSummary[]> {
+  return apiGet<StudentDiscountSummary[]>('/api/student/discounts');
+}
+
+export async function getStudentGroups(): Promise<StudentGroupSummary[]> {
+  return apiGet<StudentGroupSummary[]>('/api/student/groups');
+}
+
+export async function joinStudentGroup(groupId: string): Promise<void> {
+  await apiPost<void>(`/api/student/groups/${groupId}/join`);
+}
+
+export async function createStudentUniversity(input: StudentUniversityCreateInput): Promise<void> {
+  await apiPost<void>('/api/student/universities', input);
+}
+
 export async function swipeStudentRoommate(input: StudentRoommateSwipeInput): Promise<void> {
   await apiPost<void>('/api/student/roommates/swipe', input);
 }
-

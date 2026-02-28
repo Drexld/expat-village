@@ -3,14 +3,16 @@ import { hasApiBaseUrl } from '../http';
 import {
   createServiceCheckin,
   createServiceReview,
+  getPendingReviewPrompts,
   getServiceReviews,
   getServices,
 } from '../repositories/servicesRepository';
-import type { ServiceReview, ServiceReviewInput, ServiceSummary } from '../types';
+import type { ReviewPromptSummary, ServiceReview, ServiceReviewInput, ServiceSummary } from '../types';
 
 interface UseServicesOptions {
   enabled?: boolean;
   refreshIntervalMs?: number;
+  fetchList?: boolean;
 }
 
 interface UseServicesResult {
@@ -22,19 +24,21 @@ interface UseServicesResult {
   checkIn: (serviceId: string) => Promise<void>;
   loadReviews: (serviceId: string) => Promise<ServiceReview[]>;
   submitReview: (serviceId: string, input: ServiceReviewInput) => Promise<ServiceReview>;
+  loadPendingReviewPrompts: () => Promise<ReviewPromptSummary[]>;
 }
 
 export function useServices(options: UseServicesOptions = {}): UseServicesResult {
-  const { enabled = true, refreshIntervalMs = 5 * 60 * 1000 } = options;
+  const { enabled = true, refreshIntervalMs = 5 * 60 * 1000, fetchList = true } = options;
   const [data, setData] = useState<ServiceSummary[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(null);
 
   const shouldFetch = enabled && hasApiBaseUrl();
+  const shouldFetchList = shouldFetch && fetchList;
 
   useEffect(() => {
-    if (!shouldFetch) return;
+    if (!shouldFetchList) return;
 
     let mounted = true;
 
@@ -62,32 +66,32 @@ export function useServices(options: UseServicesOptions = {}): UseServicesResult
       mounted = false;
       window.clearInterval(interval);
     };
-  }, [shouldFetch, refreshIntervalMs]);
+  }, [shouldFetchList, refreshIntervalMs]);
 
   const checkIn = async (serviceId: string) => {
-    if (!shouldFetch) return;
+    if (!shouldFetch) {
+      throw new Error('Services API is not configured.');
+    }
     await createServiceCheckin(serviceId);
   };
 
   const loadReviews = async (serviceId: string): Promise<ServiceReview[]> => {
-    if (!shouldFetch) return [];
+    if (!shouldFetch) {
+      throw new Error('Services API is not configured.');
+    }
     return getServiceReviews(serviceId);
   };
 
   const submitReview = async (serviceId: string, input: ServiceReviewInput): Promise<ServiceReview> => {
     if (!shouldFetch) {
-      return {
-        id: `local-${Date.now()}`,
-        serviceId,
-        userId: 'local-user',
-        rating: input.rating,
-        title: input.title,
-        body: input.body,
-        tags: input.tags || [],
-        createdAt: new Date().toISOString(),
-      };
+      throw new Error('Services API is not configured.');
     }
     return createServiceReview(serviceId, input);
+  };
+
+  const loadPendingReviewPrompts = async (): Promise<ReviewPromptSummary[]> => {
+    if (!shouldFetch) return [];
+    return getPendingReviewPrompts();
   };
 
   return useMemo(
@@ -95,12 +99,13 @@ export function useServices(options: UseServicesOptions = {}): UseServicesResult
       data,
       isLoading,
       error,
-      isLive: shouldFetch && Boolean(data),
+      isLive: shouldFetch && (fetchList ? Boolean(data) : true),
       lastSyncedAt,
       checkIn,
       loadReviews,
       submitReview,
+      loadPendingReviewPrompts,
     }),
-    [data, isLoading, error, shouldFetch, lastSyncedAt],
+    [data, isLoading, error, shouldFetch, fetchList, lastSyncedAt],
   );
 }

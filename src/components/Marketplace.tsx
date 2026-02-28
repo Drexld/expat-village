@@ -32,6 +32,8 @@ const categoryIconById: Record<string, string> = {
   moving: '📦',
 };
 
+const defaultCategoryIds = ['furniture', 'electronics', 'home', 'clothing', 'bikes', 'moving'];
+
 function normalizeCategory(value: string): string {
   return value.trim().toLowerCase();
 }
@@ -42,7 +44,7 @@ function toCategoryLabel(value: string): string {
 }
 
 export function Marketplace() {
-  const { data, isLoading, isLive, createListing, expressInterest, submitReview } = useMarketplace();
+  const { data, isLoading, isLive, error, createListing, expressInterest, submitReview } = useMarketplace();
   const listings = data ?? [];
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -68,6 +70,10 @@ export function Marketplace() {
       const key = normalizeCategory(listing.category);
       counts.set(key, (counts.get(key) || 0) + 1);
     }
+
+    defaultCategoryIds.forEach((id) => {
+      if (!counts.has(id)) counts.set(id, 0);
+    });
 
     return [
       { id: 'all', name: 'All', icon: categoryIconById.all, count: listings.length },
@@ -99,9 +105,7 @@ export function Marketplace() {
 
       if (listing.escrowAvailable) {
         toast.success('Secure Trade Initiated', {
-          description: isLive
-            ? 'Interest sent and payment flow will use escrow protection.'
-            : 'Preview mode: secure trade request captured locally.',
+          description: 'Interest sent and payment flow will use escrow protection.',
           duration: 3000,
         });
       } else {
@@ -174,9 +178,7 @@ export function Marketplace() {
       setListForm({ title: '', price: '', category: '', description: '' });
 
       toast.success('Item listed!', {
-        description: isLive
-          ? '+10 points earned. Listing is now live in marketplace feed.'
-          : '+10 points earned. Preview listing added locally.',
+        description: '+10 points earned. Listing is now live in marketplace feed.',
         duration: 3000,
       });
     } catch (error) {
@@ -250,12 +252,32 @@ export function Marketplace() {
               <div className="flex-1">
                 <h3 className="font-semibold text-sm mb-1">AI Scam Shield Active</h3>
                 <p className="text-xs text-white/60 leading-relaxed">
-                  Every listing verified with escrow protection • {isLive ? 'Live backend sync active' : 'Preview mode active'}
+                  Every listing verified with escrow protection • {isLive ? 'Live backend sync active' : 'Marketplace live feed unavailable'}
                 </p>
               </div>
             </div>
           </div>
         </div>
+
+        {!isLive && !isLoading && (
+          <div className="relative rounded-[20px] p-[1px] bg-gradient-to-b from-red-500/30 to-red-500/10">
+            <div className="relative rounded-[20px] bg-gradient-to-br from-[#1a2642]/90 to-[#0f172a]/95 backdrop-blur-xl p-4 border border-red-400/20">
+              <h3 className="font-semibold text-sm text-red-300 mb-1">Marketplace live API not connected</h3>
+              <p className="text-xs text-white/70">
+                Listings, check-ins, and reviews require the live backend. Configure API env vars and refresh.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {error && (
+          <div className="relative rounded-[20px] p-[1px] bg-gradient-to-b from-red-500/30 to-red-500/10">
+            <div className="relative rounded-[20px] bg-gradient-to-br from-[#1a2642]/90 to-[#0f172a]/95 backdrop-blur-xl p-4 border border-red-400/20">
+              <h3 className="font-semibold text-sm text-red-300 mb-1">Could not load marketplace listings</h3>
+              <p className="text-xs text-white/70">{error.message}</p>
+            </div>
+          </div>
+        )}
 
         {filteredListings.filter((l) => l.featured).length > 0 && (
           <div>

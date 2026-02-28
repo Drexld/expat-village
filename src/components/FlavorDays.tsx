@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { motion } from 'motion/react';
 import {
   Camera,
@@ -11,20 +10,38 @@ import {
   Users,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import {
-  getFlavorChallenges,
-  getFlavorCommunityActivity,
-  getFlavorLeaderboard,
-  getFlavorRestaurants,
-  getTodayCuisineDay,
-} from '../services/flavorDays/service';
+import { useFlavorDays } from '../services/api/hooks';
 
 export function FlavorDays() {
-  const today = useMemo(() => getTodayCuisineDay(), []);
-  const restaurants = useMemo(() => getFlavorRestaurants(today.cuisine), [today.cuisine]);
-  const activity = useMemo(() => getFlavorCommunityActivity(), []);
-  const challenges = useMemo(() => getFlavorChallenges(), []);
-  const leaderboard = useMemo(() => getFlavorLeaderboard(), []);
+  const {
+    data,
+    isLoading,
+    isRefreshing,
+    isCheckingIn,
+    error,
+    isLive,
+    lastSyncedAt,
+    checkIn,
+  } = useFlavorDays();
+
+  const day = data?.day;
+  const restaurants = data?.restaurants || [];
+  const activity = data?.activity || [];
+  const challenges = data?.challenges || [];
+  const leaderboard = data?.leaderboard || [];
+
+  const onCheckIn = async (restaurantId: string, restaurantName: string) => {
+    try {
+      await checkIn(restaurantId);
+      toast.success(`Checked in at ${restaurantName}`, {
+        description: 'Points and challenge progress updated.',
+      });
+    } catch (errorValue) {
+      const message =
+        errorValue instanceof Error ? errorValue.message : 'Check-in failed';
+      toast.error('Check-in failed', { description: message });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#000000] via-[#0a0e1a] to-[#000000] text-white">
@@ -34,17 +51,58 @@ export function FlavorDays() {
             <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent rounded-[24px] pointer-events-none" />
             <div className="relative flex items-start gap-3">
               <div className="w-12 h-12 rounded-[14px] bg-gradient-to-br from-[#10b981] to-[#059669] flex items-center justify-center shadow-[0_4px_18px_rgba(16,185,129,0.4)]">
-                <span className="text-2xl">{today.emoji}</span>
+                <span className="text-2xl">{day?.emoji || 'FD'}</span>
               </div>
               <div className="flex-1">
-                <p className="text-xs text-green-300/90 mb-1">{today.dateLabel}</p>
-                <h2 className="text-lg font-bold mb-1">Flavor Day: {today.cuisine}</h2>
-                <p className="text-xs text-white/60 mb-2">{today.vibe}</p>
-                <p className="text-[11px] text-white/50">{today.funFact}</p>
+                <div className="flex items-center justify-between gap-2 mb-1">
+                  <p className="text-xs text-green-300/90">{day?.dateLabel || 'Today'}</p>
+                  <span
+                    className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
+                      isLive
+                        ? 'bg-green-500/20 text-green-300'
+                        : 'bg-red-500/20 text-red-300 border border-red-400/30'
+                    }`}
+                  >
+                    {isLive ? 'LIVE' : 'NOT LIVE'}
+                  </span>
+                </div>
+                <h2 className="text-lg font-bold mb-1">
+                  Flavor Day: {day?.cuisine || 'Unavailable'}
+                </h2>
+                <p className="text-xs text-white/60 mb-2">
+                  {day?.vibe || 'Connect backend flavor feeds to load today`s theme.'}
+                </p>
+                <p className="text-[11px] text-white/50">{day?.funFact || ''}</p>
+                {(lastSyncedAt || isRefreshing) && (
+                  <p className="text-[10px] text-white/45 mt-1">
+                    Updated {lastSyncedAt ? new Date(lastSyncedAt).toLocaleTimeString() : 'recently'}
+                    {isRefreshing ? ' - refreshing...' : ''}
+                  </p>
+                )}
               </div>
             </div>
           </div>
         </div>
+
+        {!isLive && !isLoading && (
+          <div className="relative rounded-[18px] p-[1px] bg-gradient-to-b from-red-500/30 to-red-500/10">
+            <div className="relative rounded-[18px] bg-gradient-to-b from-[#1a2642]/90 to-[#0f172a]/95 p-3 border border-red-400/20">
+              <p className="text-sm font-semibold text-red-300 mb-1">Flavor Days API is not connected</p>
+              <p className="text-xs text-white/70">
+                Configure `/api/flavor/*` endpoints and auth to run partner flows.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {error && (
+          <div className="relative rounded-[18px] p-[1px] bg-gradient-to-b from-red-500/30 to-red-500/10">
+            <div className="relative rounded-[18px] bg-gradient-to-b from-[#1a2642]/90 to-[#0f172a]/95 p-3 border border-red-400/20">
+              <p className="text-sm font-semibold text-red-300 mb-1">Flavor feed issue</p>
+              <p className="text-xs text-white/70">{error.message}</p>
+            </div>
+          </div>
+        )}
 
         <div>
           <div className="flex items-center justify-between mb-2">
@@ -61,6 +119,12 @@ export function FlavorDays() {
             </button>
           </div>
 
+          {isLoading && restaurants.length === 0 && (
+            <div className="text-sm text-white/60 text-center py-4">
+              Loading partner restaurants...
+            </div>
+          )}
+
           <div className="space-y-3">
             {restaurants.map((restaurant, index) => (
               <motion.div
@@ -73,7 +137,11 @@ export function FlavorDays() {
                 <div className="relative rounded-[20px] bg-gradient-to-b from-[#1a2642]/90 to-[#0f172a]/95 p-3">
                   <div className="flex gap-3">
                     <div className="relative w-24 h-20 rounded-[12px] overflow-hidden bg-white/5">
-                      <img src={restaurant.photo} alt={restaurant.name} className="w-full h-full object-cover" />
+                      <img
+                        src={restaurant.photo}
+                        alt={restaurant.name}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-1">
@@ -91,23 +159,25 @@ export function FlavorDays() {
                         <span>{restaurant.distanceKm.toFixed(1)} km</span>
                       </div>
                       <div className="flex items-center gap-2 text-[11px] mb-2">
-                        <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" strokeWidth={2} />
+                        <Star
+                          className="w-3.5 h-3.5 text-amber-400 fill-amber-400"
+                          strokeWidth={2}
+                        />
                         <span className="text-white/80">{restaurant.rating.toFixed(1)}</span>
-                        <span className="text-[#3b9eff]">Expat {restaurant.expatScore.toFixed(1)}/10</span>
+                        <span className="text-[#3b9eff]">
+                          Expat {restaurant.expatScore.toFixed(1)}/10
+                        </span>
                       </div>
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between gap-2">
                         <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#10b981]/20 text-[#10b981] font-semibold">
                           {restaurant.discount}
                         </span>
                         <button
-                          onClick={() =>
-                            toast.success(`Route opened for ${restaurant.name}`, {
-                              description: 'Navigation + check-in rewards enabled.',
-                            })
-                          }
-                          className="text-xs text-[#3b9eff] font-semibold"
+                          onClick={() => void onCheckIn(restaurant.id, restaurant.name)}
+                          disabled={isCheckingIn}
+                          className="text-xs text-[#3b9eff] font-semibold disabled:opacity-60"
                         >
-                          Navigate
+                          {isCheckingIn ? 'Checking...' : 'Check In'}
                         </button>
                       </div>
                     </div>
@@ -116,6 +186,12 @@ export function FlavorDays() {
               </motion.div>
             ))}
           </div>
+
+          {!isLoading && restaurants.length === 0 && (
+            <div className="text-sm text-white/60 text-center py-4">
+              No partner restaurants available yet.
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-2 gap-3">
@@ -125,10 +201,14 @@ export function FlavorDays() {
                 <Camera className="w-4 h-4 text-[#3b9eff]" strokeWidth={2} />
                 <p className="text-xs font-semibold">Photo Mission</p>
               </div>
-              <p className="text-[11px] text-white/60 mb-2">Post your meal in Town Hall to earn +12 points.</p>
+              <p className="text-[11px] text-white/60 mb-2">
+                Post your meal in Town Hall to earn +12 points.
+              </p>
               <button
                 onClick={() =>
-                  toast.success('Photo flow launched', { description: 'Tag #FlavorDay to score bonus points.' })
+                  toast.success('Photo flow launched', {
+                    description: 'Tag #FlavorDay to score bonus points.',
+                  })
                 }
                 className="w-full py-2 rounded-[10px] bg-[#3b9eff]/20 text-[#3b9eff] text-xs font-semibold"
               >
@@ -143,7 +223,9 @@ export function FlavorDays() {
                 <Users className="w-4 h-4 text-[#8b5cf6]" strokeWidth={2} />
                 <p className="text-xs font-semibold">Community Pulse</p>
               </div>
-              <p className="text-[11px] text-white/60 mb-2">42 expats active in Flavor Days now.</p>
+              <p className="text-[11px] text-white/60 mb-2">
+                {activity.length} expat activities logged recently.
+              </p>
               <button
                 onClick={() =>
                   toast.success('Town Hall thread opened', {
@@ -168,10 +250,15 @@ export function FlavorDays() {
               {challenges.map((challenge) => {
                 const percentage = Math.round((challenge.progress / challenge.total) * 100);
                 return (
-                  <div key={challenge.id} className="p-3 rounded-[12px] bg-white/5 border border-white/10">
+                  <div
+                    key={challenge.id}
+                    className="p-3 rounded-[12px] bg-white/5 border border-white/10"
+                  >
                     <div className="flex items-center justify-between mb-1">
                       <p className="text-sm font-semibold">{challenge.title}</p>
-                      <span className="text-[10px] text-amber-300 font-bold">+{challenge.rewardPoints}</span>
+                      <span className="text-[10px] text-amber-300 font-bold">
+                        +{challenge.rewardPoints}
+                      </span>
                     </div>
                     <p className="text-[11px] text-white/60 mb-2">{challenge.description}</p>
                     <div className="h-1.5 rounded-full bg-white/10 overflow-hidden mb-1">
@@ -188,6 +275,11 @@ export function FlavorDays() {
                 );
               })}
             </div>
+            {!isLoading && challenges.length === 0 && (
+              <div className="text-sm text-white/60 text-center py-4">
+                No active challenges published yet.
+              </div>
+            )}
           </div>
         </div>
 
@@ -199,7 +291,10 @@ export function FlavorDays() {
             </div>
             <div className="space-y-2">
               {leaderboard.map((entry, index) => (
-                <div key={entry.id} className="p-2.5 rounded-[12px] bg-white/5 border border-white/10 flex items-center gap-2">
+                <div
+                  key={entry.id}
+                  className="p-2.5 rounded-[12px] bg-white/5 border border-white/10 flex items-center gap-2"
+                >
                   <span className="w-5 text-xs text-white/70 font-bold">{index + 1}</span>
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#3b9eff] to-[#8b5cf6] flex items-center justify-center text-xs font-bold">
                     {entry.avatar}
@@ -212,6 +307,11 @@ export function FlavorDays() {
                 </div>
               ))}
             </div>
+            {!isLoading && leaderboard.length === 0 && (
+              <div className="text-sm text-white/60 text-center py-4">
+                Leaderboard is empty.
+              </div>
+            )}
           </div>
         </div>
 
@@ -219,7 +319,8 @@ export function FlavorDays() {
           <div className="relative rounded-[16px] bg-gradient-to-b from-[#1a2642]/80 to-[#0f172a]/90 p-3">
             <p className="text-[11px] text-white/60 leading-relaxed">
               <CheckCircle2 className="w-3.5 h-3.5 inline mr-1 text-[#10b981]" />
-              Flavor Days is wired to partner-ready flows: discounts, activity feed, challenge progression, and leaderboard rewards.
+              Flavor Days now runs through live backend flows for partners, check-ins, challenge
+              progress, and leaderboard updates.
             </p>
             <button
               onClick={() =>
@@ -239,7 +340,10 @@ export function FlavorDays() {
           <h3 className="text-sm font-bold mb-2">Live Activity</h3>
           <div className="space-y-2">
             {activity.map((item) => (
-              <div key={item.id} className="p-2.5 rounded-[12px] bg-white/5 border border-white/10 flex items-center gap-2">
+              <div
+                key={item.id}
+                className="p-2.5 rounded-[12px] bg-white/5 border border-white/10 flex items-center gap-2"
+              >
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#3b9eff] to-[#8b5cf6] flex items-center justify-center text-xs font-bold">
                   {item.avatar}
                 </div>
@@ -255,6 +359,11 @@ export function FlavorDays() {
               </div>
             ))}
           </div>
+          {!isLoading && activity.length === 0 && (
+            <div className="text-sm text-white/60 text-center py-4">
+              No activity logged yet.
+            </div>
+          )}
         </div>
       </div>
     </div>

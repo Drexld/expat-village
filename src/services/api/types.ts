@@ -31,6 +31,67 @@ export interface HomePulse {
   }>;
 }
 
+export interface HomeWarsawDailyChallenge {
+  id: string;
+  question: string;
+  options: string[];
+  correctIndex: number;
+  pointsReward: number;
+  rewardLabel?: string;
+}
+
+export interface HomeWarsawDailyLeaderboardEntry {
+  rank: number;
+  userId?: string;
+  name: string;
+  avatar: string;
+  points: number;
+  streak: number;
+}
+
+export interface HomeCommunityPreview {
+  id: string;
+  authorAvatar: string;
+  title: string;
+  timestamp: string;
+  isNew: boolean;
+  replies: number;
+}
+
+export interface HomeCommunityTopic {
+  id: string;
+  label: string;
+  count: number;
+  trend: number;
+  icon: 'fire' | 'pin' | 'briefcase' | 'bank' | 'house' | 'file';
+}
+
+export interface HomeQuickAction {
+  id: string;
+  label: string;
+  subtitle: string;
+  icon: 'calendar' | 'users' | 'message' | 'zap';
+  accent: 'blue' | 'pink' | 'green' | 'amber';
+  priority: number;
+}
+
+export interface HomeSupportPayload {
+  warsawDaily: {
+    weatherChallenge: HomeWarsawDailyChallenge;
+    wisdomChallenge: HomeWarsawDailyChallenge;
+    leaderboard: HomeWarsawDailyLeaderboardEntry[];
+  };
+  community: {
+    townHall: {
+      activeCount: number;
+      viewingCount: number;
+      previews: HomeCommunityPreview[];
+    };
+    hotTopics: HomeCommunityTopic[];
+  };
+  quickActions: HomeQuickAction[];
+}
+
 export interface GuideSummary {
   id: string;
   title: string;
@@ -57,6 +118,14 @@ export interface ServiceReview {
   title?: string;
   body: string;
   tags: string[];
+  createdAt: string;
+}
+
+export interface ReviewPromptSummary {
+  id: string;
+  serviceId: string;
+  serviceName: string;
+  dueAt: string | null;
   createdAt: string;
 }
 
@@ -131,6 +200,8 @@ export interface MarketplaceListingSummary {
   escrowAvailable: boolean;
   featured?: boolean;
   aiScamScore: number;
+  aiScamSource: string;
+  aiScamConfidence: number;
 }
 
 export interface MarketplaceCreateListingInput {
@@ -194,6 +265,31 @@ export interface RoommateProfileSummary {
   verified: boolean;
 }
 
+export interface StudentDiscountSummary {
+  id: string;
+  name: string;
+  discount: string;
+  category: string;
+  distance: string;
+  validUntil: string;
+}
+
+export interface StudentGroupSummary {
+  id: string;
+  name: string;
+  members: number;
+  category: string;
+  active: boolean;
+}
+
+export interface StudentUniversityCreateInput {
+  name: string;
+  shortName: string;
+  location: string;
+  website?: string;
+  reason?: string;
+}
+
 export interface StudentRoommateSwipeInput {
   profileId: string;
   direction: 'left' | 'right';
@@ -224,6 +320,72 @@ export interface PollVoteInput {
   optionId: string;
 }
 
+export interface FlavorDaySummary {
+  id: string;
+  cuisine: string;
+  emoji: string;
+  dateLabel: string;
+  vibe: string;
+  funFact: string;
+}
+
+export interface FlavorRestaurantSummary {
+  id: string;
+  name: string;
+  district: string;
+  cuisine: string;
+  rating: number;
+  expatScore: number;
+  discount: string;
+  verified: boolean;
+  distanceKm: number;
+  photo: string;
+}
+
+export interface FlavorActivitySummary {
+  id: string;
+  user: string;
+  avatar: string;
+  action: string;
+  points: number;
+  timestamp: string;
+}
+
+export interface FlavorChallengeSummary {
+  id: string;
+  title: string;
+  description: string;
+  rewardPoints: number;
+  progress: number;
+  total: number;
+}
+
+export interface FlavorLeaderboardEntry {
+  id: string;
+  name: string;
+  avatar: string;
+  points: number;
+  badges: number;
+}
+
+export interface FlavorDayBundle {
+  day: FlavorDaySummary | null;
+  restaurants: FlavorRestaurantSummary[];
+  activity: FlavorActivitySummary[];
+  challenges: FlavorChallengeSummary[];
+  leaderboard: FlavorLeaderboardEntry[];
+}
+
+export interface FlavorCheckinInput {
+  restaurantId: string;
+}
+
+export interface FlavorCheckinResult {
+  checkinId: string;
+  rewardPoints: number;
+  createdAt: string;
+}
+
 export interface MeProfile {
   id: string;
   displayName: string;
@@ -231,6 +393,17 @@ export interface MeProfile {
   points: number;
   streak: number;
   bio?: string;
+  tribe?: string;
+  interest?: string;
+  onboardingCompleted?: boolean;
+}
+
+export interface MePreferences {
+  mood?: string;
+  language: string;
+  notificationsEnabled: boolean;
+  morningBriefingSeenDate?: string;
+  moodCheckSeenDate?: string;
 }
 
 export interface MeJourneyEvent {
@@ -358,4 +531,109 @@ export interface LawyerReviewRequestResult {
   id: string;
   status: 'requested' | 'triaged' | 'assigned' | 'completed';
   createdAt: string;
+}
+
+export type AIHubJourneyImpact = 'high' | 'medium' | 'low';
+
+export interface AIHubForecastAction {
+  title: string;
+  points: number;
+  etaDays: number;
+  impact: AIHubJourneyImpact;
+}
+
+export interface AIHubMilestoneForecast {
+  level: 'Newcomer' | 'Settler' | 'Local' | 'Warsaw Native';
+  etaDays: number;
+  confidence: number;
+  blockers: string[];
+  nextActions: AIHubForecastAction[];
+}
+
+export interface AIHubDNAMatch {
+  id: string;
+  name: string;
+  avatar: string;
+  compatibility: number;
+  district: string;
+  interests: string[];
+  reason: string;
+}
+
+export interface AIHubDecisionOption {
+  id: string;
+  label: string;
+  score: number;
+  benefits: string[];
+  risks: string[];
+}
+
+export interface AIHubDecisionAdvice {
+  scenario: string;
+  recommendation: string;
+  confidence: number;
+  options: AIHubDecisionOption[];
+}
+
+export interface AIHubCoachScenario {
+  id: string;
+  title: string;
+  context: string;
+  phrase: string;
+  transliteration: string;
+  english: string;
+  tips: string[];
+}
+
+export interface AIHubLuckSignal {
+  id: string;
+  label: string;
+  value: number;
+  direction: 'up' | 'down' | 'stable';
+  weight: number;
+}
+
+export interface AIHubLuckScore {
+  score: number;
+  tier: 'Low' | 'Medium' | 'High';
+  summary: string;
+  signals: AIHubLuckSignal[];
+}
+
+export interface AIHubShadowSuggestion {
+  id: string;
+  title: string;
+  detail: string;
+  points: number;
+  automationReady: boolean;
+}
+
+export interface AIHubStudentInsight {
+  id: string;
+  title: string;
+  value: string;
+  description: string;
+  confidence: number;
+}
+
+export interface AIHubMeta {
+  source: string;
+  updatedAt: string;
+  ttlSeconds: number;
+  personalized: boolean;
+}
+
+export interface AIHubBundle {
+  forecast: AIHubMilestoneForecast;
+  matches: AIHubDNAMatch[];
+  advice: AIHubDecisionAdvice;
+  coachScenarios: AIHubCoachScenario[];
+  luck: AIHubLuckScore;
+  shadow: AIHubShadowSuggestion[];
+  student: AIHubStudentInsight[];
+  meta: AIHubMeta;
+}
+
+export interface AIHubAdvisorInput {
+  scenario: string;
 }

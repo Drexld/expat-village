@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
 import {
   Mic,
@@ -18,6 +18,7 @@ import { PremiumWarsawDaily } from './PremiumWarsawDaily';
 import { PremiumCommunityCards } from './PremiumCommunityCards';
 import { toast } from 'sonner';
 import type { HomePulse as HomePulseData, MeProgress } from '../services/api/types';
+import { useHomeSupport, useServices } from '../services/api/hooks';
 
 interface HomeProps {
   user: {
@@ -39,8 +40,11 @@ export function Home({ user, onOpenBriefing, userMood, homePulseData, homePulseL
   const [notifications] = useState(3);
   const [isListening, setIsListening] = useState(false);
   const [voiceTranscript, setVoiceTranscript] = useState('');
+  const [pendingReviewCount, setPendingReviewCount] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useScroll();
+  const servicesApi = useServices({ fetchList: false });
+  const homeSupport = useHomeSupport();
 
   const y1 = useTransform(scrollY, [0, 300], [0, -50]);
   const y2 = useTransform(scrollY, [0, 300], [0, -30]);
@@ -60,6 +64,63 @@ export function Home({ user, onOpenBriefing, userMood, homePulseData, homePulseL
         duration: 3000,
       });
     }, 2000);
+  };
+
+  useEffect(() => {
+    if (!servicesApi.isLive) return;
+
+    let active = true;
+    servicesApi
+      .loadPendingReviewPrompts()
+      .then((prompts) => {
+        if (!active) return;
+        setPendingReviewCount(prompts.length);
+      })
+      .catch(() => {
+        if (!active) return;
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [servicesApi.isLive, servicesApi.loadPendingReviewPrompts]);
+
+  const quickActions = homeSupport.data?.quickActions || [];
+
+  const iconForQuickAction = (icon: 'calendar' | 'users' | 'message' | 'zap') => {
+    if (icon === 'calendar') return Calendar;
+    if (icon === 'users') return Users;
+    if (icon === 'message') return MessageSquare;
+    return Zap;
+  };
+
+  const colorForQuickAction = (accent: 'blue' | 'pink' | 'green' | 'amber') => {
+    if (accent === 'pink') return 'from-[#ec4899] to-[#db2777]';
+    if (accent === 'green') return 'from-[#10b981] to-[#059669]';
+    if (accent === 'amber') return 'from-[#f59e0b] to-[#d97706]';
+    return 'from-[#3b82f6] to-[#2563eb]';
+  };
+
+  const handleQuickAction = (actionId: string, label: string) => {
+    if (actionId === 'book-pesel') {
+      toast.info('Go to Tasks tab', { description: 'Open urgent legal tasks to continue.' });
+      return;
+    }
+    if (actionId === 'find-expats') {
+      toast.info('Go to Community tab', { description: 'Explore active Town Hall discussions.' });
+      return;
+    }
+    if (actionId === 'ask-question') {
+      toast.info('Open Warsaw Whisper', { description: 'Create a new post to ask the community.' });
+      return;
+    }
+    if (actionId === 'find-services') {
+      toast.info('Go to Discover > Warsaw Concierge', {
+        description: 'Browse verified services with reviews.',
+      });
+      return;
+    }
+    toast.info(label);
   };
 
   return (
@@ -107,6 +168,37 @@ export function Home({ user, onOpenBriefing, userMood, homePulseData, homePulseL
           </motion.button>
         )}
 
+        {pendingReviewCount > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.03 }}
+            className="w-full mb-3 relative rounded-[16px] p-[1px] bg-gradient-to-b from-[#10b981]/35 to-[#059669]/10"
+          >
+            <div className="relative rounded-[16px] bg-gradient-to-b from-[#1a2642]/90 to-[#0f172a]/95 p-3.5">
+              <div className="absolute inset-0 rounded-[16px] bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none" />
+              <div className="relative flex items-center justify-between">
+                <div className="text-left">
+                  <p className="text-sm font-semibold text-green-300">Review Reminder</p>
+                  <p className="text-[11px] text-white/55">
+                    You have {pendingReviewCount} pending service review {pendingReviewCount === 1 ? 'prompt' : 'prompts'}.
+                  </p>
+                </div>
+                <button
+                  onClick={() =>
+                    toast.info('Open Discover > Warsaw Concierge', {
+                      description: 'Complete your pending review prompts there.',
+                    })
+                  }
+                  className="px-3 py-1.5 rounded-lg bg-green-500/20 border border-green-400/30 text-[11px] font-semibold text-green-300"
+                >
+                  Review
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         {onOpenBriefing && (
           <motion.div
             style={{ y: y1 }}
@@ -135,10 +227,20 @@ export function Home({ user, onOpenBriefing, userMood, homePulseData, homePulseL
             transition={{ delay: 0.2 }}
             className="col-span-2"
           >
-            <PremiumWarsawDaily streak={user.streak} />
+            <PremiumWarsawDaily
+              streak={user.streak}
+              weatherChallenge={homeSupport.data?.warsawDaily.weatherChallenge}
+              wisdomChallenge={homeSupport.data?.warsawDaily.wisdomChallenge}
+              leaderboard={homeSupport.data?.warsawDaily.leaderboard}
+              isLive={homeSupport.isLive}
+            />
           </motion.div>
 
-          <PremiumCommunityCards />
+          <PremiumCommunityCards
+            townHall={homeSupport.data?.community.townHall || null}
+            hotTopics={homeSupport.data?.community.hotTopics || []}
+            isLive={homeSupport.isLive}
+          />
         </motion.div>
 
         <motion.div style={{ y: y3 }}>
@@ -186,31 +288,33 @@ export function Home({ user, onOpenBriefing, userMood, homePulseData, homePulseL
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
           >
-            {[
-              { icon: Calendar, label: 'Book PESEL', color: 'from-[#3b82f6] to-[#2563eb]', delay: 0.6 },
-              { icon: Users, label: 'Find Expats', color: 'from-[#ec4899] to-[#db2777]', delay: 0.7 },
-              { icon: MessageSquare, label: 'Ask Question', color: 'from-[#10b981] to-[#059669]', delay: 0.8 },
-              { icon: Zap, label: 'Find Services', color: 'from-[#f59e0b] to-[#d97706]', delay: 0.9 },
-            ].map((action, index) => {
-              const Icon = action.icon;
+            {quickActions.map((action, index) => {
+              const Icon = iconForQuickAction(action.icon);
               return (
                 <motion.button
-                  key={index}
+                  key={action.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: action.delay }}
+                  transition={{ delay: 0.6 + index * 0.1 }}
                   whileHover={{ scale: 1.05, y: -5 }}
                   whileTap={{ scale: 0.95 }}
+                  onClick={() => handleQuickAction(action.id, action.label)}
                   className="relative overflow-hidden rounded-[20px] bg-gradient-to-b from-[#1a2642] via-[#14203a] to-[#0f1829] shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_4px_20px_rgba(0,0,0,0.3)] p-4 text-left group"
                 >
-                  <div className={`w-10 h-10 rounded-[14px] bg-gradient-to-br ${action.color} flex items-center justify-center mb-3 shadow-[0_4px_12px_rgba(0,0,0,0.3)] group-hover:shadow-[0_6px_20px_rgba(0,0,0,0.4)] transition-all`}>
+                  <div className={`w-10 h-10 rounded-[14px] bg-gradient-to-br ${colorForQuickAction(action.accent)} flex items-center justify-center mb-3 shadow-[0_4px_12px_rgba(0,0,0,0.3)] group-hover:shadow-[0_6px_20px_rgba(0,0,0,0.4)] transition-all`}>
                     <Icon className="w-5 h-5 text-white" />
                   </div>
                   <p className="text-[13px] font-semibold">{action.label}</p>
+                  <p className="text-[10px] text-white/50 mt-0.5">{action.subtitle}</p>
                 </motion.button>
               );
             })}
           </motion.div>
+          {!homeSupport.isLoading && quickActions.length === 0 && (
+            <div className="mt-3 text-xs text-white/50">
+              Quick actions are syncing from live backend.
+            </div>
+          )}
         </motion.div>
 
         {!isListening && (

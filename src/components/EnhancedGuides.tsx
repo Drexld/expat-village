@@ -12,90 +12,13 @@ interface Guide {
   views: number;
   upvotes: number;
   lastUpdated: string;
+  updatedAtIso: string;
   hasVideo: boolean;
   hasAR: boolean;
   realTimeData?: string;
   author?: string;
   trending?: boolean;
 }
-
-const FALLBACK_GUIDES: Guide[] = [
-  {
-    id: '1',
-    title: 'Getting Your PESEL Number',
-    category: 'Admin',
-    views: 2847,
-    upvotes: 184,
-    lastUpdated: '2 days ago',
-    hasVideo: true,
-    hasAR: true,
-    realTimeData: 'Wait times: 2 weeks as of Feb 9, 2026',
-    author: 'drexld',
-    trending: true,
-  },
-  {
-    id: '2',
-    title: 'Opening a Polish Bank Account',
-    category: 'Finance',
-    views: 1923,
-    upvotes: 156,
-    lastUpdated: '1 week ago',
-    hasVideo: true,
-    hasAR: false,
-    realTimeData: 'PKO BP offers fastest setup (2 days)',
-    author: 'MariaK',
-  },
-  {
-    id: '3',
-    title: 'Finding Housing in Warsaw',
-    category: 'Housing',
-    views: 3421,
-    upvotes: 289,
-    lastUpdated: '3 days ago',
-    hasVideo: true,
-    hasAR: false,
-    realTimeData: 'Avg rent Mokotow: 3,200 PLN (studio)',
-    author: 'WarsawLocal',
-    trending: true,
-  },
-  {
-    id: '4',
-    title: 'Healthcare System Guide',
-    category: 'Health',
-    views: 1456,
-    upvotes: 98,
-    lastUpdated: '1 day ago',
-    hasVideo: false,
-    hasAR: false,
-    realTimeData: 'English-speaking doctors available 24/7',
-    author: 'HealthyExpat',
-  },
-  {
-    id: '5',
-    title: 'Polish SIM Cards Comparison',
-    category: 'Tech',
-    views: 2134,
-    upvotes: 167,
-    lastUpdated: '5 days ago',
-    hasVideo: true,
-    hasAR: false,
-    realTimeData: 'Orange offers best student deals',
-    author: 'TechGuru',
-  },
-  {
-    id: '6',
-    title: 'Warsaw Public Transport 101',
-    category: 'Transport',
-    views: 2876,
-    upvotes: 221,
-    lastUpdated: '1 week ago',
-    hasVideo: true,
-    hasAR: true,
-    realTimeData: 'Monthly pass: 110 PLN, Student: 55 PLN',
-    author: 'CommuterPro',
-    trending: true,
-  },
-];
 
 function formatRelativeDate(value: string): string {
   const date = new Date(value);
@@ -113,7 +36,7 @@ function formatRelativeDate(value: string): string {
   return `${months} month${months === 1 ? '' : 's'} ago`;
 }
 
-function mapGuideSummary(summary: GuideSummary, fallback?: Guide): Guide {
+function mapGuideSummary(summary: GuideSummary): Guide {
   const title = summary.title.toLowerCase();
   const defaultHasVideo = !title.includes('policy') && !title.includes('legal');
   const defaultHasAR = title.includes('transport') || title.includes('pesel') || title.includes('office');
@@ -125,11 +48,12 @@ function mapGuideSummary(summary: GuideSummary, fallback?: Guide): Guide {
     views: summary.views,
     upvotes: summary.upvotes,
     lastUpdated: formatRelativeDate(summary.updatedAt),
-    hasVideo: fallback?.hasVideo ?? defaultHasVideo,
-    hasAR: fallback?.hasAR ?? defaultHasAR,
-    realTimeData: summary.realTimeData || fallback?.realTimeData,
-    author: fallback?.author || 'ExpatVillage',
-    trending: summary.trending ?? fallback?.trending,
+    updatedAtIso: summary.updatedAt,
+    hasVideo: defaultHasVideo,
+    hasAR: defaultHasAR,
+    realTimeData: summary.realTimeData,
+    author: 'ExpatVillage',
+    trending: summary.trending,
   };
 }
 
@@ -138,18 +62,14 @@ export function EnhancedGuides() {
   const [isVoiceSearch, setIsVoiceSearch] = useState(false);
   const [expandedGuide, setExpandedGuide] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<'trending' | 'recent' | 'popular'>('trending');
-  const [guides, setGuides] = useState<Guide[]>(FALLBACK_GUIDES);
+  const [guides, setGuides] = useState<Guide[]>([]);
   const [activeCategory, setActiveCategory] = useState('all');
 
   const guidesApi = useGuides();
 
   useEffect(() => {
-    if (!guidesApi.data || guidesApi.data.length === 0) return;
-
-    const fallbackByKey = new Map<string, Guide>();
-    FALLBACK_GUIDES.forEach((guide) => fallbackByKey.set(guide.title.toLowerCase(), guide));
-
-    const mapped = guidesApi.data.map((summary) => mapGuideSummary(summary, fallbackByKey.get(summary.title.toLowerCase())));
+    if (!guidesApi.data) return;
+    const mapped = guidesApi.data.map((summary) => mapGuideSummary(summary));
     setGuides(mapped);
   }, [guidesApi.data]);
 
@@ -183,8 +103,8 @@ export function EnhancedGuides() {
         if (sortBy === 'trending') return Number(Boolean(b.trending)) - Number(Boolean(a.trending));
         if (sortBy === 'popular') return b.upvotes - a.upvotes;
 
-        const aDate = new Date(a.lastUpdated).getTime();
-        const bDate = new Date(b.lastUpdated).getTime();
+        const aDate = new Date(a.updatedAtIso).getTime();
+        const bDate = new Date(b.updatedAtIso).getTime();
         if (Number.isNaN(aDate) || Number.isNaN(bDate)) return 0;
         return bDate - aDate;
       });
@@ -208,26 +128,24 @@ export function EnhancedGuides() {
 
   const handleUpvote = async (guide: Guide) => {
     setGuides((prev) => prev.map((item) => (item.id === guide.id ? { ...item, upvotes: item.upvotes + 1 } : item)));
+    try {
+      await guidesApi.submitVote(guide.id, 1);
+      toast.success(`Upvoted "${guide.title}"`, {
+        description: '+2 points earned',
+        duration: 2000,
+      });
 
-    toast.success(`Upvoted "${guide.title}"`, {
-      description: '+2 points earned',
-      duration: 2000,
-    });
-
-    if ('vibrate' in navigator) {
-      navigator.vibrate(30);
-    }
-
-    if (guidesApi.isLive) {
-      try {
-        await guidesApi.submitVote(guide.id, 1);
-      } catch {
-        setGuides((prev) => prev.map((item) => (item.id === guide.id ? { ...item, upvotes: Math.max(0, item.upvotes - 1) } : item)));
-        toast.error('Could not sync upvote', {
-          description: 'Please retry. Your local count was reverted.',
-          duration: 3000,
-        });
+      if ('vibrate' in navigator) {
+        navigator.vibrate(30);
       }
+    } catch {
+      setGuides((prev) =>
+        prev.map((item) => (item.id === guide.id ? { ...item, upvotes: Math.max(0, item.upvotes - 1) } : item)),
+      );
+      toast.error('Could not sync upvote', {
+        description: 'Please retry. Your local count was reverted.',
+        duration: 3000,
+      });
     }
   };
 
@@ -322,6 +240,32 @@ export function EnhancedGuides() {
       </div>
 
       <div className="px-5 pb-24 space-y-3">
+        {!guidesApi.isLive && !guidesApi.isLoading && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative rounded-[20px] p-[1px] bg-gradient-to-b from-red-500/30 to-red-500/10"
+          >
+            <div className="relative rounded-[20px] bg-gradient-to-b from-[#1a2642]/90 to-[#0f172a]/95 backdrop-blur-xl p-4 border border-red-400/20">
+              <p className="text-sm font-semibold text-red-300 mb-1">Guides live API not connected</p>
+              <p className="text-xs text-white/70">Connect backend API to load guide feed and submit votes.</p>
+            </div>
+          </motion.div>
+        )}
+
+        {guidesApi.error && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative rounded-[20px] p-[1px] bg-gradient-to-b from-red-500/30 to-red-500/10"
+          >
+            <div className="relative rounded-[20px] bg-gradient-to-b from-[#1a2642]/90 to-[#0f172a]/95 backdrop-blur-xl p-4 border border-red-400/20">
+              <p className="text-sm font-semibold text-red-300 mb-1">Could not load guides</p>
+              <p className="text-xs text-white/70">{guidesApi.error.message}</p>
+            </div>
+          </motion.div>
+        )}
+
         <AnimatePresence>
           {filteredGuides.map((guide, index) => (
             <motion.div

@@ -12,6 +12,37 @@ import { PremiumProfile } from './components/PremiumProfile';
 import { PersonalityOnboarding } from './components/PersonalityOnboarding';
 import { useDailyBriefing, useHomePulse, useMeProfileProgress } from './services/api/hooks';
 
+const CACHE_ONBOARDING_PROFILE = 'onboarding-profile';
+const CACHE_ONBOARDING_COMPLETE = 'onboarding-complete';
+const CACHE_MOOD_SELECTED = 'mood-check-selected';
+const CACHE_MOOD_CHECK_DATE = 'mood-check-date';
+const CACHE_BRIEFING_SEEN_DATE = 'briefing-seen-date';
+
+function getWarsawClock(): { dateKey: string; hour: number } {
+  try {
+    const parts = new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Europe/Warsaw',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      hour12: false,
+    }).formatToParts(new Date());
+
+    const map = new Map(parts.map((part) => [part.type, part.value]));
+    const year = map.get('year') || '1970';
+    const month = map.get('month') || '01';
+    const day = map.get('day') || '01';
+    const hour = Number(map.get('hour') || '0');
+    return { dateKey: `${year}-${month}-${day}`, hour };
+  } catch {
+    const now = new Date();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return { dateKey: `${now.getFullYear()}-${month}-${day}`, hour: now.getHours() };
+  }
+}
+
 function getInitialUser() {
   const defaultUser = {
     name: 'Alex',
@@ -24,7 +55,7 @@ function getInitialUser() {
   };
 
   try {
-    const raw = sessionStorage.getItem('onboarding-profile');
+    const raw = sessionStorage.getItem(CACHE_ONBOARDING_PROFILE);
     if (!raw) return defaultUser;
     const parsed = JSON.parse(raw);
     return {
@@ -40,12 +71,16 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [showBriefing, setShowBriefing] = useState(false);
   const [showMoodCheck, setShowMoodCheck] = useState(false);
-  const [userMood, setUserMood] = useState<string>(() => sessionStorage.getItem('mood-check-selected') || '');
-  const [showOnboarding, setShowOnboarding] = useState(() => sessionStorage.getItem('onboarding-complete') !== 'true');
+  const [userMood, setUserMood] = useState<string>(
+    () => sessionStorage.getItem(CACHE_MOOD_SELECTED) || '',
+  );
+  const [showOnboarding, setShowOnboarding] = useState(
+    () => sessionStorage.getItem(CACHE_ONBOARDING_COMPLETE) !== 'true',
+  );
   const [user, setUser] = useState(getInitialUser);
   const homePulse = useHomePulse({ enabled: !showOnboarding });
   const dailyBriefing = useDailyBriefing({ enabled: !showOnboarding });
-  const meProfileProgress = useMeProfileProgress({ enabled: !showOnboarding });
+  const meProfileProgress = useMeProfileProgress({ enabled: true });
 
   const effectiveUser = useMemo(
     () => ({
@@ -64,25 +99,83 @@ export default function App() {
   );
 
   useEffect(() => {
+    const profile = meProfileProgress.profile;
+    if (!profile) return;
+
+    const onboardingCompleted = Boolean(profile.onboardingCompleted);
+    sessionStorage.setItem(CACHE_ONBOARDING_COMPLETE, onboardingCompleted ? 'true' : 'false');
+    setShowOnboarding(!onboardingCompleted);
+
+    const cachedRaw = sessionStorage.getItem(CACHE_ONBOARDING_PROFILE);
+    const cached = (() => {
+      if (!cachedRaw) return {};
+      try {
+        return JSON.parse(cachedRaw) as Record<string, unknown>;
+      } catch {
+        return {};
+      }
+    })();
+
+    sessionStorage.setItem(
+      CACHE_ONBOARDING_PROFILE,
+      JSON.stringify({
+        ...cached,
+        name: profile.displayName,
+        tribe: profile.tribe || cached.tribe || '',
+        interest: profile.interest || cached.interest || '',
+      }),
+    );
+  }, [
+    meProfileProgress.profile?.displayName,
+    meProfileProgress.profile?.interest,
+    meProfileProgress.profile?.onboardingCompleted,
+    meProfileProgress.profile?.tribe,
+  ]);
+
+  useEffect(() => {
+    const mood = meProfileProgress.preferences?.mood;
+    if (!mood) return;
+    setUserMood(mood);
+    sessionStorage.setItem(CACHE_MOOD_SELECTED, mood);
+  }, [meProfileProgress.preferences?.mood]);
+
+  useEffect(() => {
     if (showOnboarding) return;
 
-    const currentHour = new Date().getHours();
-    const today = new Date().toDateString();
-    const briefingSeenDate = sessionStorage.getItem('briefing-seen-date');
-    const moodCheckSeenDate = sessionStorage.getItem('mood-check-date');
-    
-    // Mood check: only around noon/2 PM, once per day.
+    const warsawClock = getWarsawClock();
+    const todayKey = warsawClock.dateKey;
+    const currentHour = warsawClock.hour;
+    const briefingSeenDate =
+      meProfileProgress.preferences?.morningBriefingSeenDate ||
+      sessionStorage.getItem(CACHE_BRIEFING_SEEN_DATE);
+    const moodCheckSeenDate =
+      meProfileProgress.preferences?.moodCheckSeenDate ||
+      sessionStorage.getItem(CACHE_MOOD_CHECK_DATE);
+
+    const timers: number[] = [];
+
+    // Mood check: noon window, once daily.
     const isMoodWindow = currentHour >= 12 && currentHour < 15;
-    if (isMoodWindow && moodCheckSeenDate !== today) {
-      setTimeout(() => setShowMoodCheck(true), 2000);
+    if (isMoodWindow && moodCheckSeenDate !== todayKey && !showMoodCheck) {
+      timers.push(window.setTimeout(() => setShowMoodCheck(true), 2000));
     }
-    
-    // Morning briefing: only in the morning, first open of the day.
+
+    // Morning briefing: morning window, once daily.
     const isMorningWindow = currentHour >= 5 && currentHour < 12;
-    if (isMorningWindow && briefingSeenDate !== today) {
-      setTimeout(() => setShowBriefing(true), 1000);
+    if (isMorningWindow && briefingSeenDate !== todayKey && !showBriefing) {
+      timers.push(window.setTimeout(() => setShowBriefing(true), 1000));
     }
-  }, [showOnboarding]);
+
+    return () => {
+      timers.forEach((timer) => window.clearTimeout(timer));
+    };
+  }, [
+    showOnboarding,
+    showBriefing,
+    showMoodCheck,
+    meProfileProgress.preferences?.morningBriefingSeenDate,
+    meProfileProgress.preferences?.moodCheckSeenDate,
+  ]);
 
   useEffect(() => {
     const handleOffline = () => {
@@ -107,16 +200,19 @@ export default function App() {
   }, []);
 
   const handleCloseBriefing = () => {
+    const todayKey = getWarsawClock().dateKey;
     setShowBriefing(false);
-    sessionStorage.setItem('briefing-seen-date', new Date().toDateString());
+    sessionStorage.setItem(CACHE_BRIEFING_SEEN_DATE, todayKey);
+
+    void meProfileProgress
+      .savePreferences({ morningBriefingSeenDate: todayKey })
+      .catch(() => {
+        toast.error('Could not sync briefing state');
+      });
   };
 
   const handleOpenBriefing = () => {
     setShowBriefing(true);
-  };
-
-  const handleOpenMoodCheck = () => {
-    setShowMoodCheck(true);
   };
 
   const handleCloseMoodCheck = () => {
@@ -124,12 +220,22 @@ export default function App() {
   };
 
   const handleMoodChange = (mood: string) => {
+    const todayKey = getWarsawClock().dateKey;
     if (mood && mood !== 'skip') {
       setUserMood(mood);
-      sessionStorage.setItem('mood-check-selected', mood);
+      sessionStorage.setItem(CACHE_MOOD_SELECTED, mood);
     }
     handleCloseMoodCheck();
-    sessionStorage.setItem('mood-check-date', new Date().toDateString());
+    sessionStorage.setItem(CACHE_MOOD_CHECK_DATE, todayKey);
+
+    void meProfileProgress
+      .savePreferences({
+        mood: mood && mood !== 'skip' ? mood : undefined,
+        moodCheckSeenDate: todayKey,
+      })
+      .catch(() => {
+        toast.error('Could not sync mood check state');
+      });
   };
 
   const handleOnboardingComplete = (payload: {
@@ -150,8 +256,8 @@ export default function App() {
       completedAt: new Date().toISOString(),
     };
 
-    sessionStorage.setItem('onboarding-profile', JSON.stringify(profile));
-    sessionStorage.setItem('onboarding-complete', 'true');
+    sessionStorage.setItem(CACHE_ONBOARDING_PROFILE, JSON.stringify(profile));
+    sessionStorage.setItem(CACHE_ONBOARDING_COMPLETE, 'true');
 
     setUser((prev) => ({
       ...prev,
@@ -162,6 +268,17 @@ export default function App() {
     toast.success('Welcome to Expat Village', {
       description: `Badge unlocked: ${payload.badge}`,
     });
+
+    void meProfileProgress
+      .saveProfile({
+        displayName: payload.name,
+        tribe: payload.tribe,
+        interest: payload.interest,
+        onboardingCompleted: true,
+      })
+      .catch(() => {
+        toast.error('Could not sync onboarding state to backend');
+      });
   };
 
   const renderContent = () => {
@@ -189,7 +306,10 @@ export default function App() {
             user={effectiveUser}
             progressData={meProfileProgress.progress}
             profileData={meProfileProgress.profile}
+            preferencesData={meProfileProgress.preferences}
             profileLive={meProfileProgress.isLive}
+            onSaveProfile={meProfileProgress.saveProfile}
+            onSavePreferences={meProfileProgress.savePreferences}
           />
         );
       default:
