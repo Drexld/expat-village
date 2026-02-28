@@ -148,12 +148,32 @@ function inferSeverity(text: string): 'low' | 'medium' | 'high' {
 async function fetchText(url: string): Promise<string> {
   const response = await fetch(url, {
     method: 'GET',
-    headers: { Accept: 'application/rss+xml, application/atom+xml, application/xml, text/xml, text/plain' },
+    headers: {
+      Accept:
+        'application/json, application/rss+xml, application/atom+xml, application/xml, text/xml, text/html, text/plain',
+      'User-Agent': 'ExpatVillageIngest/1.0 (+https://expat-village.vercel.app)',
+    },
   });
   if (!response.ok) {
     throw internalError(`Feed request failed: ${url} (${response.status})`);
   }
   return response.text();
+}
+
+async function fetchTextWithRetry(url: string, attempts = 2): Promise<string> {
+  let lastError: unknown;
+  for (let index = 0; index < attempts; index += 1) {
+    try {
+      return await fetchText(url);
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  if (lastError instanceof Error) {
+    throw lastError;
+  }
+  throw internalError(`Feed request failed: ${url}`);
 }
 
 function extractTag(content: string, tagName: string): string | undefined {
@@ -208,10 +228,181 @@ function parseFeedXml(xml: string, sourceName: string): FeedItem[] {
   return items;
 }
 
+function extractLinkFromUnknown(value: unknown): string | undefined {
+  if (typeof value === 'string' && value.trim()) {
+    return value.trim();
+  }
+
+  if (value && typeof value === 'object') {
+    const record = value as Record<string, unknown>;
+    const href = record.href;
+    if (typeof href === 'string' && href.trim()) {
+      return href.trim();
+    }
+  }
+
+  return undefined;
+}
+
+function pickString(record: Record<string, unknown>, keys: string[]): string {
+  for (const key of keys) {
+    const raw = record[key];
+    if (typeof raw === 'string' && raw.trim()) {
+      return cleanupWhitespace(raw);
+    }
+  }
+  return '';
+}
+
+function parseFeedJson(jsonText: string, sourceUrl: string): FeedItem[] {
+  const sourceName = new URL(sourceUrl).hostname.replace(/^www\./, '');
+  let parsed: unknown;
+
+  try {
+    parsed = JSON.parse(jsonText);
+  } catch {
+    return [];
+  }
+
+  const records: Record<string, unknown>[] = [];
+  if (Array.isArray(parsed)) {
+    for (const item of parsed) {
+      if (item && typeof item === 'object') {
+        records.push(item as Record<string, unknown>);
+      }
+    }
+  } else if (parsed && typeof parsed === 'object') {
+    const root = parsed as Record<string, unknown>;
+    const nestedItems = root.items;
+    if (Array.isArray(nestedItems)) {
+      for (const item of nestedItems) {
+        if (item && typeof item === 'object') {
+          records.push(item as Record<string, unknown>);
+        }
+      }
+    } else {
+      records.push(root);
+    }
+  }
+
+  return records
+    .slice(0, 80)
+    .map((record, index) => {
+      const title = pickString(record, [
+        'title',
+        'displayAddress',
+        'name',
+        'ELI',
+        'address',
+        'id',
+      ]).slice(0, 160);
+
+      const summary =
+        pickString(record, ['summary', 'description', 'comments', 'documentType', 'status', 'type']).slice(0, 450) ||
+        title;
+
+      const linksValue = record.links;
+      const link =
+        extractLinkFromUnknown(record.link) ||
+        extractLinkFromUnknown(record.url) ||
+        extractLinkFromUnknown(record.href) ||
+        (Array.isArray(linksValue)
+          ? linksValue.map(extractLinkFromUnknown).find((value) => Boolean(value))
+          : undefined) ||
+        sourceUrl;
+
+      const publishedAt = normalizeDate(
+        pickString(record, [
+          'publishedAt',
+          'published',
+          'changeDate',
+          'documentDate',
+          'announcementDate',
+          'promulgation',
+          'created_at',
+          'updatedAt',
+        ]),
+      );
+
+      if (!title) return null;
+
+      return {
+        id: stableExternalId(sourceName, String(record.id || ''), link, title, publishedAt, String(index)),
+        title,
+        summary,
+        link,
+        publishedAt,
+        sourceName,
+      } satisfies FeedItem;
+    })
+    .filter(Boolean) as FeedItem[];
+}
+
+function normalizeUrl(href: string, base: string): string {
+  try {
+    return new URL(href, base).toString();
+  } catch {
+    return href;
+  }
+}
+
+function parseFeedHtml(html: string, sourceUrl: string): FeedItem[] {
+  const sourceName = new URL(sourceUrl).hostname.replace(/^www\./, '');
+  const matches = Array.from(
+    html.matchAll(/<a\b[^>]*href=(?:"([^"]+)"|'([^']+)')[^>]*>([\s\S]*?)<\/a>/gi),
+  );
+  const seen = new Set<string>();
+  const items: FeedItem[] = [];
+
+  for (const match of matches) {
+    const hrefRaw = match[1] || match[2] || '';
+    const textRaw = stripHtml(match[3] || '');
+    const title = cleanupWhitespace(textRaw).slice(0, 140);
+    if (!hrefRaw || !title || title.length < 10) continue;
+
+    const link = normalizeUrl(hrefRaw, sourceUrl);
+    const allowed =
+      link.includes('/-/') ||
+      link.includes('/news') ||
+      link.includes('/aktual') ||
+      link.includes('/process') ||
+      link.includes('infoulice.um.warszawa.pl');
+
+    if (!allowed || seen.has(link)) continue;
+    seen.add(link);
+
+    items.push({
+      id: stableExternalId(sourceName, link, title),
+      title,
+      summary: title,
+      link,
+      sourceName,
+      publishedAt: undefined,
+    });
+  }
+
+  return items.slice(0, 40);
+}
+
 async function fetchFeedItems(url: string): Promise<FeedItem[]> {
+  const payload = await fetchTextWithRetry(url);
+  const trimmed = payload.trim();
   const sourceName = new URL(url).hostname.replace(/^www\./, '');
-  const xml = await fetchText(url);
-  return parseFeedXml(xml, sourceName);
+
+  if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+    return parseFeedJson(trimmed, url);
+  }
+
+  if (
+    /<rss[\s>]/i.test(trimmed) ||
+    /<feed[\s>]/i.test(trimmed) ||
+    /<item[\s>]/i.test(trimmed) ||
+    /<entry[\s>]/i.test(trimmed)
+  ) {
+    return parseFeedXml(trimmed, sourceName);
+  }
+
+  return parseFeedHtml(trimmed, url);
 }
 
 function extractJsonObject(text: string): string | null {
