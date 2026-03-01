@@ -54,6 +54,49 @@ interface DailyBriefingRow {
   fetched_at?: string | null;
 }
 
+function isLikelyEnglish(value: string): boolean {
+  const text = value.toLowerCase();
+  const polishSignals = [
+    'przejd',
+    'sekcji',
+    'kontakt',
+    'utrudnienia',
+    'budowa',
+    'ulice',
+    'warszaw',
+    'komunikacji',
+    'wniosek',
+    'pobyt',
+    'ustaw',
+    'go to the footer section',
+  ];
+
+  if (/[ąćęłńóśżź]/i.test(text)) return false;
+  const score = polishSignals.reduce((acc, token) => (text.includes(token) ? acc + 1 : acc), 0);
+  return score <= 1;
+}
+
+function isLowQualityHighlight(title: string, summary: string): boolean {
+  const merged = `${title} ${summary}`.toLowerCase();
+  const blocked = [
+    'go to the footer',
+    'footer section',
+    'go to the contact section',
+    'skip to content',
+    'cookie settings',
+    'privacy policy',
+    'go to section',
+    'kontakt',
+    'przejdź do sekcji',
+    'przejdz do sekcji',
+  ];
+
+  if (blocked.some((phrase) => merged.includes(phrase))) return true;
+  if (title.trim().length < 12) return true;
+  if (title.toLowerCase() === summary.toLowerCase() && title.split(/\s+/).length <= 4) return true;
+  return false;
+}
+
 function safeIso(value?: string | null): string {
   const date = value ? new Date(value) : new Date();
   if (Number.isNaN(date.getTime())) return new Date().toISOString();
@@ -89,19 +132,32 @@ export async function getHomePulseBundleData(): Promise<HandlerResultWithFreshne
     supabaseSelect<UpdateRow>(
       'immigration_updates',
       'id,title,summary,severity,published_at,fetched_at',
-      { limit: 2, orderBy: 'published_at', ascending: false },
+      { limit: 20, orderBy: 'published_at', ascending: false },
     ),
     supabaseSelect<TransitRow>(
       'transit_disruptions',
       'id,title,summary,severity,starts_at,fetched_at',
-      { limit: 2, orderBy: 'starts_at', ascending: false },
+      { limit: 20, orderBy: 'starts_at', ascending: false },
     ),
     supabaseSelect<UpdateRow>(
       'legal_parliament_updates',
       'id,title,summary,severity,published_at,fetched_at',
-      { limit: 2, orderBy: 'published_at', ascending: false },
+      { limit: 20, orderBy: 'published_at', ascending: false },
     ),
   ]);
+
+  const immigrationClean = immigrationRows
+    .filter((row) => !isLowQualityHighlight(row.title, row.summary))
+    .filter((row) => isLikelyEnglish(`${row.title}. ${row.summary}`))
+    .slice(0, 2);
+  const transportClean = transportRows
+    .filter((row) => !isLowQualityHighlight(row.title, row.summary))
+    .filter((row) => isLikelyEnglish(`${row.title}. ${row.summary}`))
+    .slice(0, 2);
+  const legalClean = legalRows
+    .filter((row) => !isLowQualityHighlight(row.title, row.summary))
+    .filter((row) => isLikelyEnglish(`${row.title}. ${row.summary}`))
+    .slice(0, 2);
 
   const weather = weatherRows[0]
     ? {
@@ -133,7 +189,7 @@ export async function getHomePulseBundleData(): Promise<HandlerResultWithFreshne
       };
 
   const highlights = [
-    ...immigrationRows.map((row) => ({
+    ...immigrationClean.map((row) => ({
       id: row.id || crypto.randomUUID(),
       kind: 'immigration' as const,
       title: row.title,
@@ -141,7 +197,7 @@ export async function getHomePulseBundleData(): Promise<HandlerResultWithFreshne
       severity: row.severity || 'medium',
       publishedAt: safeIso(row.published_at || row.fetched_at),
     })),
-    ...transportRows.map((row) => ({
+    ...transportClean.map((row) => ({
       id: row.id || crypto.randomUUID(),
       kind: 'transport' as const,
       title: row.title,
@@ -149,7 +205,7 @@ export async function getHomePulseBundleData(): Promise<HandlerResultWithFreshne
       severity: row.severity || 'low',
       publishedAt: safeIso(row.starts_at || row.fetched_at),
     })),
-    ...legalRows.map((row) => ({
+    ...legalClean.map((row) => ({
       id: row.id || crypto.randomUUID(),
       kind: 'legal' as const,
       title: row.title,
