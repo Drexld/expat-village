@@ -1,4 +1,4 @@
-import { internalError } from '../security';
+﻿import { internalError } from '../security';
 import { supabaseInsert, supabaseSelect, supabaseUpsert } from '../data/supabaseRest';
 
 const GROQ_CHAT_COMPLETIONS_URL = 'https://api.groq.com/openai/v1/chat/completions';
@@ -120,18 +120,22 @@ function isLikelyEnglish(text: string): boolean {
     ' powiat',
     ' ztm',
     ' przystanek',
-    ' opó',
-    ' ł',
-    ' ą',
-    ' ę',
-    ' ś',
-    ' ż',
-    ' ź',
-    ' ć',
-    ' ń',
+    ' utrudnienia',
+    ' budowa',
+    ' ulice',
+    ' warszaw',
+    ' komunikacji',
+    ' wniosek',
+    ' pobyt',
+    ' urzad',
+    ' ustaw',
+    ' przejd',
+    ' sekcji',
+    ' kontakt',
   ];
 
   const score = polishSignals.reduce((acc, token) => (value.includes(token) ? acc + 1 : acc), 0);
+  if (/[acelnószz]/i.test(value)) return false;
   return score <= 1;
 }
 
@@ -248,6 +252,12 @@ function stringFromUnknown(value: unknown): string {
   if (typeof value === 'string' && value.trim()) {
     return cleanupWhitespace(value);
   }
+  if (typeof value === 'number' || typeof value === 'bigint') {
+    return String(value);
+  }
+  if (typeof value === 'boolean') {
+    return value ? 'true' : 'false';
+  }
 
   if (Array.isArray(value)) {
     for (const item of value) {
@@ -266,6 +276,30 @@ function stringFromUnknown(value: unknown): string {
   }
 
   return '';
+}
+
+function collectObjectRecords(value: unknown, depth = 0, out: Record<string, unknown>[] = []): Record<string, unknown>[] {
+  if (!value || depth > 5) return out;
+
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      if (item && typeof item === 'object' && !Array.isArray(item)) {
+        out.push(item as Record<string, unknown>);
+      }
+      collectObjectRecords(item, depth + 1, out);
+    }
+    return out;
+  }
+
+  if (typeof value === 'object') {
+    const record = value as Record<string, unknown>;
+    out.push(record);
+    for (const nested of Object.values(record)) {
+      collectObjectRecords(nested, depth + 1, out);
+    }
+  }
+
+  return out;
 }
 
 function pickString(record: Record<string, unknown>, keys: string[]): string {
@@ -287,29 +321,40 @@ function parseFeedJson(jsonText: string, sourceUrl: string): FeedItem[] {
     return [];
   }
 
-  const records: Record<string, unknown>[] = [];
-  if (Array.isArray(parsed)) {
-    for (const item of parsed) {
-      if (item && typeof item === 'object') {
-        records.push(item as Record<string, unknown>);
-      }
-    }
-  } else if (parsed && typeof parsed === 'object') {
-    const root = parsed as Record<string, unknown>;
-    const nestedItems = root.items;
-    if (Array.isArray(nestedItems)) {
-      for (const item of nestedItems) {
-        if (item && typeof item === 'object') {
-          records.push(item as Record<string, unknown>);
-        }
-      }
-    } else {
-      records.push(root);
-    }
-  }
+  const rawRecords = collectObjectRecords(parsed);
+  const records = rawRecords.filter((record) => {
+    const titleCandidate = pickString(record, [
+      'title',
+      'titleEn',
+      'headline',
+      'processTitle',
+      'documentTitle',
+      'displayAddress',
+      'name',
+      'description',
+      'ELI',
+      'eli',
+      'number',
+      'id',
+    ]);
+    const summaryCandidate = pickString(record, [
+      'summary',
+      'description',
+      'comments',
+      'documentType',
+      'status',
+      'statusName',
+      'type',
+      'stage',
+      'result',
+    ]);
 
-  return records
-    .slice(0, 80)
+    return Boolean(titleCandidate || summaryCandidate);
+  });
+
+  const dedupedBySignature = new Set<string>();
+  const items = records
+    .slice(0, 250)
     .map((record, index) => {
       const title = pickString(record, [
         'title',
@@ -367,6 +412,9 @@ function parseFeedJson(jsonText: string, sourceUrl: string): FeedItem[] {
       );
 
       if (!title) return null;
+      const signature = `${title.toLowerCase()}|${summary.toLowerCase()}|${link}`;
+      if (dedupedBySignature.has(signature)) return null;
+      dedupedBySignature.add(signature);
 
       return {
         id: stableExternalId(sourceName, String(record.id || ''), link, title, publishedAt, String(index)),
@@ -378,6 +426,8 @@ function parseFeedJson(jsonText: string, sourceUrl: string): FeedItem[] {
       } satisfies FeedItem;
     })
     .filter(Boolean) as FeedItem[];
+
+  return items.slice(0, 80);
 }
 
 function normalizeUrl(href: string, base: string): string {
@@ -424,6 +474,28 @@ function parseFeedHtml(html: string, sourceUrl: string): FeedItem[] {
   }
 
   return items.slice(0, 40);
+}
+
+function isLowQualityNewsItem(item: FeedItem): boolean {
+  const merged = cleanupWhitespace(`${item.title} ${item.summary}`).toLowerCase();
+  const blocked = [
+    'go to the footer',
+    'footer section',
+    'go to the contact section',
+    'skip to content',
+    'cookie settings',
+    'privacy policy',
+    'go to section',
+    'kontakt',
+    'przejdź do sekcji',
+    'przejdz do sekcji',
+  ];
+
+  if (blocked.some((phrase) => merged.includes(phrase))) return true;
+  if (item.title.trim().length < 12) return true;
+  if (item.title.toLowerCase() === item.summary.toLowerCase() && item.title.split(/\s+/).length <= 4) return true;
+  if (item.link && /\/kontakt|#|\/tag\//i.test(item.link)) return true;
+  return false;
 }
 
 async function fetchFeedItems(url: string): Promise<FeedItem[]> {
@@ -651,6 +723,8 @@ async function ingestNewsFamily(
 
       const normalizedRows: Array<Record<string, unknown>> = [];
       for (const item of items.slice(0, 15)) {
+        if (isLowQualityNewsItem(item)) continue;
+
         const normalized = await normalizeFeedItemToEnglish(item);
         if (!normalized) {
           result.skippedNonEnglish += 1;
@@ -742,3 +816,5 @@ export async function runPolandFeedIngestion(input: {
   result.finishedAt = new Date().toISOString();
   return result;
 }
+
+
