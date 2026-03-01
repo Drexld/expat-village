@@ -244,12 +244,35 @@ function extractLinkFromUnknown(value: unknown): string | undefined {
   return undefined;
 }
 
+function stringFromUnknown(value: unknown): string {
+  if (typeof value === 'string' && value.trim()) {
+    return cleanupWhitespace(value);
+  }
+
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const extracted = stringFromUnknown(item);
+      if (extracted) return extracted;
+    }
+    return '';
+  }
+
+  if (value && typeof value === 'object') {
+    const record = value as Record<string, unknown>;
+    for (const nested of Object.values(record)) {
+      const extracted = stringFromUnknown(nested);
+      if (extracted) return extracted;
+    }
+  }
+
+  return '';
+}
+
 function pickString(record: Record<string, unknown>, keys: string[]): string {
   for (const key of keys) {
     const raw = record[key];
-    if (typeof raw === 'string' && raw.trim()) {
-      return cleanupWhitespace(raw);
-    }
+    const extracted = stringFromUnknown(raw);
+    if (extracted) return extracted;
   }
   return '';
 }
@@ -290,15 +313,32 @@ function parseFeedJson(jsonText: string, sourceUrl: string): FeedItem[] {
     .map((record, index) => {
       const title = pickString(record, [
         'title',
+        'titleEn',
+        'headline',
+        'processTitle',
+        'documentTitle',
         'displayAddress',
         'name',
+        'description',
         'ELI',
+        'eli',
         'address',
+        'number',
         'id',
       ]).slice(0, 160);
 
       const summary =
-        pickString(record, ['summary', 'description', 'comments', 'documentType', 'status', 'type']).slice(0, 450) ||
+        pickString(record, [
+          'summary',
+          'description',
+          'comments',
+          'documentType',
+          'status',
+          'statusName',
+          'type',
+          'stage',
+          'result',
+        ]).slice(0, 450) ||
         title;
 
       const linksValue = record.links;
@@ -315,6 +355,8 @@ function parseFeedJson(jsonText: string, sourceUrl: string): FeedItem[] {
         pickString(record, [
           'publishedAt',
           'published',
+          'updated',
+          'modified',
           'changeDate',
           'documentDate',
           'announcementDate',
